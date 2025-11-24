@@ -63,18 +63,26 @@ let municipios = [];
 fetch('manzanas_por_colonia.csv')
   .then(resp => resp.text())
   .then(texto => {
-    const lineas = texto.split(/\\r?\\n/).map(l => l.trim()).filter(l => l.length > 0);
+    const lineas = texto.split(/\r?\n/).map(l => l.trim()).filter(l => l.length > 0);
 
-    // Convertir líneas (saltando encabezado)
+    // Saltamos encabezado
     datos = lineas.slice(1).map((l, idx) => {
       const cols = l.split(",");
+
+      // OJO: columnas en el mismo orden que tu archivo
+      const ALCALDIA       = cols[0];
+      const COLONIA        = cols[1];
+      const TIPO           = cols[2];
+      const CP             = cols[3];
+      const MANZANAS       = cols[4];
+
       return {
         index: idx,
-        MUN_NAME: cols[0],
-        SETT_NAME: cols[1],
-        SETT_TYPE: cols[2],
-        CP: cols[3],
-        MANZANAS: cols[4]
+        MUN_NAME: ALCALDIA,
+        SETT_NAME: COLONIA,
+        SETT_TYPE: TIPO,
+        CP: CP,
+        MANZANAS: MANZANAS
       };
     });
 
