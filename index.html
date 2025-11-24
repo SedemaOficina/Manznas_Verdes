@@ -1,50 +1,39 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="UTF-8">
-<title>Buscador de Manzanas por Colonia | CDMX</title>
+  <meta charset="UTF-8">
+  <title>Buscador de Manzanas por Colonia | SEDEMA CDMX</title>
 
-<!-- Select2 -->
-<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+  <link href="styles.css" rel="stylesheet" />
 
-<style>
-body {
-    font-family: Arial, sans-serif;
-    margin: 40px;
-    background: #f7f7f7;
-}
-.container {
-    background: white;
-    padding: 25px;
-    border-radius: 8px;
-    max-width: 750px;
-    margin: auto;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.15);
-}
-h2 {
-    margin-bottom: 20px;
-    color: #333;
-}
-.resultado {
-    margin-top: 25px;
-    padding: 20px;
-    border-radius: 6px;
-    background: #e7f3ff;
-    font-size: 18px;
-    border-left: 5px solid #007acc;
-}
-</style>
+  <!-- Select2 -->
+  <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+
+  <!-- Fuente Roboto -->
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
 </head>
 <body>
 
+<header>
+  <h1>SEDEMA · Buscador de Manzanas por Colonia</h1>
+  <div class="linea-oro"></div>
+</header>
+
 <div class="container">
 
-<h2>Buscador de Número de Manzanas por Colonia</h2>
+  <h2>Consulta por alcaldía y colonia</h2>
 
-<label>Buscar colonia o alcaldía:</label>
-<select id="selector" style="width: 100%"></select>
+  <div class="form-row">
+    <label for="munSelector">Alcaldía:</label>
+    <select id="munSelector" style="width:100%"></select>
+  </div>
 
-<div id="resultado" class="resultado" style="display:none;"></div>
+  <div class="form-row">
+    <label for="colSelector">Colonia:</label>
+    <select id="colSelector" style="width:100%"></select>
+  </div>
+
+  <div id="resultado" class="resultado" style="display:none;"></div>
 
 </div>
 
@@ -54,18 +43,19 @@ h2 {
 
 <script>
 let datos = [];
+let municipios = [];
 
-// Cargar el CSV directamente desde el repositorio
+// Cargar CSV
 fetch('manzanas_por_colonia.csv')
   .then(resp => resp.text())
   .then(texto => {
-    let lineas = texto.split("\n").map(l => l.trim()).filter(l => l.length > 0);
-    let headers = lineas[0].split(",");
+    const lineas = texto.split(/\r?\n/).map(l => l.trim()).filter(l => l.length > 0);
 
-    // Convertir CSV a objetos JSON
-    datos = lineas.slice(1).map(l => {
-      let cols = l.split(",");
+    // Saltar encabezado
+    datos = lineas.slice(1).map((l, idx) => {
+      const cols = l.split(",");
       return {
+        index: idx,
         MUN_NAME: cols[0],
         SETT_NAME: cols[1],
         SETT_TYPE: cols[2],
@@ -74,33 +64,81 @@ fetch('manzanas_por_colonia.csv')
       };
     });
 
-    // Poblar el selector
-    let opciones = datos.map((d,i) => ({
-        id: i,
-        text: `${d.SETT_NAME} (${d.MUN_NAME})`
-    }));
+    // Lista única de alcaldías
+    municipios = [...new Set(datos.map(d => d.MUN_NAME))]
+      .sort((a,b) => a.localeCompare(b, 'es'));
 
-    $('#selector').select2({
-        data: opciones,
-        placeholder: "Escribe el nombre de la colonia o alcaldía…",
-        allowClear: true
+    const $mun = $('#munSelector');
+    $mun.append(new Option('', '', true, true)); // placeholder
+
+    municipios.forEach(m => {
+      $mun.append(new Option(m, m));
+    });
+
+    $mun.select2({
+      placeholder: 'Selecciona una alcaldía…',
+      allowClear: true
+    });
+
+    $('#colSelector').select2({
+      placeholder: 'Primero selecciona una alcaldía…',
+      allowClear: true
     });
   });
 
-// Mostrar información al seleccionar
-$('#selector').on('change', function() {
-    let idx = $(this).val();
-    if (idx === null) return;
+// Cambio de alcaldía
+$('#munSelector').on('change', function() {
+  const mun = $(this).val();
+  const $col = $('#colSelector');
+  $col.empty().trigger('change');
+  $('#resultado').hide();
 
-    let d = datos[idx];
+  if (!mun) {
+    $col.select2({
+      placeholder: 'Primero selecciona una alcaldía…',
+      allowClear: true
+    });
+    return;
+  }
 
-    document.getElementById("resultado").style.display = "block";
-    document.getElementById("resultado").innerHTML =
-        `<b>Alcaldía:</b> ${d.MUN_NAME}<br>
-         <b>Colonia:</b> ${d.SETT_NAME}<br>
-         <b>Tipo:</b> ${d.SETT_TYPE}<br>
-         <b>Código Postal:</b> ${d.CP}<br><br>
-         <h3>Número de manzanas: <span style='color:#d9534f'>${d.MANZANAS}</span></h3>`;
+  // Filtrar colonias de la alcaldía seleccionada
+  const colonias = datos
+    .filter(d => d.MUN_NAME === mun)
+    .sort((a,b) => a.SETT_NAME.localeCompare(b.SETT_NAME, 'es'));
+
+  $col.append(new Option('', '', true, true)); // placeholder
+
+  colonias.forEach(d => {
+    const text = `${d.SETT_NAME} (CP ${d.CP})`;
+    $col.append(new Option(text, d.index));
+  });
+
+  $col.select2({
+    placeholder: 'Selecciona una colonia…',
+    allowClear: true
+  });
+});
+
+// Cambio de colonia
+$('#colSelector').on('change', function() {
+  const idx = $(this).val();
+  if (idx === null || idx === '') {
+    $('#resultado').hide();
+    return;
+  }
+
+  const d = datos[parseInt(idx, 10)];
+
+  const html =
+    `<div class='card'>
+        <p><b>Alcaldía:</b> ${d.MUN_NAME}</p>
+        <p><b>Colonia:</b> ${d.SETT_NAME}</p>
+        <p><b>Tipo:</b> ${d.SETT_TYPE}</p>
+        <p><b>Código Postal:</b> ${d.CP}</p>
+        <h3>Número de manzanas: <span class='numero'>${d.MANZANAS}</span></h3>
+     </div>`;
+
+  $('#resultado').html(html).show();
 });
 </script>
 
