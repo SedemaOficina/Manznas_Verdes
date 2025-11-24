@@ -1,29 +1,55 @@
 /* Estilo institucional SEDEMA / CDMX */
 
+:root {
+  --verde-sedema: #007a4d;
+  --verde-oscuro: #00513a;
+  --dorado: #c49a3b;
+  --gris-fondo: #f5f5f5;
+  --azul-claro: #e6f2ff;
+}
+
+* {
+  box-sizing: border-box;
+}
+
 body {
   font-family: 'Roboto', sans-serif;
   margin: 0;
-  background: #f3f3f3;
+  background: var(--gris-fondo);
+  color: #333;
 }
+
+/* HEADER */
 
 header {
   background: #ffffff;
-  padding: 24px;
-  text-align: center;
   border-bottom: 3px solid #e0e0e0;
 }
 
-header h1 {
+.header-inner {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 20px 24px 12px 24px;
+}
+
+.header-texto h1 {
+  margin: 0 0 6px 0;
   font-weight: 700;
-  color: #004d40; /* verde oscuro institucional */
-  margin-bottom: 10px;
+  color: var(--verde-oscuro);
+  font-size: 26px;
+}
+
+.header-texto p {
+  margin: 0;
+  color: #555;
+  font-size: 14px;
 }
 
 .linea-oro {
   height: 4px;
   width: 90px;
-  margin: 0 auto;
-  background: #c49a3b;
+  margin: 0 auto 0 24px;
+  background: var(--dorado);
   animation: linea-mover 2s infinite alternate ease-in-out;
   border-radius: 2px;
 }
@@ -33,53 +59,79 @@ header h1 {
   100% { width: 140px; opacity: 1; }
 }
 
+/* CONTENEDOR PRINCIPAL */
+
 .container {
   background: #ffffff;
-  padding: 32px;
-  border-radius: 10px;
-  max-width: 900px;
-  margin: 36px auto;
-  box-shadow: 0 3px 12px rgba(0,0,0,0.12);
+  padding: 28px 28px 32px 28px;
+  border-radius: 12px;
+  max-width: 1100px;
+  margin: 30px auto;
+  box-shadow: 0 4px 14px rgba(0,0,0,0.12);
 }
 
 h2 {
-  color: #333333;
-  margin-bottom: 24px;
+  margin-top: 0;
+  margin-bottom: 20px;
   font-weight: 500;
+  color: var(--verde-oscuro);
 }
 
-.form-row {
-  margin-bottom: 18px;
+/* FORMULARIO */
+
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px;
 }
 
-label {
-  font-weight: 500;
+.form-item label {
   display: block;
+  font-weight: 500;
   margin-bottom: 6px;
   color: #333;
 }
 
+.hint {
+  display: block;
+  font-size: 12px;
+  color: #777;
+  margin-top: 4px;
+}
+
+@media (max-width: 768px) {
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* TARJETA DE RESULTADO */
+
 .resultado {
-  margin-top: 28px;
+  margin-top: 26px;
 }
 
 .card {
-  background: #e6f2ff;
-  padding: 20px;
-  border-radius: 8px;
-  border-left: 6px solid #00a64e; /* verde CDMX */
+  background: var(--azul-claro);
+  padding: 20px 22px;
+  border-radius: 10px;
+  border-left: 6px solid var(--verde-sedema);
 }
 
 .card p {
   margin: 6px 0;
-  font-size: 16px;
+  font-size: 15px;
+}
+
+.label {
+  font-weight: 700;
 }
 
 .card h3 {
-  margin-top: 14px;
-  font-size: 22px;
+  margin-top: 16px;
+  font-size: 20px;
   font-weight: 700;
-  color: #333;
+  color: #111;
 }
 
 .numero {
@@ -87,13 +139,34 @@ label {
   font-weight: 700;
 }
 
-/* Ajuste ligero para Select2 */
-.select2-container .select2-selection--single {
-  height: 38px;
+/* FOOTER */
+
+footer {
+  text-align: center;
+  font-size: 12px;
+  color: #777;
+  padding-bottom: 18px;
 }
+
+/* Ajuste visual Select2 */
+
+.select2-container .select2-selection--single {
+  height: 40px;
+  border-radius: 6px;
+  border-color: #bdbdbd;
+}
+
 .select2-container--default .select2-selection--single .select2-selection__rendered {
   line-height: 38px;
+  padding-left: 10px;
 }
+
 .select2-container--default .select2-selection--single .select2-selection__arrow {
-  height: 36px;
+  height: 38px;
+}
+
+.select2-container--default .select2-selection--single:focus,
+.select2-container--default.select2-container--open .select2-selection--single {
+  border-color: var(--verde-sedema);
+  outline: none;
 }
