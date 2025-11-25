@@ -91,7 +91,7 @@ function normalizarTexto(str) {
   return fixes[str.trim()] || str.trim();
 }
 
-// ---------------- Inicializar mapa ----------------
+// ---------------- Inicializar mapa base ----------------
 function initMapBase() {
   map = L.map('map').setView([19.35, -99.13], 11);
 
@@ -119,13 +119,13 @@ function initMapBase() {
   capaManzanasTodas = L.geoJSON(null, {
     style: {
       color: '#999999',
-      weight: 0.5,
+      weight: 0.4,
       fillColor: '#cccccc',
       fillOpacity: 0.3
     }
   }).addTo(map);
 
-  // Manzanas resaltadas (sobre la colonia seleccionada)
+  // Manzanas resaltadas dentro de la colonia seleccionada
   capaManzanasResaltadas = L.geoJSON(null, {
     style: {
       color: '#ff6f00',
@@ -151,7 +151,7 @@ function cargarCapasEnMapa() {
   }
 }
 
-// ---------------- Mostrar manzanas dentro de una colonia ----------------
+// ---------------- Resaltar manzanas dentro de una colonia ----------------
 function resaltarManzanasDeColonia(alcaldia, colonia) {
   if (!manzanasGeojson) return;
 
@@ -185,13 +185,12 @@ document.addEventListener('DOMContentLoaded', () => {
   const colSelect = document.getElementById('colSelector');
   const resultadoDiv = document.getElementById('resultado');
 
-  initMapBase();  // siempre verás el mapbase
+  initMapBase();  // Siempre verás el mapbase
 
-  // Listeners de los selects
+  // Listeners de selects
   munSelect.addEventListener('change', () => {
     const mun = munSelect.value;
 
-    // Reset colonia y resultados
     colSelect.innerHTML = '';
     colSelect.disabled = true;
     resultadoDiv.style.display = 'none';
@@ -245,8 +244,8 @@ document.addEventListener('DOMContentLoaded', () => {
   // Cargar CSV + GeoJSON
   Promise.all([
     fetch('manzanas_por_colonia.csv').then(r => r.text()),
-    fetch('colonias.json').then(r => r.json()),
-    fetch('manzanas.json').then(r => r.json())
+    fetch('colonias_Reproyectadas.geojson').then(r => r.json()),
+    fetch('manzanas_Reproyectadas.json').then(r => r.json())
   ]).then(([csvText, coloniasData, manzanasData]) => {
 
     coloniasGeojson = coloniasData;
@@ -254,6 +253,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const lineas = csvText.split(/\r?\n/).map(l => l.trim()).filter(l => l.length > 0);
 
+    // CSV: ALCALDIA,COLONIA,TIPO,CP,No. De Manzanas
     datos = lineas.slice(1).map((l, idx) => {
       const cols = l.split(",");
       const ALCALDIA = normalizarTexto(cols[0] || '');
@@ -287,7 +287,7 @@ document.addEventListener('DOMContentLoaded', () => {
       munSelect.appendChild(opt);
     });
 
-    // Cargar colonias y manzanas al mapa
+    // Cargar colonias y manzanas en el mapa
     cargarCapasEnMapa();
   }).catch(err => {
     console.error('Error cargando datos:', err);
