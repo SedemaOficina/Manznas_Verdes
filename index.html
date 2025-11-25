@@ -192,16 +192,18 @@ Promise.all([
   const $mun = $('#munSelector');
   const $col = $('#colSelector');
 
-  // Inicializar Select2 una sola vez
+  // Inicializar Select2 (UNA sola vez)
   $mun.select2({
     placeholder: 'Selecciona una alcaldía…',
     allowClear: true,
+    closeOnSelect: true,
     width: 'resolve'
   });
 
   $col.select2({
     placeholder: 'Primero selecciona una alcaldía…',
     allowClear: true,
+    closeOnSelect: true,
     width: 'resolve'
   });
 
@@ -220,18 +222,17 @@ $('#munSelector').on('change', function() {
   const mun = $(this).val();
   const $col = $('#colSelector');
 
-  $col.empty();
-  $col.val(null).trigger('change');
+  // Limpiar colonia y resultado
+  $col.prop('disabled', true);
+  $col.empty();                 // eliminar opciones
+  $col.val(null).trigger('change'); // reset valor Select2
   $('#resultado').hide();
   if (capaManzanas) capaManzanas.clearLayers();
 
   if (!mun) {
-    $col.prop('disabled', true);
-    $col.select2({
-      placeholder: 'Primero selecciona una alcaldía…',
-      allowClear: true,
-      width: 'resolve'
-    });
+    // volvemos al placeholder inicial
+    $col.data('select2').$container.find('.select2-selection__placeholder')
+        .text('Primero selecciona una alcaldía…');
     return;
   }
 
@@ -241,14 +242,18 @@ $('#munSelector').on('change', function() {
 
   $col.prop('disabled', false);
 
-  // Placeholder de colonia
-  $col.append(new Option('', '', true, true));  // opción vacía
+  // placeholder vacío para que funcione allowClear
+  $col.append(new Option('', '', true, true));
 
   colonias.forEach(d => {
     const text = `${d.SETT_NAME} (CP ${d.CP})`;
     const opt  = new Option(text, String(d.index), false, false);
     $col.append(opt);
   });
+
+  // actualizar placeholder visual
+  $col.data('select2').$container.find('.select2-selection__placeholder')
+      .text('Selecciona una colonia…');
 
   $col.val(null).trigger('change');
 });
