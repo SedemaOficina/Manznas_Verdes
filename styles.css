@@ -98,7 +98,6 @@ h2 {
   padding: 6px 8px;
   border-radius: 6px;
   border: 1px solid #bdbdbd;
-  font-size: 14px;
 }
 
 .form-item input[list]:disabled {
@@ -151,28 +150,20 @@ h2 {
   padding: 14px 16px;
 }
 
-.kpi-header {
+.kpi-row {
   display: flex;
   justify-content: space-between;
   align-items: center;
   gap: 12px;
-  margin-bottom: 8px;
 }
 
-.kpi-title {
-  display: flex;
-  flex-direction: column;
+.kpi-row-bottom {
+  margin-top: 8px;
 }
 
-.kpi-colonia {
-  font-size: 16px;
-  font-weight: 700;
-  color: #1b1b1b;
-}
-
-.kpi-alcaldia {
+.kpi-info p {
+  margin: 2px 0;
   font-size: 13px;
-  color: #555;
 }
 
 .kpi-prioridad {
@@ -180,21 +171,14 @@ h2 {
   align-items: center;
 }
 
-.kpi-body {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-
 .kpi-metric {
   display: flex;
-  justify-content: space-between;
-  align-items: baseline;
+  flex-direction: column;
 }
 
 .kpi-label {
-  font-size: 13px;
-  color: #555;
+  font-size: 12px;
+  color: #666;
 }
 
 .kpi-value {
@@ -206,6 +190,11 @@ h2 {
 .kpi-secondary {
   font-size: 12px;
   color: #777;
+  text-align: right;
+}
+
+.label {
+  font-weight: 600;
 }
 
 /* Badge de prioridad */
@@ -214,7 +203,7 @@ h2 {
   display: inline-block;
   padding: 4px 10px;
   border-radius: 999px;
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 600;
   color: #ffffff;
   text-transform: uppercase;
@@ -272,12 +261,14 @@ h2 {
 
 .leaflet-tooltip.tooltip-prioridad {
   border: none;
-  border-radius: 999px;
-  padding: 4px 12px;
+  border-radius: 10px;
+  padding: 4px 10px;
   font-size: 11px;
   font-weight: 600;
   color: #fff;
   text-transform: uppercase;
+  text-align: center;
+  line-height: 1.4;
 }
 
 /* Colores por prioridad para el tooltip */
