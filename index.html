@@ -103,7 +103,7 @@ function initMap() {
     attribution: '&copy; OpenStreetMap'
   }).addTo(map);
 
-  // Capa de colonias
+  // Colonias
   capaColonias = L.geoJSON(coloniasGeojson, {
     style: {
       color: '#00695c',
@@ -118,7 +118,7 @@ function initMap() {
     }
   }).addTo(map);
 
-  // Capa de manzanas filtradas por colonia
+  // Manzanas filtradas
   capaManzanas = L.geoJSON(null, {
     style: {
       color: '#ff6f00',
@@ -240,7 +240,9 @@ $('#munSelector').on('change', function() {
     .sort((a,b) => a.SETT_NAME.localeCompare(b.SETT_NAME, 'es'));
 
   $col.prop('disabled', false);
-  $col.append(new Option('', '', true, true));  // placeholder
+
+  // Placeholder de colonia
+  $col.append(new Option('', '', true, true));  // opción vacía
 
   colonias.forEach(d => {
     const text = `${d.SETT_NAME} (CP ${d.CP})`;
@@ -249,11 +251,6 @@ $('#munSelector').on('change', function() {
   });
 
   $col.val(null).trigger('change');
-  $col.select2({
-    placeholder: 'Selecciona una colonia…',
-    allowClear: true,
-    width: 'resolve'
-  });
 });
 
 // Cambio de colonia
