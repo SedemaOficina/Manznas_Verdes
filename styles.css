@@ -29,26 +29,26 @@ header {
 .header-inner {
   max-width: 1100px;
   margin: 0 auto;
-  padding: 20px 24px 12px 24px;
+  padding: 16px 16px 10px 16px;
 }
 
 .header-texto h1 {
-  margin: 0 0 6px 0;
+  margin: 0 0 4px 0;
   font-weight: 700;
   color: var(--verde-oscuro);
-  font-size: 26px;
+  font-size: 22px;
 }
 
 .header-texto p {
   margin: 0;
   color: #555;
-  font-size: 14px;
+  font-size: 13px;
 }
 
 .linea-oro {
   height: 4px;
   width: 90px;
-  margin: 0 auto 0 24px;
+  margin: 0 auto 0 16px;
   background: var(--dorado);
   animation: linea-mover 2s infinite alternate ease-in-out;
   border-radius: 2px;
@@ -63,16 +63,16 @@ header {
 
 .container {
   background: #ffffff;
-  padding: 28px 28px 32px 28px;
+  padding: 20px 20px 24px 20px;
   border-radius: 12px;
   max-width: 1100px;
-  margin: 30px auto;
+  margin: 20px auto;
   box-shadow: 0 4px 14px rgba(0,0,0,0.12);
 }
 
 h2 {
   margin-top: 0;
-  margin-bottom: 20px;
+  margin-bottom: 16px;
   font-weight: 500;
   color: var(--verde-oscuro);
 }
@@ -82,52 +82,77 @@ h2 {
 .form-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 18px;
+  gap: 14px;
 }
 
 .form-item label {
   display: block;
   font-weight: 500;
-  margin-bottom: 6px;
+  margin-bottom: 4px;
   color: #333;
 }
 
-.form-item select {
+.form-item select,
+.form-item input[list] {
   width: 100%;
   padding: 6px 8px;
   border-radius: 6px;
   border: 1px solid #bdbdbd;
+  font-size: 14px;
+}
+
+.form-item input[list]:disabled {
+  background-color: #f0f0f0;
 }
 
 .hint {
   display: block;
-  font-size: 12px;
+  font-size: 11px;
   color: #777;
-  margin-top: 4px;
+  margin-top: 3px;
 }
 
+/* Mobile layout */
+
 @media (max-width: 768px) {
+  .container {
+    margin: 10px;
+    padding: 16px;
+  }
+
   .form-grid {
     grid-template-columns: 1fr;
+  }
+
+  #map {
+    height: 320px;
+  }
+
+  .header-texto h1 {
+    font-size: 18px;
+  }
+
+  .header-texto p {
+    font-size: 12px;
   }
 }
 
 /* TARJETA DE RESULTADO */
 
 .resultado {
-  margin-top: 26px;
+  margin-top: 20px;
 }
 
 .card {
   background: var(--azul-claro);
-  padding: 20px 22px;
+  padding: 16px 18px;
   border-radius: 10px;
   border-left: 6px solid var(--verde-sedema);
 }
 
 .card p {
-  margin: 6px 0;
-  font-size: 15px;
+  margin: 4px 0;
+  font-size: 14px;
 }
 
 .label {
@@ -135,8 +160,8 @@ h2 {
 }
 
 .card h3 {
-  margin-top: 16px;
-  font-size: 20px;
+  margin-top: 12px;
+  font-size: 18px;
   font-weight: 700;
   color: #111;
 }
@@ -149,11 +174,11 @@ h2 {
 /* MAPA */
 
 .map-section {
-  margin-top: 28px;
+  margin-top: 22px;
 }
 
 .map-section h3 {
-  margin-bottom: 10px;
+  margin-bottom: 8px;
   font-weight: 500;
   color: #004d40;
 }
@@ -170,8 +195,7 @@ h2 {
 
 footer {
   text-align: center;
-  font-size: 12px;
+  font-size: 11px;
   color: #777;
-  padding-bottom: 18px;
+  padding-bottom: 16px;
 }
-
