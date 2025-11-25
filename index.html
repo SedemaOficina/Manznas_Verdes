@@ -108,7 +108,7 @@ function estiloPrioridad(prioridad) {
   }
 }
 
-// Clase CSS para prioridad
+// Clase CSS para prioridad (para badge y tooltip)
 function prioridadClass(prioridad) {
   const p = (prioridad || "").toLowerCase().trim();
   if (p === "muy baja") return "prio-muy-baja";
@@ -372,23 +372,24 @@ document.addEventListener('DOMContentLoaded', () => {
     const prioText  = prioridad || 'Sin dato';
 
     resultadoDiv.innerHTML =
-      `<div class="card">
-         <div class="card-header">
-           <div class="card-title">
-             <span class="card-colonia">${col}</span>
-             <span class="card-alcaldia">${alc}</span>
+      `<div class="kpi-card">
+         <div class="kpi-header">
+           <div class="kpi-title">
+             <div class="kpi-colonia">${col || 'Colonia desconocida'}</div>
+             <div class="kpi-alcaldia">${alc || 'Alcaldía desconocida'}</div>
            </div>
-           <div class="card-prioridad">
+           <div class="kpi-prioridad">
              <span class="badge-prioridad ${prioClass}">${prioText}</span>
            </div>
          </div>
-         <div class="card-body">
-           <p><span class="label">Código Postal:</span> ${cp || 'No disponible'}</p>
-           <p><span class="label">Prioridad de reforestación:</span> ${prioText}</p>
-           <p class="card-manzanas">
-             <span class="label">Número de manzanas:</span>
-             <span class="numero">${numManz}</span>
-           </p>
+         <div class="kpi-body">
+           <div class="kpi-metric">
+             <div class="kpi-label">Número de manzanas</div>
+             <div class="kpi-value">${numManz || '0'}</div>
+           </div>
+           <div class="kpi-secondary">
+             <span class="label">Código Postal:</span> ${cp || 'No disponible'}
+           </div>
          </div>
        </div>`;
     resultadoDiv.style.display = 'block';
