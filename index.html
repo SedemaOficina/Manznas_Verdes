@@ -4,10 +4,16 @@
   <meta charset="UTF-8">
   <title>Buscador de Manzanas por Colonia | SEDEMA CDMX</title>
 
-  <!-- CSS Select2 -->
+  <!-- Select2 -->
   <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+  <!-- Leaflet -->
+  <link rel="stylesheet"
+        href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+        integrity="sha256-sA+z0pCfQZ8jNqHhYt1CbnK+k52r7Di5G3lD1Jp3pGI="
+        crossorigin="" />
   <!-- Fuente Roboto -->
-  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap"
+        rel="stylesheet">
   <!-- Estilos institucionales -->
   <link href="styles.css" rel="stylesheet" />
 </head>
@@ -28,14 +34,12 @@
   <h2>Consulta por alcaldía y colonia</h2>
 
   <div class="form-grid">
-    <!-- Select de Alcaldía -->
     <div class="form-item">
       <label for="munSelector">Alcaldía</label>
       <select id="munSelector" style="width:100%"></select>
       <small class="hint">Escribe el nombre de la alcaldía y selecciónala.</small>
     </div>
 
-    <!-- Select de Colonia dependiente -->
     <div class="form-item">
       <label for="colSelector">Colonia</label>
       <select id="colSelector" style="width:100%" disabled></select>
@@ -45,81 +49,176 @@
 
   <section id="resultado" class="resultado" style="display:none;"></section>
 
+  <!-- Mapa -->
+  <section class="map-section">
+    <h3>Mapa de colonias y manzanas</h3>
+    <div id="map"></div>
+  </section>
+
 </main>
 
 <footer>
   <p>Herramienta de consulta interna · Secretaría del Medio Ambiente de la Ciudad de México.</p>
 </footer>
 
-<!-- JS -->
+<!-- JS libs -->
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+        integrity="sha256-o9N1j7kGStG3a7Wv+gLxwP2tT1rjT4W2R3lQN8Z8pcQ="
+        crossorigin=""></script>
+<!-- Turf.js para intersecciones espaciales -->
+<script src="https://cdn.jsdelivr.net/npm/@turf/turf@6/turf.min.js"></script>
 
 <script>
-let datos = [];
-let municipios = [];
+// ---------------- Variables globales ----------------
+let datos = [];           // registros del CSV (alcaldía, colonia, CP, #manzanas)
+let municipios = [];      // lista única de alcaldías
 
-// Cargar el CSV
-fetch('manzanas_por_colonia.csv')
-  .then(resp => resp.text())
-  .then(texto => {
-    const lineas = texto.split(/\r?\n/).map(l => l.trim()).filter(l => l.length > 0);
+let map;
+let coloniasGeojson = null;
+let manzanasGeojson = null;
+let capaColonias;
+let capaManzanas;
+let indiceColonias = {};  // clave "ALCALDIA|COLONIA" -> layer de colonia
 
-    // Saltamos encabezado
-    datos = lineas.slice(1).map((l, idx) => {
-      const cols = l.split(",");
+// ---------------- Utilidades ----------------
+function normalizarTexto(str) {
+  if (!str) return str;
+  const fixes = {
+    "TL?HUAC": "TLÁHUAC",
+    "?LVARO OBREG?N": "ÁLVARO OBREGÓN"
+    // agrega más casos si detectas otros errores de codificación
+  };
+  return fixes[str.trim()] || str.trim();
+}
 
-      // OJO: columnas en el mismo orden que tu archivo
-      const ALCALDIA       = cols[0];
-      const COLONIA        = cols[1];
-      const TIPO           = cols[2];
-      const CP             = cols[3];
-      const MANZANAS       = cols[4];
+// ---------------- Inicializar mapa ----------------
+function initMap() {
+  map = L.map('map').setView([19.35, -99.13], 11);
 
-      return {
-        index: idx,
-        MUN_NAME: ALCALDIA,
-        SETT_NAME: COLONIA,
-        SETT_TYPE: TIPO,
-        CP: CP,
-        MANZANAS: MANZANAS
-      };
-    });
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    maxZoom: 19,
+    attribution: '&copy; OpenStreetMap'
+  }).addTo(map);
 
-    // Lista única de alcaldías
-    municipios = [...new Set(datos.map(d => d.MUN_NAME))]
-      .sort((a,b) => a.localeCompare(b, 'es'));
+  // Capa de colonias
+  capaColonias = L.geoJSON(coloniasGeojson, {
+    style: {
+      color: '#00695c',
+      weight: 1,
+      fillOpacity: 0.05
+    },
+    onEachFeature: function (feature, layer) {
+      const alc = normalizarTexto(feature.properties.ALCALDIA || '');
+      const col = normalizarTexto(feature.properties.SETT_NAME || '');
+      const key = alc + '|' + col;
+      indiceColonias[key] = layer;
+    }
+  }).addTo(map);
 
-    const $mun = $('#munSelector');
+  // Capa de manzanas filtradas por colonia
+  capaManzanas = L.geoJSON(null, {
+    style: {
+      color: '#ff6f00',
+      weight: 1,
+      fillOpacity: 0.3
+    }
+  }).addTo(map);
 
-    // Placeholder vacío
-    $mun.append(new Option('', '', true, true));
+  if (capaColonias.getLayers().length > 0) {
+    map.fitBounds(capaColonias.getBounds());
+  }
+}
 
-    municipios.forEach(m => {
-      $mun.append(new Option(m, m));
-    });
+// ---------------- Mostrar manzanas de una colonia ----------------
+function mostrarManzanasDeColonia(alcaldia, colonia) {
+  if (!manzanasGeojson) return;
 
-    $mun.select2({
-      placeholder: 'Selecciona una alcaldía…',
-      allowClear: true,
-      width: 'resolve'
-    });
+  const key = alcaldia + '|' + colonia;
+  const layerColonia = indiceColonias[key];
+  if (!layerColonia) {
+    capaManzanas.clearLayers();
+    return;
+  }
 
-    $('#colSelector').select2({
-      placeholder: 'Primero selecciona una alcaldía…',
-      allowClear: true,
-      width: 'resolve'
-    });
+  const gjColonia = layerColonia.toGeoJSON();
+
+  // Filtrar manzanas que intersectan con la colonia (Turf)
+  const seleccionadas = manzanasGeojson.features.filter(f => {
+    try {
+      return turf.booleanIntersects(f, gjColonia);
+    } catch (e) {
+      return false;
+    }
   });
+
+  capaManzanas.clearLayers();
+  capaManzanas.addData(seleccionadas);
+}
+
+// ---------------- Carga inicial: CSV + JSON ----------------
+Promise.all([
+  fetch('manzanas_por_colonia.csv').then(r => r.text()),
+  fetch('colonias.json').then(r => r.json()),
+  fetch('manzanas.json').then(r => r.json())
+]).then(([csvText, coloniasData, manzanasData]) => {
+
+  coloniasGeojson = coloniasData;
+  manzanasGeojson = manzanasData;
+
+  // Procesar CSV (encabezado: ALCALDIA, COLONIA, TIPO, CP, No. De Manzanas)
+  const lineas = csvText.split(/\r?\n/).map(l => l.trim()).filter(l => l.length > 0);
+
+  datos = lineas.slice(1).map((l, idx) => {
+    const cols = l.split(",");
+    const ALCALDIA = normalizarTexto(cols[0] || '');
+    const COLONIA  = normalizarTexto(cols[1] || '');
+    const TIPO     = (cols[2] || '').trim();
+    const CP       = (cols[3] || '').trim();
+    const MANZ     = (cols[4] || '').trim();
+    return {
+      index: idx,
+      MUN_NAME: ALCALDIA,
+      SETT_NAME: COLONIA,
+      SETT_TYPE: TIPO,
+      CP: CP,
+      MANZANAS: MANZ
+    };
+  });
+
+  municipios = [...new Set(datos.map(d => d.MUN_NAME))]
+    .sort((a,b) => a.localeCompare(b, 'es'));
+
+  const $mun = $('#munSelector');
+  $mun.append(new Option('', '', true, true));
+  municipios.forEach(m => $mun.append(new Option(m, m)));
+
+  $mun.select2({
+    placeholder: 'Selecciona una alcaldía…',
+    allowClear: true,
+    width: 'resolve'
+  });
+
+  $('#colSelector').select2({
+    placeholder: 'Primero selecciona una alcaldía…',
+    allowClear: true,
+    width: 'resolve'
+  });
+
+  initMap();
+});
+
+// ---------------- Eventos de UI ----------------
 
 // Cambio de alcaldía
 $('#munSelector').on('change', function() {
   const mun = $(this).val();
   const $col = $('#colSelector');
 
-  // Limpiar y deshabilitar colonia
   $col.empty().trigger('change');
   $('#resultado').hide();
+  if (capaManzanas) capaManzanas.clearLayers();
 
   if (!mun) {
     $col.prop('disabled', true);
@@ -131,15 +230,12 @@ $('#munSelector').on('change', function() {
     return;
   }
 
-  // Filtrar colonias de esa alcaldía
   const colonias = datos
     .filter(d => d.MUN_NAME === mun)
     .sort((a,b) => a.SETT_NAME.localeCompare(b.SETT_NAME, 'es'));
 
-  // Rellenar selector de colonia
   $col.prop('disabled', false);
-  $col.append(new Option('', '', true, true)); // placeholder
-
+  $col.append(new Option('', '', true, true));
   colonias.forEach(d => {
     const text = `${d.SETT_NAME} (CP ${d.CP})`;
     $col.append(new Option(text, d.index));
@@ -157,6 +253,7 @@ $('#colSelector').on('change', function() {
   const idx = $(this).val();
   if (idx === null || idx === '') {
     $('#resultado').hide();
+    if (capaManzanas) capaManzanas.clearLayers();
     return;
   }
 
@@ -170,8 +267,15 @@ $('#colSelector').on('change', function() {
         <p><span class="label">Código Postal:</span> ${d.CP}</p>
         <h3>Número de manzanas: <span class="numero">${d.MANZANAS}</span></h3>
      </div>`;
-
   $('#resultado').html(html).show();
+
+  const key = d.MUN_NAME + '|' + d.SETT_NAME;
+  const layer = indiceColonias[key];
+  if (layer) {
+    map.fitBounds(layer.getBounds(), { padding: [20, 20] });
+  }
+
+  mostrarManzanasDeColonia(d.MUN_NAME, d.SETT_NAME);
 });
 </script>
 
