@@ -66,7 +66,7 @@
 <script>
 // ------------ Variables globales ------------ //
 let coloniasFeatures = [];
-let manzanasFeatures = [];
+Let manzanasFeatures = [];
 
 let map;
 let capaColonias;
@@ -117,12 +117,22 @@ function initMap() {
     attribution: '&copy; OpenStreetMap'
   }).addTo(map);
 
-  // Colonias (estilo base en verde suave)
+  // TODAS las manzanas en gris claro (siempre visibles)
+  capaManzanasTodas = L.geoJSON(null, {
+    style: {
+      color: "#999999",
+      weight: 0.4,
+      fillColor: "#d0d0d0",
+      fillOpacity: 0.35
+    }
+  }).addTo(map);
+
+  // Colonias: SOLO contornos verdes por defecto
   capaColonias = L.geoJSON(null, {
     style: {
       color: '#00897b',
-      weight: 0.8,
-      fillOpacity: 0.04
+      weight: 1.2,
+      fillOpacity: 0   // sin relleno para que se vean las manzanas debajo
     },
     onEachFeature: function(feature, layer) {
       const p = feature.properties || {};
@@ -133,23 +143,13 @@ function initMap() {
     }
   }).addTo(map);
 
-  // Todas las manzanas en gris claro
-  capaManzanasTodas = L.geoJSON(null, {
-    style: {
-      color: "#999999",
-      weight: 0.3,
-      fillColor: "#cccccc",
-      fillOpacity: 0.35
-    }
-  }).addTo(map);
-
   // Manzanas dentro de la colonia seleccionada (gris más oscuro, 50% opacidad)
   capaManzanasResaltadas = L.geoJSON(null, {
     style: {
       color: "#555555",
       weight: 0.8,
       fillColor: "#777777",
-      fillOpacity: 0.90
+      fillOpacity: 0.50
     }
   }).addTo(map);
 }
@@ -161,8 +161,8 @@ function cargarCapasEnMapa() {
   capaManzanasResaltadas.clearLayers();
   indiceColonias = {};
 
-  capaColonias.addData(coloniasFeatures);
-  capaManzanasTodas.addData(manzanasFeatures);
+  capaManzanasTodas.addData(manzanasFeatures); // base de gris
+  capaColonias.addData(coloniasFeatures);      // contornos por encima
 
   if (capaColonias.getLayers().length > 0) {
     map.fitBounds(capaColonias.getBounds());
@@ -178,10 +178,10 @@ function resaltarColoniaYManzanas(alc, col, prioridad) {
     return;
   }
 
-  // Reset estilo de todas las colonias
+  // Reset estilo de todas las colonias (contorno verde sin relleno)
   capaColonias.resetStyle();
 
-  // Aplicar estilo según prioridad
+  // Aplicar estilo según prioridad (borde coloreado y relleno suave)
   const est = estiloPrioridad(prioridad);
   layerColonia.setStyle({
     color: est.color,
