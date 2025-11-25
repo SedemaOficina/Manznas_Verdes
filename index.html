@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <title>SEDEMA · Buscador de Manzanas por Colonia</title>
 
-  <!-- Leaflet SIN integrity -->
+  <!-- Leaflet -->
   <link rel="stylesheet"
         href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 
@@ -39,9 +39,11 @@
     </div>
 
     <div class="form-item">
-      <label for="colSelector">Colonia</label>
-      <select id="colSelector" disabled></select>
-      <small class="hint">Después elige la colonia.</small>
+      <label for="colInput">Colonia</label>
+      <!-- Autocomplete con datalist -->
+      <input id="colInput" list="colList" placeholder="Empieza a escribir la colonia…" disabled>
+      <datalist id="colList"></datalist>
+      <small class="hint">Escribe el nombre de la colonia y selecciónala.</small>
     </div>
   </div>
 
@@ -58,7 +60,7 @@
   <p>Herramienta de consulta interna · Secretaría del Medio Ambiente de la Ciudad de México.</p>
 </footer>
 
-<!-- JS libs SIN integrity -->
+<!-- JS libs -->
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@turf/turf@6/turf.min.js"></script>
 
@@ -76,23 +78,30 @@ let indiceColonias = {}; // clave "ALCALDIA|COLONIA" -> layer colonia
 // ------------ Utilidades ------------ //
 function normalizarTexto(str) {
   if (!str) return str;
+  const raw = str.trim();
+
+  // Corrección de acentos rotos en alcaldías / colonias
   const fixes = {
     "TL?HUAC": "TLÁHUAC",
-    "?LVARO OBREG?N": "ÁLVARO OBREGÓN"
+    "?LVARO OBREG?N": "ÁLVARO OBREGÓN",
+    "COYOAC?N": "COYOACÁN",
+    "BENITO JU?REZ": "BENITO JUÁREZ"
   };
-  return fixes[str.trim()] || str.trim();
+  if (fixes[raw]) return fixes[raw];
+  return raw;
 }
 
 // ------------ Inicializar mapa base ------------ //
 function initMap() {
   map = L.map('map').setView([19.35, -99.13], 11);
 
-  // Mapbase OSM
+  // Base OSM
   L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     maxZoom: 19,
     attribution: '&copy; OpenStreetMap'
   }).addTo(map);
 
+  // Colonias (estilo por defecto en verde)
   capaColonias = L.geoJSON(null, {
     style: {
       color: '#00695c',
@@ -108,23 +117,23 @@ function initMap() {
     }
   }).addTo(map);
 
-  // Todas las manzanas en gris
+  // Todas las manzanas en gris claro
   capaManzanasTodas = L.geoJSON(null, {
     style: {
-      color: '#bbbbbb',
+      color: '#cccccc',
       weight: 0.3,
-      fillColor: '#dddddd',
+      fillColor: '#e0e0e0',
       fillOpacity: 0.3
     }
   }).addTo(map);
 
-  // Manzanas dentro de colonia seleccionada
+  // Manzanas dentro de la colonia seleccionada (gris 50% opacidad)
   capaManzanasResaltadas = L.geoJSON(null, {
     style: {
-      color: '#ff6f00',
-      weight: 1.0,
-      fillColor: '#ffb74d',
-      fillOpacity: 0.8
+      color: '#666666',
+      weight: 0.8,
+      fillColor: '#808080',
+      fillOpacity: 0.5
     }
   }).addTo(map);
 }
@@ -153,6 +162,16 @@ function resaltarManzanas(alc, col) {
     return;
   }
 
+  // Resetear estilos de todas las colonias al verde
+  capaColonias.resetStyle();
+
+  // Colonia seleccionada con trazo rojo y más grueso
+  layerColonia.setStyle({
+    color: '#ff0000',
+    weight: 2.5,
+    fillOpacity: 0.08
+  });
+
   const geoColonia = layerColonia.toGeoJSON();
 
   const seleccionadas = manzanasFeatures.filter(f => {
@@ -172,7 +191,8 @@ function resaltarManzanas(alc, col) {
 // ------------ Código principal ------------ //
 document.addEventListener('DOMContentLoaded', () => {
   const munSelect = document.getElementById('munSelector');
-  const colSelect = document.getElementById('colSelector');
+  const colInput  = document.getElementById('colInput');
+  const colList   = document.getElementById('colList');
   const resultadoDiv = document.getElementById('resultado');
 
   initMap();
@@ -195,7 +215,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const alcSet = new Set(coloniasFeatures.map(f => f.properties.ALCALDIA));
     const alcaldias = Array.from(alcSet).sort((a,b) => a.localeCompare(b, 'es'));
 
-    // llenar select de alcaldía
+    // Llenar select de alcaldía
     const opt0 = document.createElement('option');
     opt0.value = '';
     opt0.textContent = 'Selecciona una alcaldía…';
@@ -212,51 +232,65 @@ document.addEventListener('DOMContentLoaded', () => {
   })
   .catch(err => console.error('Error cargando GeoJSON:', err));
 
-  // cambio de alcaldía
+  // Cambio de alcaldía
   munSelect.addEventListener('change', () => {
     const alc = munSelect.value;
 
-    colSelect.innerHTML = '';
-    colSelect.disabled = true;
+    // Reset colonia y resultados
+    colInput.value = '';
+    colInput.disabled = true;
+    colList.innerHTML = '';
     resultadoDiv.style.display = 'none';
     capaManzanasResaltadas.clearLayers();
+    if (capaColonias) capaColonias.resetStyle();
 
     if (!alc) return;
 
+    // Filtrar colonias por alcaldía
     const coloniasDeAlc = coloniasFeatures
       .filter(f => f.properties.ALCALDIA === alc)
       .sort((a,b) => a.properties.COLONIA.localeCompare(b.properties.COLONIA, 'es'));
 
-    const opt0 = document.createElement('option');
-    opt0.value = '';
-    opt0.textContent = 'Selecciona una colonia…';
-    colSelect.appendChild(opt0);
-
     coloniasDeAlc.forEach(f => {
-      const idx = coloniasFeatures.indexOf(f);
+      const idxGlobal = coloniasFeatures.indexOf(f);
       const opt = document.createElement('option');
-      opt.value = idx;
-      opt.textContent = `${f.properties.COLONIA} (CP ${f.properties.CP_2 || ''})`;
-      colSelect.appendChild(opt);
+      opt.value = `${f.properties.COLONIA} (CP ${f.properties.CP_2 || ''})`;
+      opt.dataset.idx = idxGlobal;
+      colList.appendChild(opt);
     });
 
-    colSelect.disabled = false;
+    colInput.disabled = false;
   });
 
-  // cambio de colonia
-  colSelect.addEventListener('change', () => {
-    const idx = colSelect.value;
-    if (!idx) {
+  // Selección de colonia desde autocomplete (datalist)
+  colInput.addEventListener('change', () => {
+    const val = colInput.value;
+    if (!val) {
       resultadoDiv.style.display = 'none';
       capaManzanasResaltadas.clearLayers();
+      if (capaColonias) capaColonias.resetStyle();
       return;
     }
 
-    const feat = coloniasFeatures[parseInt(idx, 10)];
+    // Buscar option con ese value
+    let selectedOpt = null;
+    Array.from(colList.options).forEach(o => {
+      if (o.value === val) selectedOpt = o;
+    });
+
+    if (!selectedOpt) {
+      resultadoDiv.style.display = 'none';
+      capaManzanasResaltadas.clearLayers();
+      if (capaColonias) capaColonias.resetStyle();
+      return;
+    }
+
+    const idx = parseInt(selectedOpt.dataset.idx, 10);
+    const feat = coloniasFeatures[idx];
     const p = feat.properties || {};
 
-    const alc = p.ALCALDIA || '';
-    const col = p.COLONIA || '';
+    const alc  = p.ALCALDIA || '';
+    const col  = p.COLONIA || '';
     const tipo = p.TIPO || '';
     const cp   = p.CP_2 || p.CP || '';
     const numManz = p.No_mazas || p.No_Manzanas || p.No_Mazanas || '';
