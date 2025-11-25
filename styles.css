@@ -139,6 +139,26 @@ h2 {
   font-weight: 700;
 }
 
+/* MAPA */
+
+.map-section {
+  margin-top: 28px;
+}
+
+.map-section h3 {
+  margin-bottom: 10px;
+  font-weight: 500;
+  color: #004d40;
+}
+
+#map {
+  width: 100%;
+  height: 420px;
+  border-radius: 10px;
+  border: 1px solid #e0e0e0;
+  overflow: hidden;
+}
+
 /* FOOTER */
 
 footer {
@@ -148,7 +168,7 @@ footer {
   padding-bottom: 18px;
 }
 
-/* Ajuste visual Select2 */
+/* Ajustes Select2 */
 
 .select2-container .select2-selection--single {
   height: 40px;
