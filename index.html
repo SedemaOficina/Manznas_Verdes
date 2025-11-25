@@ -2,18 +2,21 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <title>Buscador de Manzanas por Colonia | SEDEMA CDMX</title>
+  <title>SEDEMA · Buscador de Manzanas por Colonia</title>
 
   <!-- Select2 -->
   <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+
   <!-- Leaflet -->
   <link rel="stylesheet"
         href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
         integrity="sha256-sA+z0pCfQZ8jNqHhYt1CbnK+k52r7Di5G3lD1Jp3pGI="
         crossorigin="" />
+
   <!-- Fuente Roboto -->
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap"
         rel="stylesheet">
+
   <!-- Estilos institucionales -->
   <link href="styles.css" rel="stylesheet" />
 </head>
@@ -67,7 +70,6 @@
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
         integrity="sha256-o9N1j7kGStG3a7Wv+gLxwP2tT1rjT4W2R3lQN8Z8pcQ="
         crossorigin=""></script>
-<!-- Turf.js para intersecciones espaciales -->
 <script src="https://cdn.jsdelivr.net/npm/@turf/turf@6/turf.min.js"></script>
 
 <script>
@@ -88,7 +90,6 @@ function normalizarTexto(str) {
   const fixes = {
     "TL?HUAC": "TLÁHUAC",
     "?LVARO OBREG?N": "ÁLVARO OBREGÓN"
-    // agrega más casos si detectas otros errores de codificación
   };
   return fixes[str.trim()] || str.trim();
 }
@@ -144,7 +145,6 @@ function mostrarManzanasDeColonia(alcaldia, colonia) {
 
   const gjColonia = layerColonia.toGeoJSON();
 
-  // Filtrar manzanas que intersectan con la colonia (Turf)
   const seleccionadas = manzanasGeojson.features.filter(f => {
     try {
       return turf.booleanIntersects(f, gjColonia);
@@ -167,7 +167,6 @@ Promise.all([
   coloniasGeojson = coloniasData;
   manzanasGeojson = manzanasData;
 
-  // Procesar CSV (encabezado: ALCALDIA, COLONIA, TIPO, CP, No. De Manzanas)
   const lineas = csvText.split(/\r?\n/).map(l => l.trim()).filter(l => l.length > 0);
 
   datos = lineas.slice(1).map((l, idx) => {
@@ -191,20 +190,25 @@ Promise.all([
     .sort((a,b) => a.localeCompare(b, 'es'));
 
   const $mun = $('#munSelector');
-  $mun.append(new Option('', '', true, true));
-  municipios.forEach(m => $mun.append(new Option(m, m)));
+  const $col = $('#colSelector');
 
+  // Inicializar Select2 una sola vez
   $mun.select2({
     placeholder: 'Selecciona una alcaldía…',
     allowClear: true,
     width: 'resolve'
   });
 
-  $('#colSelector').select2({
+  $col.select2({
     placeholder: 'Primero selecciona una alcaldía…',
     allowClear: true,
     width: 'resolve'
   });
+
+  // Llenar alcaldías
+  $mun.append(new Option('', '', true, true));
+  municipios.forEach(m => $mun.append(new Option(m, m)));
+  $mun.val(null).trigger('change');
 
   initMap();
 });
@@ -216,7 +220,8 @@ $('#munSelector').on('change', function() {
   const mun = $(this).val();
   const $col = $('#colSelector');
 
-  $col.empty().trigger('change');
+  $col.empty();
+  $col.val(null).trigger('change');
   $('#resultado').hide();
   if (capaManzanas) capaManzanas.clearLayers();
 
@@ -235,12 +240,15 @@ $('#munSelector').on('change', function() {
     .sort((a,b) => a.SETT_NAME.localeCompare(b.SETT_NAME, 'es'));
 
   $col.prop('disabled', false);
-  $col.append(new Option('', '', true, true));
+  $col.append(new Option('', '', true, true));  // placeholder
+
   colonias.forEach(d => {
     const text = `${d.SETT_NAME} (CP ${d.CP})`;
-    $col.append(new Option(text, d.index));
+    const opt  = new Option(text, String(d.index), false, false);
+    $col.append(opt);
   });
 
+  $col.val(null).trigger('change');
   $col.select2({
     placeholder: 'Selecciona una colonia…',
     allowClear: true,
