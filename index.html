@@ -4,9 +4,6 @@
   <meta charset="UTF-8">
   <title>SEDEMA · Buscador de Manzanas por Colonia</title>
 
-  <!-- Select2 -->
-  <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
-
   <!-- Leaflet -->
   <link rel="stylesheet"
         href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
@@ -39,14 +36,14 @@
   <div class="form-grid">
     <div class="form-item">
       <label for="munSelector">Alcaldía</label>
-      <select id="munSelector" style="width:100%"></select>
-      <small class="hint">Escribe el nombre de la alcaldía y selecciónala.</small>
+      <select id="munSelector"></select>
+      <small class="hint">Selecciona la alcaldía.</small>
     </div>
 
     <div class="form-item">
       <label for="colSelector">Colonia</label>
-      <select id="colSelector" style="width:100%" disabled></select>
-      <small class="hint">Primero elige una alcaldía. Después escribe el nombre de la colonia.</small>
+      <select id="colSelector" disabled></select>
+      <small class="hint">Después elige la colonia.</small>
     </div>
   </div>
 
@@ -65,8 +62,6 @@
 </footer>
 
 <!-- JS libs -->
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
         integrity="sha256-o9N1j7kGStG3a7Wv+gLxwP2tT1rjT4W2R3lQN8Z8pcQ="
         crossorigin=""></script>
@@ -75,14 +70,16 @@
 <script>
 // ---------------- Variables globales ----------------
 let datos = [];           // registros del CSV (alcaldía, colonia, CP, #manzanas)
-let municipios = [];      // lista única de alcaldías
+let municipios = [];
 
 let map;
 let coloniasGeojson = null;
 let manzanasGeojson = null;
-let capaColonias;
-let capaManzanas;
-let indiceColonias = {};  // clave "ALCALDIA|COLONIA" -> layer de colonia
+
+let capaColonias = null;
+let capaManzanasTodas = null;
+let capaManzanasResaltadas = null;
+let indiceColonias = {};  // "ALCALDIA|COLONIA" -> layer de colonia
 
 // ---------------- Utilidades ----------------
 function normalizarTexto(str) {
@@ -95,16 +92,16 @@ function normalizarTexto(str) {
 }
 
 // ---------------- Inicializar mapa ----------------
-function initMap() {
+function initMapBase() {
   map = L.map('map').setView([19.35, -99.13], 11);
 
+  // Mapbase de calles OSM
   L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     maxZoom: 19,
     attribution: '&copy; OpenStreetMap'
   }).addTo(map);
 
-  // Colonias
-  capaColonias = L.geoJSON(coloniasGeojson, {
+  capaColonias = L.geoJSON(null, {
     style: {
       color: '#00695c',
       weight: 1,
@@ -118,28 +115,50 @@ function initMap() {
     }
   }).addTo(map);
 
-  // Manzanas filtradas
-  capaManzanas = L.geoJSON(null, {
+  // Todas las manzanas en gris claro
+  capaManzanasTodas = L.geoJSON(null, {
     style: {
-      color: '#ff6f00',
-      weight: 1,
+      color: '#999999',
+      weight: 0.5,
+      fillColor: '#cccccc',
       fillOpacity: 0.3
     }
   }).addTo(map);
 
-  if (capaColonias.getLayers().length > 0) {
-    map.fitBounds(capaColonias.getBounds());
+  // Manzanas resaltadas (sobre la colonia seleccionada)
+  capaManzanasResaltadas = L.geoJSON(null, {
+    style: {
+      color: '#ff6f00',
+      weight: 1.2,
+      fillColor: '#ffb74d',
+      fillOpacity: 0.7
+    }
+  }).addTo(map);
+}
+
+// Cargar capas en el mapa una vez que tenemos los GeoJSON
+function cargarCapasEnMapa() {
+  if (coloniasGeojson) {
+    capaColonias.clearLayers();
+    capaColonias.addData(coloniasGeojson);
+    if (capaColonias.getLayers().length > 0) {
+      map.fitBounds(capaColonias.getBounds());
+    }
+  }
+  if (manzanasGeojson) {
+    capaManzanasTodas.clearLayers();
+    capaManzanasTodas.addData(manzanasGeojson);
   }
 }
 
-// ---------------- Mostrar manzanas de una colonia ----------------
-function mostrarManzanasDeColonia(alcaldia, colonia) {
+// ---------------- Mostrar manzanas dentro de una colonia ----------------
+function resaltarManzanasDeColonia(alcaldia, colonia) {
   if (!manzanasGeojson) return;
 
   const key = alcaldia + '|' + colonia;
   const layerColonia = indiceColonias[key];
   if (!layerColonia) {
-    capaManzanas.clearLayers();
+    capaManzanasResaltadas.clearLayers();
     return;
   }
 
@@ -153,100 +172,74 @@ function mostrarManzanasDeColonia(alcaldia, colonia) {
     }
   });
 
-  capaManzanas.clearLayers();
-  capaManzanas.addData(seleccionadas);
+  capaManzanasResaltadas.clearLayers();
+  capaManzanasResaltadas.addData(seleccionadas);
+
+  // Zoom al polígono de la colonia
+  map.fitBounds(layerColonia.getBounds(), { padding: [20, 20] });
 }
 
 // ---------------- Código principal ----------------
-$(function() {
-  const $mun = $('#munSelector');
-  const $col = $('#colSelector');
+document.addEventListener('DOMContentLoaded', () => {
+  const munSelect = document.getElementById('munSelector');
+  const colSelect = document.getElementById('colSelector');
+  const resultadoDiv = document.getElementById('resultado');
 
-  // Inicializamos SOLO el Select2 de alcaldía de inicio
-  $mun.select2({
-    placeholder: 'Selecciona una alcaldía…',
-    allowClear: true,
-    closeOnSelect: true,
-    width: 'resolve'
-  });
+  initMapBase();  // siempre verás el mapbase
 
-  // Handler cambio de alcaldía (antes de cargar datos para no duplicar)
-  $mun.on('change', function() {
-    const mun = $(this).val();
+  // Listeners de los selects
+  munSelect.addEventListener('change', () => {
+    const mun = munSelect.value;
 
-    // Si ya hay Select2 en colonias, destruirlo
-    if ($col.hasClass('select2-hidden-accessible')) {
-      $col.select2('destroy');
-    }
+    // Reset colonia y resultados
+    colSelect.innerHTML = '';
+    colSelect.disabled = true;
+    resultadoDiv.style.display = 'none';
+    capaManzanasResaltadas.clearLayers();
 
-    $col.empty();
-    $col.val(null);
-    $('#resultado').hide();
-    $col.prop('disabled', true);
-    if (capaManzanas) capaManzanas.clearLayers();
+    if (!mun) return;
 
-    if (!mun) {
-      // vuelve a placeholder inicial
-      $col.select2({
-        placeholder: 'Primero selecciona una alcaldía…',
-        allowClear: false,
-        width: 'resolve'
-      });
-      return;
-    }
-
-    // Filtrar colonias del municipio
     const colonias = datos
       .filter(d => d.MUN_NAME === mun)
       .sort((a,b) => a.SETT_NAME.localeCompare(b.SETT_NAME, 'es'));
 
-    // Rellenar opciones
-    $col.append(new Option('', '', true, true)); // opción vacía para placeholder
+    // Opción vacía
+    const opt0 = document.createElement('option');
+    opt0.value = '';
+    opt0.textContent = 'Selecciona una colonia…';
+    colSelect.appendChild(opt0);
+
     colonias.forEach(d => {
-      const text = `${d.SETT_NAME} (CP ${d.CP})`;
-      const opt  = new Option(text, String(d.index), false, false);
-      $col.append(opt);
+      const opt = document.createElement('option');
+      opt.value = d.index;
+      opt.textContent = `${d.SETT_NAME} (CP ${d.CP})`;
+      colSelect.appendChild(opt);
     });
 
-    $col.prop('disabled', false);
-
-    // Re-inicializar Select2 de colonias de forma limpia
-    $col.select2({
-      placeholder: 'Selecciona una colonia…',
-      allowClear: true,
-      closeOnSelect: true,
-      width: 'resolve'
-    }).val(null).trigger('change');
+    colSelect.disabled = false;
   });
 
-  // Handler cambio de colonia
-  $col.on('change', function() {
-    const idx = $(this).val();
-    if (idx === null || idx === '') {
-      $('#resultado').hide();
-      if (capaManzanas) capaManzanas.clearLayers();
+  colSelect.addEventListener('change', () => {
+    const idx = colSelect.value;
+    if (!idx) {
+      resultadoDiv.style.display = 'none';
+      capaManzanasResaltadas.clearLayers();
       return;
     }
 
     const d = datos[parseInt(idx, 10)];
 
-    const html =
+    resultadoDiv.innerHTML =
       `<div class="card">
-          <p><span class="label">Alcaldía:</span> ${d.MUN_NAME}</p>
-          <p><span class="label">Colonia:</span> ${d.SETT_NAME}</p>
-          <p><span class="label">Tipo:</span> ${d.SETT_TYPE}</p>
-          <p><span class="label">Código Postal:</span> ${d.CP}</p>
-          <h3>Número de manzanas: <span class="numero">${d.MANZANAS}</span></h3>
+         <p><span class="label">Alcaldía:</span> ${d.MUN_NAME}</p>
+         <p><span class="label">Colonia:</span> ${d.SETT_NAME}</p>
+         <p><span class="label">Tipo:</span> ${d.SETT_TYPE}</p>
+         <p><span class="label">Código Postal:</span> ${d.CP}</p>
+         <h3>Número de manzanas: <span class="numero">${d.MANZANAS}</span></h3>
        </div>`;
-    $('#resultado').html(html).show();
+    resultadoDiv.style.display = 'block';
 
-    const key = d.MUN_NAME + '|' + d.SETT_NAME;
-    const layer = indiceColonias[key];
-    if (layer) {
-      map.fitBounds(layer.getBounds(), { padding: [20, 20] });
-    }
-
-    mostrarManzanasDeColonia(d.MUN_NAME, d.SETT_NAME);
+    resaltarManzanasDeColonia(d.MUN_NAME, d.SETT_NAME);
   });
 
   // Cargar CSV + GeoJSON
@@ -281,12 +274,23 @@ $(function() {
     municipios = [...new Set(datos.map(d => d.MUN_NAME))]
       .sort((a,b) => a.localeCompare(b, 'es'));
 
-    // Llenar alcaldías
-    $mun.append(new Option('', '', true, true));
-    municipios.forEach(m => $mun.append(new Option(m, m)));
-    $mun.val(null).trigger('change');
+    // Llenar select de alcaldía
+    const opt0 = document.createElement('option');
+    opt0.value = '';
+    opt0.textContent = 'Selecciona una alcaldía…';
+    munSelect.appendChild(opt0);
 
-    initMap();
+    municipios.forEach(m => {
+      const opt = document.createElement('option');
+      opt.value = m;
+      opt.textContent = m;
+      munSelect.appendChild(opt);
+    });
+
+    // Cargar colonias y manzanas al mapa
+    cargarCapasEnMapa();
+  }).catch(err => {
+    console.error('Error cargando datos:', err);
   });
 });
 </script>
