@@ -108,6 +108,17 @@ function estiloPrioridad(prioridad) {
   }
 }
 
+// Clase CSS para prioridad
+function prioridadClass(prioridad) {
+  const p = (prioridad || "").toLowerCase().trim();
+  if (p === "muy baja") return "prio-muy-baja";
+  if (p === "baja")     return "prio-baja";
+  if (p === "media")    return "prio-media";
+  if (p === "alta")     return "prio-alta";
+  if (p === "muy alta") return "prio-muy-alta";
+  return "prio-desconocida";
+}
+
 // ------------ Inicializar mapa + mapas base ------------ //
 function initMap() {
   map = L.map('map').setView([19.35, -99.13], 11);
@@ -216,6 +227,8 @@ function resaltarColoniaYManzanas(alc, col, prioridad) {
 
   // Reset estilo de todas las colonias (contorno verde sin relleno)
   capaColonias.resetStyle();
+  // Quitar tooltips anteriores
+  capaColonias.eachLayer(l => l.unbindTooltip());
 
   // Aplicar estilo según prioridad (borde coloreado y relleno suave)
   const est = estiloPrioridad(prioridad);
@@ -225,6 +238,16 @@ function resaltarColoniaYManzanas(alc, col, prioridad) {
     fillColor: est.fillColor,
     fillOpacity: 0.15
   });
+
+  // Tooltip permanente sobre la colonia con color acorde a prioridad
+  const prioClass = prioridadClass(prioridad);
+  const labelText = prioridad ? `Prioridad: ${prioridad}` : "Prioridad: sin dato";
+
+  layerColonia.bindTooltip(labelText, {
+    permanent: true,
+    direction: 'center',
+    className: `tooltip-prioridad ${prioClass}`
+  }).openTooltip();
 
   const geoColonia = layerColonia.toGeoJSON();
 
@@ -298,7 +321,10 @@ document.addEventListener('DOMContentLoaded', () => {
     colValueToIndex = {};
     resultadoDiv.style.display = 'none';
     capaManzanasResaltadas.clearLayers();
-    if (capaColonias) capaColonias.resetStyle();
+    if (capaColonias) {
+      capaColonias.resetStyle();
+      capaColonias.eachLayer(l => l.unbindTooltip());
+    }
 
     if (!alc) return;
 
@@ -325,7 +351,10 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!label || !(label in colValueToIndex)) {
       resultadoDiv.style.display = 'none';
       capaManzanasResaltadas.clearLayers();
-      if (capaColonias) capaColonias.resetStyle();
+      if (capaColonias) {
+        capaColonias.resetStyle();
+        capaColonias.eachLayer(l => l.unbindTooltip());
+      }
       return;
     }
 
@@ -339,13 +368,28 @@ document.addEventListener('DOMContentLoaded', () => {
     const prioridad = p.prioridad || '';
     const numManz   = p.CVEGEO_count != null ? p.CVEGEO_count : '';
 
+    const prioClass = prioridadClass(prioridad);
+    const prioText  = prioridad || 'Sin dato';
+
     resultadoDiv.innerHTML =
       `<div class="card">
-         <p><span class="label">Alcaldía:</span> ${alc}</p>
-         <p><span class="label">Colonia:</span> ${col}</p>
-         <p><span class="label">Código Postal:</span> ${cp}</p>
-         <p><span class="label">Prioridad de reforestación:</span> ${prioridad}</p>
-         <h3>Número de manzanas: <span class="numero">${numManz}</span></h3>
+         <div class="card-header">
+           <div class="card-title">
+             <span class="card-colonia">${col}</span>
+             <span class="card-alcaldia">${alc}</span>
+           </div>
+           <div class="card-prioridad">
+             <span class="badge-prioridad ${prioClass}">${prioText}</span>
+           </div>
+         </div>
+         <div class="card-body">
+           <p><span class="label">Código Postal:</span> ${cp || 'No disponible'}</p>
+           <p><span class="label">Prioridad de reforestación:</span> ${prioText}</p>
+           <p class="card-manzanas">
+             <span class="label">Número de manzanas:</span>
+             <span class="numero">${numManz}</span>
+           </p>
+         </div>
        </div>`;
     resultadoDiv.style.display = 'block';
 
