@@ -4,17 +4,15 @@
   <meta charset="UTF-8">
   <title>SEDEMA · Buscador de Manzanas por Colonia</title>
 
-  <!-- Leaflet -->
+  <!-- Leaflet SIN integrity -->
   <link rel="stylesheet"
-        href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
-        integrity="sha256-sA+z0pCfQZ8jNqHhYt1CbnK+k52r7Di5G3lD1Jp3pGI="
-        crossorigin="" />
+        href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 
   <!-- Fuente Roboto -->
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap"
         rel="stylesheet">
 
-  <!-- Estilos -->
+  <!-- Estilos institucionales -->
   <link href="styles.css" rel="stylesheet" />
 </head>
 <body>
@@ -60,10 +58,8 @@
   <p>Herramienta de consulta interna · Secretaría del Medio Ambiente de la Ciudad de México.</p>
 </footer>
 
-<!-- JS libs -->
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
-        integrity="sha256-o9N1j7kGStG3a7Wv+gLxwP2tT1rjT4W2R3lQN8Z8pcQ="
-        crossorigin=""></script>
+<!-- JS libs SIN integrity -->
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@turf/turf@6/turf.min.js"></script>
 
 <script>
@@ -133,7 +129,7 @@ function initMap() {
   }).addTo(map);
 }
 
-// Dibujar colonias y manzanas en el mapa
+// Dibujar colonias y manzanas
 function cargarCapasEnMapa() {
   capaColonias.clearLayers();
   capaManzanasTodas.clearLayers();
@@ -159,7 +155,6 @@ function resaltarManzanas(alc, col) {
 
   const geoColonia = layerColonia.toGeoJSON();
 
-  // Filtrar manzanas que intersectan ese polígono
   const seleccionadas = manzanasFeatures.filter(f => {
     try {
       return turf.booleanIntersects(f, geoColonia);
@@ -182,16 +177,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
   initMap();
 
-  // Cargar GeoJSON de colonias y manzanas
+  // Cargar GeoJSON
   Promise.all([
     fetch('colonias_bb.geojson').then(r => r.json()),
-    fetch('manznas_bb.geojson').then(r => r.json())
+    fetch('manznas_bb.json').then(r => r.json())
   ])
   .then(([coloniasData, manzanasData]) => {
-    coloniasFeatures = (coloniasData.features || []);
-    manzanasFeatures = (manzanasData.features || []);
+    coloniasFeatures = coloniasData.features || [];
+    manzanasFeatures = manzanasData.features || [];
 
-    // Normalizar textos y preparar lista de alcaldías
     coloniasFeatures.forEach(f => {
       if (!f.properties) f.properties = {};
       f.properties.ALCALDIA = normalizarTexto(f.properties.ALCALDIA || '');
@@ -201,7 +195,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const alcSet = new Set(coloniasFeatures.map(f => f.properties.ALCALDIA));
     const alcaldias = Array.from(alcSet).sort((a,b) => a.localeCompare(b, 'es'));
 
-    // Llenar select de alcaldía
+    // llenar select de alcaldía
     const opt0 = document.createElement('option');
     opt0.value = '';
     opt0.textContent = 'Selecciona una alcaldía…';
@@ -216,15 +210,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
     cargarCapasEnMapa();
   })
-  .catch(err => {
-    console.error('Error cargando GeoJSON:', err);
-  });
+  .catch(err => console.error('Error cargando GeoJSON:', err));
 
-  // Cambio de alcaldía
+  // cambio de alcaldía
   munSelect.addEventListener('change', () => {
     const alc = munSelect.value;
 
-    // Reset colonia y resultados
     colSelect.innerHTML = '';
     colSelect.disabled = true;
     resultadoDiv.style.display = 'none';
@@ -241,9 +232,10 @@ document.addEventListener('DOMContentLoaded', () => {
     opt0.textContent = 'Selecciona una colonia…';
     colSelect.appendChild(opt0);
 
-    coloniasDeAlc.forEach((f, idx) => {
+    coloniasDeAlc.forEach(f => {
+      const idx = coloniasFeatures.indexOf(f);
       const opt = document.createElement('option');
-      opt.value = coloniasFeatures.indexOf(f);  // índice global
+      opt.value = idx;
       opt.textContent = `${f.properties.COLONIA} (CP ${f.properties.CP_2 || ''})`;
       colSelect.appendChild(opt);
     });
@@ -251,7 +243,7 @@ document.addEventListener('DOMContentLoaded', () => {
     colSelect.disabled = false;
   });
 
-  // Cambio de colonia
+  // cambio de colonia
   colSelect.addEventListener('change', () => {
     const idx = colSelect.value;
     if (!idx) {
