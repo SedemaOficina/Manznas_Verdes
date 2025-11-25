@@ -61,7 +61,7 @@
 
 <!-- JS libs -->
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@turf/turf@6/turf.min.js"></script>
+script src="https://cdn.jsdelivr.net/npm/@turf/turf@6/turf.min.js"></script>
 
 <script>
 // ------------ Variables globales ------------ //
@@ -108,7 +108,7 @@ function estiloPrioridad(prioridad) {
   }
 }
 
-// Clase CSS para prioridad (para badge y tooltip)
+// Clase CSS para prioridad
 function prioridadClass(prioridad) {
   const p = (prioridad || "").toLowerCase().trim();
   if (p === "muy baja") return "prio-muy-baja";
@@ -217,7 +217,7 @@ function cargarCapasEnMapa() {
 }
 
 // Resaltar colonia y manzanas internas
-function resaltarColoniaYManzanas(alc, col, prioridad) {
+function resaltarColoniaYManzanas(alc, col, prioridad, numManz) {
   const key = alc + '|' + col;
   const layerColonia = indiceColonias[key];
   if (!layerColonia) {
@@ -241,9 +241,14 @@ function resaltarColoniaYManzanas(alc, col, prioridad) {
 
   // Tooltip permanente sobre la colonia con color acorde a prioridad
   const prioClass = prioridadClass(prioridad);
-  const labelText = prioridad ? `Prioridad: ${prioridad}` : "Prioridad: sin dato";
+  const prioText  = prioridad || 'Sin dato';
+  const numText   = numManz != null && numManz !== '' ? numManz : '0';
 
-  layerColonia.bindTooltip(labelText, {
+  const labelHtml =
+    `<div>Prioridad: ${prioText}</div>` +
+    `<div>No. de manzanas: ${numText}</div>`;
+
+  layerColonia.bindTooltip(labelHtml, {
     permanent: true,
     direction: 'center',
     className: `tooltip-prioridad ${prioClass}`
@@ -370,22 +375,23 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const prioClass = prioridadClass(prioridad);
     const prioText  = prioridad || 'Sin dato';
+    const numText   = numManz !== '' ? numManz : '0';
 
     resultadoDiv.innerHTML =
       `<div class="kpi-card">
-         <div class="kpi-header">
-           <div class="kpi-title">
-             <div class="kpi-colonia">${col || 'Colonia desconocida'}</div>
-             <div class="kpi-alcaldia">${alc || 'Alcaldía desconocida'}</div>
+         <div class="kpi-row">
+           <div class="kpi-info">
+             <p><span class="label">Alcaldía:</span> ${alc}</p>
+             <p><span class="label">Colonia:</span> ${col}</p>
            </div>
            <div class="kpi-prioridad">
              <span class="badge-prioridad ${prioClass}">${prioText}</span>
            </div>
          </div>
-         <div class="kpi-body">
+         <div class="kpi-row kpi-row-bottom">
            <div class="kpi-metric">
-             <div class="kpi-label">Número de manzanas</div>
-             <div class="kpi-value">${numManz || '0'}</div>
+             <span class="kpi-label">Número de manzanas</span>
+             <span class="kpi-value">${numText}</span>
            </div>
            <div class="kpi-secondary">
              <span class="label">Código Postal:</span> ${cp || 'No disponible'}
@@ -394,7 +400,7 @@ document.addEventListener('DOMContentLoaded', () => {
        </div>`;
     resultadoDiv.style.display = 'block';
 
-    resaltarColoniaYManzanas(alc, col, prioridad);
+    resaltarColoniaYManzanas(alc, col, prioridad, numText);
   });
 });
 </script>
