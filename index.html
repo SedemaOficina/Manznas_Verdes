@@ -66,9 +66,10 @@
 <script>
 // ------------ Variables globales ------------ //
 let coloniasFeatures = [];
-Let manzanasFeatures = [];
+let manzanasFeatures = [];
 
 let map;
+let baseCallesOSM, baseCallesClaras, baseSatelite, baseSinFondo;
 let capaColonias;
 let capaManzanasTodas;
 let capaManzanasResaltadas;
@@ -107,17 +108,35 @@ function estiloPrioridad(prioridad) {
   }
 }
 
-// ------------ Inicializar mapa ------------ //
+// ------------ Inicializar mapa + mapas base ------------ //
 function initMap() {
   map = L.map('map').setView([19.35, -99.13], 11);
 
-  // Base OSM
-  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+  // Mapas base
+  baseCallesOSM = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     maxZoom: 19,
     attribution: '&copy; OpenStreetMap'
-  }).addTo(map);
+  });
 
-  // TODAS las manzanas en gris claro (siempre visibles)
+  baseCallesClaras = L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+    maxZoom: 19,
+    attribution: '&copy; OpenStreetMap &copy; CARTO'
+  });
+
+  baseSatelite = L.tileLayer(
+    'https://server.arcgisonline.com/ArcGIS/rest/services/' +
+    'World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+      maxZoom: 19,
+      attribution: '&copy; Esri &mdash; Esri, Maxar, Earthstar Geographics y otros'
+  });
+
+  // Capa vacía para "Sin mapa base"
+  baseSinFondo = L.layerGroup();
+
+  // Activamos por defecto Calles OSM
+  baseCallesOSM.addTo(map);
+
+  // Capas de datos: manzanas y colonias
   capaManzanasTodas = L.geoJSON(null, {
     style: {
       color: "#999999",
@@ -127,7 +146,6 @@ function initMap() {
     }
   }).addTo(map);
 
-  // Colonias: SOLO contornos verdes por defecto
   capaColonias = L.geoJSON(null, {
     style: {
       color: '#00897b',
@@ -143,7 +161,6 @@ function initMap() {
     }
   }).addTo(map);
 
-  // Manzanas dentro de la colonia seleccionada (gris más oscuro, 50% opacidad)
   capaManzanasResaltadas = L.geoJSON(null, {
     style: {
       color: "#555555",
@@ -151,6 +168,25 @@ function initMap() {
       fillColor: "#777777",
       fillOpacity: 0.50
     }
+  }).addTo(map);
+
+  // Control de capas (mapas base + overlays)
+  const baseMaps = {
+    "Calles (OSM)": baseCallesOSM,
+    "Calles claras": baseCallesClaras,
+    "Satélite": baseSatelite,
+    "Sin mapa base": baseSinFondo
+  };
+
+  const overlayMaps = {
+    "Colonias": capaColonias,
+    "Manzanas (todas)": capaManzanasTodas,
+    "Manzanas en colonia": capaManzanasResaltadas
+  };
+
+  L.control.layers(baseMaps, overlayMaps, {
+    position: 'topright',
+    collapsed: true
   }).addTo(map);
 }
 
@@ -161,7 +197,7 @@ function cargarCapasEnMapa() {
   capaManzanasResaltadas.clearLayers();
   indiceColonias = {};
 
-  capaManzanasTodas.addData(manzanasFeatures); // base de gris
+  capaManzanasTodas.addData(manzanasFeatures); // base en gris
   capaColonias.addData(coloniasFeatures);      // contornos por encima
 
   if (capaColonias.getLayers().length > 0) {
