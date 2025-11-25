@@ -145,23 +145,55 @@ h2 {
 
 .card {
   background: var(--azul-claro);
-  padding: 16px 18px;
+  padding: 14px 16px;
   border-radius: 10px;
   border-left: 6px solid var(--verde-sedema);
 }
 
-.card p {
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.card-title {
+  display: flex;
+  flex-direction: column;
+}
+
+.card-colonia {
+  font-size: 16px;
+  font-weight: 700;
+  color: #1b1b1b;
+}
+
+.card-alcaldia {
+  font-size: 13px;
+  color: #555;
+}
+
+.card-prioridad {
+  display: flex;
+  align-items: center;
+}
+
+.card-body p {
   margin: 4px 0;
-  font-size: 14px;
+  font-size: 13px;
+}
+
+.card-manzanas {
+  margin-top: 8px;
 }
 
 .label {
-  font-weight: 700;
+  font-weight: 600;
 }
 
 .card h3 {
-  margin-top: 12px;
-  font-size: 18px;
+  margin-top: 6px;
+  font-size: 17px;
   font-weight: 700;
   color: #111;
 }
@@ -169,6 +201,45 @@ h2 {
 .numero {
   color: #d32f2f;
   font-weight: 700;
+  margin-left: 4px;
+}
+
+/* Badge de prioridad */
+
+.badge-prioridad {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #ffffff;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.prio-muy-baja {
+  background-color: #006100;
+}
+
+.prio-baja {
+  background-color: #7aab00;
+}
+
+.prio-media {
+  background-color: #ffff00;
+  color: #333;
+}
+
+.prio-alta {
+  background-color: #ff9900;
+}
+
+.prio-muy-alta {
+  background-color: #ff2200;
+}
+
+.prio-desconocida {
+  background-color: #757575;
 }
 
 /* MAPA */
@@ -189,6 +260,45 @@ h2 {
   border-radius: 10px;
   border: 1px solid #e0e0e0;
   overflow: hidden;
+}
+
+/* Tooltip de prioridad en el mapa */
+
+.leaflet-tooltip.tooltip-prioridad {
+  border: none;
+  border-radius: 999px;
+  padding: 4px 12px;
+  font-size: 11px;
+  font-weight: 600;
+  color: #fff;
+  text-transform: uppercase;
+}
+
+/* Colores por prioridad para el tooltip */
+
+.leaflet-tooltip.tooltip-prioridad.prio-muy-baja {
+  background-color: #006100;
+}
+
+.leaflet-tooltip.tooltip-prioridad.prio-baja {
+  background-color: #7aab00;
+}
+
+.leaflet-tooltip.tooltip-prioridad.prio-media {
+  background-color: #ffff00;
+  color: #333;
+}
+
+.leaflet-tooltip.tooltip-prioridad.prio-alta {
+  background-color: #ff9900;
+}
+
+.leaflet-tooltip.tooltip-prioridad.prio-muy-alta {
+  background-color: #ff2200;
+}
+
+.leaflet-tooltip.tooltip-prioridad.prio-desconocida {
+  background-color: #757575;
 }
 
 /* FOOTER */
