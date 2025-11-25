@@ -157,42 +157,12 @@ function mostrarManzanasDeColonia(alcaldia, colonia) {
   capaManzanas.addData(seleccionadas);
 }
 
-// ---------------- Carga inicial: CSV + JSON ----------------
-Promise.all([
-  fetch('manzanas_por_colonia.csv').then(r => r.text()),
-  fetch('colonias.json').then(r => r.json()),
-  fetch('manzanas.json').then(r => r.json())
-]).then(([csvText, coloniasData, manzanasData]) => {
-
-  coloniasGeojson = coloniasData;
-  manzanasGeojson = manzanasData;
-
-  const lineas = csvText.split(/\r?\n/).map(l => l.trim()).filter(l => l.length > 0);
-
-  datos = lineas.slice(1).map((l, idx) => {
-    const cols = l.split(",");
-    const ALCALDIA = normalizarTexto(cols[0] || '');
-    const COLONIA  = normalizarTexto(cols[1] || '');
-    const TIPO     = (cols[2] || '').trim();
-    const CP       = (cols[3] || '').trim();
-    const MANZ     = (cols[4] || '').trim();
-    return {
-      index: idx,
-      MUN_NAME: ALCALDIA,
-      SETT_NAME: COLONIA,
-      SETT_TYPE: TIPO,
-      CP: CP,
-      MANZANAS: MANZ
-    };
-  });
-
-  municipios = [...new Set(datos.map(d => d.MUN_NAME))]
-    .sort((a,b) => a.localeCompare(b, 'es'));
-
+// ---------------- Código principal ----------------
+$(function() {
   const $mun = $('#munSelector');
   const $col = $('#colSelector');
 
-  // Inicializar Select2 (UNA sola vez)
+  // Inicializamos SOLO el Select2 de alcaldía de inicio
   $mun.select2({
     placeholder: 'Selecciona una alcaldía…',
     allowClear: true,
@@ -200,92 +170,124 @@ Promise.all([
     width: 'resolve'
   });
 
-  $col.select2({
-    placeholder: 'Primero selecciona una alcaldía…',
-    allowClear: true,
-    closeOnSelect: true,
-    width: 'resolve'
-  });
+  // Handler cambio de alcaldía (antes de cargar datos para no duplicar)
+  $mun.on('change', function() {
+    const mun = $(this).val();
 
-  // Llenar alcaldías
-  $mun.append(new Option('', '', true, true));
-  municipios.forEach(m => $mun.append(new Option(m, m)));
-  $mun.val(null).trigger('change');
+    // Si ya hay Select2 en colonias, destruirlo
+    if ($col.hasClass('select2-hidden-accessible')) {
+      $col.select2('destroy');
+    }
 
-  initMap();
-});
-
-// ---------------- Eventos de UI ----------------
-
-// Cambio de alcaldía
-$('#munSelector').on('change', function() {
-  const mun = $(this).val();
-  const $col = $('#colSelector');
-
-  // Limpiar colonia y resultado
-  $col.prop('disabled', true);
-  $col.empty();                 // eliminar opciones
-  $col.val(null).trigger('change'); // reset valor Select2
-  $('#resultado').hide();
-  if (capaManzanas) capaManzanas.clearLayers();
-
-  if (!mun) {
-    // volvemos al placeholder inicial
-    $col.data('select2').$container.find('.select2-selection__placeholder')
-        .text('Primero selecciona una alcaldía…');
-    return;
-  }
-
-  const colonias = datos
-    .filter(d => d.MUN_NAME === mun)
-    .sort((a,b) => a.SETT_NAME.localeCompare(b.SETT_NAME, 'es'));
-
-  $col.prop('disabled', false);
-
-  // placeholder vacío para que funcione allowClear
-  $col.append(new Option('', '', true, true));
-
-  colonias.forEach(d => {
-    const text = `${d.SETT_NAME} (CP ${d.CP})`;
-    const opt  = new Option(text, String(d.index), false, false);
-    $col.append(opt);
-  });
-
-  // actualizar placeholder visual
-  $col.data('select2').$container.find('.select2-selection__placeholder')
-      .text('Selecciona una colonia…');
-
-  $col.val(null).trigger('change');
-});
-
-// Cambio de colonia
-$('#colSelector').on('change', function() {
-  const idx = $(this).val();
-  if (idx === null || idx === '') {
+    $col.empty();
+    $col.val(null);
     $('#resultado').hide();
+    $col.prop('disabled', true);
     if (capaManzanas) capaManzanas.clearLayers();
-    return;
-  }
 
-  const d = datos[parseInt(idx, 10)];
+    if (!mun) {
+      // vuelve a placeholder inicial
+      $col.select2({
+        placeholder: 'Primero selecciona una alcaldía…',
+        allowClear: false,
+        width: 'resolve'
+      });
+      return;
+    }
 
-  const html =
-    `<div class="card">
-        <p><span class="label">Alcaldía:</span> ${d.MUN_NAME}</p>
-        <p><span class="label">Colonia:</span> ${d.SETT_NAME}</p>
-        <p><span class="label">Tipo:</span> ${d.SETT_TYPE}</p>
-        <p><span class="label">Código Postal:</span> ${d.CP}</p>
-        <h3>Número de manzanas: <span class="numero">${d.MANZANAS}</span></h3>
-     </div>`;
-  $('#resultado').html(html).show();
+    // Filtrar colonias del municipio
+    const colonias = datos
+      .filter(d => d.MUN_NAME === mun)
+      .sort((a,b) => a.SETT_NAME.localeCompare(b.SETT_NAME, 'es'));
 
-  const key = d.MUN_NAME + '|' + d.SETT_NAME;
-  const layer = indiceColonias[key];
-  if (layer) {
-    map.fitBounds(layer.getBounds(), { padding: [20, 20] });
-  }
+    // Rellenar opciones
+    $col.append(new Option('', '', true, true)); // opción vacía para placeholder
+    colonias.forEach(d => {
+      const text = `${d.SETT_NAME} (CP ${d.CP})`;
+      const opt  = new Option(text, String(d.index), false, false);
+      $col.append(opt);
+    });
 
-  mostrarManzanasDeColonia(d.MUN_NAME, d.SETT_NAME);
+    $col.prop('disabled', false);
+
+    // Re-inicializar Select2 de colonias de forma limpia
+    $col.select2({
+      placeholder: 'Selecciona una colonia…',
+      allowClear: true,
+      closeOnSelect: true,
+      width: 'resolve'
+    }).val(null).trigger('change');
+  });
+
+  // Handler cambio de colonia
+  $col.on('change', function() {
+    const idx = $(this).val();
+    if (idx === null || idx === '') {
+      $('#resultado').hide();
+      if (capaManzanas) capaManzanas.clearLayers();
+      return;
+    }
+
+    const d = datos[parseInt(idx, 10)];
+
+    const html =
+      `<div class="card">
+          <p><span class="label">Alcaldía:</span> ${d.MUN_NAME}</p>
+          <p><span class="label">Colonia:</span> ${d.SETT_NAME}</p>
+          <p><span class="label">Tipo:</span> ${d.SETT_TYPE}</p>
+          <p><span class="label">Código Postal:</span> ${d.CP}</p>
+          <h3>Número de manzanas: <span class="numero">${d.MANZANAS}</span></h3>
+       </div>`;
+    $('#resultado').html(html).show();
+
+    const key = d.MUN_NAME + '|' + d.SETT_NAME;
+    const layer = indiceColonias[key];
+    if (layer) {
+      map.fitBounds(layer.getBounds(), { padding: [20, 20] });
+    }
+
+    mostrarManzanasDeColonia(d.MUN_NAME, d.SETT_NAME);
+  });
+
+  // Cargar CSV + GeoJSON
+  Promise.all([
+    fetch('manzanas_por_colonia.csv').then(r => r.text()),
+    fetch('colonias.json').then(r => r.json()),
+    fetch('manzanas.json').then(r => r.json())
+  ]).then(([csvText, coloniasData, manzanasData]) => {
+
+    coloniasGeojson = coloniasData;
+    manzanasGeojson = manzanasData;
+
+    const lineas = csvText.split(/\r?\n/).map(l => l.trim()).filter(l => l.length > 0);
+
+    datos = lineas.slice(1).map((l, idx) => {
+      const cols = l.split(",");
+      const ALCALDIA = normalizarTexto(cols[0] || '');
+      const COLONIA  = normalizarTexto(cols[1] || '');
+      const TIPO     = (cols[2] || '').trim();
+      const CP       = (cols[3] || '').trim();
+      const MANZ     = (cols[4] || '').trim();
+      return {
+        index: idx,
+        MUN_NAME: ALCALDIA,
+        SETT_NAME: COLONIA,
+        SETT_TYPE: TIPO,
+        CP: CP,
+        MANZANAS: MANZ
+      };
+    });
+
+    municipios = [...new Set(datos.map(d => d.MUN_NAME))]
+      .sort((a,b) => a.localeCompare(b, 'es'));
+
+    // Llenar alcaldías
+    $mun.append(new Option('', '', true, true));
+    municipios.forEach(m => $mun.append(new Option(m, m)));
+    $mun.val(null).trigger('change');
+
+    initMap();
+  });
 });
 </script>
 
