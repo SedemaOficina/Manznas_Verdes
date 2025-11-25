@@ -12,7 +12,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap"
         rel="stylesheet">
 
-  <!-- Estilos -->
+  <!-- Estilos propios -->
   <link href="styles.css" rel="stylesheet" />
 </head>
 <body>
@@ -50,6 +50,7 @@
 
   <section class="map-section">
     <h3>Mapa de colonias y manzanas</h3>
+
     <div class="map-wrapper">
       <div id="map"></div>
 
@@ -136,65 +137,57 @@ function normalizarTexto(str) {
   return fixes[raw] || raw;
 }
 
-// Colores según prioridad (tus códigos)
+// Colores según prioridad
 function estiloPrioridad(prioridad) {
   const p = (prioridad || "").toLowerCase().trim();
-
-  if (p === "muy baja") {
-    return { color: "#003300", fillColor: "#006100" };
-  } else if (p === "baja") {
-    return { color: "#557700", fillColor: "#7aab00" };
-  } else if (p === "media") {
-    return { color: "#b2b200", fillColor: "#ffff00" };
-  } else if (p === "alta") {
-    return { color: "#cc6600", fillColor: "#ff9900" };
-  } else if (p === "muy alta") {
-    return { color: "#b21800", fillColor: "#ff2200" };
-  } else {
-    return { color: "#666666", fillColor: "#cccccc" };
-  }
+  if (p === "muy baja")  return { color: "#003300", fillColor: "#006100" };
+  if (p === "baja")      return { color: "#557700", fillColor: "#7aab00" };
+  if (p === "media")     return { color: "#b2b200", fillColor: "#ffff00" };
+  if (p === "alta")      return { color: "#cc6600", fillColor: "#ff9900" };
+  if (p === "muy alta")  return { color: "#b21800", fillColor: "#ff2200" };
+  return { color: "#666666", fillColor: "#cccccc" };
 }
 
-// Clase CSS para prioridad (badge y tooltip)
 function prioridadClass(prioridad) {
   const p = (prioridad || "").toLowerCase().trim();
-  if (p === "muy baja") return "prio-muy-baja";
-  if (p === "baja")     return "prio-baja";
-  if (p === "media")    return "prio-media";
-  if (p === "alta")     return "prio-alta";
-  if (p === "muy alta") return "prio-muy-alta";
+  if (p === "muy baja")  return "prio-muy-baja";
+  if (p === "baja")      return "prio-baja";
+  if (p === "media")     return "prio-media";
+  if (p === "alta")      return "prio-alta";
+  if (p === "muy alta")  return "prio-muy-alta";
   return "prio-desconocida";
 }
 
-// ------------ Inicializar mapa + mapas base ------------ //
+// ------------ Inicializar mapa ------------ //
 function initMap() {
   map = L.map('map').setView([19.35, -99.13], 11);
 
-  // Mapas base
   baseCallesOSM = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     maxZoom: 19,
     attribution: '&copy; OpenStreetMap'
   });
 
-  baseCallesClaras = L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
-    maxZoom: 19,
-    attribution: '&copy; OpenStreetMap &copy; CARTO'
-  });
+  baseCallesClaras = L.tileLayer(
+    'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',
+    {
+      maxZoom: 19,
+      attribution: '&copy; OpenStreetMap &copy; CARTO'
+    }
+  );
 
   baseSatelite = L.tileLayer(
     'https://server.arcgisonline.com/ArcGIS/rest/services/' +
-    'World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+    'World_Imagery/MapServer/tile/{z}/{y}/{x}',
+    {
       maxZoom: 19,
       attribution: '&copy; Esri &mdash; Esri, Maxar, Earthstar Geographics y otros'
-  });
+    }
+  );
 
-  // Capa vacía para "Sin mapa base"
   baseSinFondo = L.layerGroup();
 
-  // Activamos por defecto Calles OSM
   baseCallesOSM.addTo(map);
 
-  // Capas de datos: manzanas y colonias
   capaManzanasTodas = L.geoJSON(null, {
     style: {
       color: "#999999",
@@ -208,7 +201,7 @@ function initMap() {
     style: {
       color: '#00897b',
       weight: 1.2,
-      fillOpacity: 0   // sin relleno para que se vean las manzanas debajo
+      fillOpacity: 0
     },
     onEachFeature: function(feature, layer) {
       const p = feature.properties || {};
@@ -228,7 +221,6 @@ function initMap() {
     }
   }).addTo(map);
 
-  // Control de capas (mapas base + overlays)
   const baseMaps = {
     "Calles (OSM)": baseCallesOSM,
     "Calles claras": baseCallesClaras,
@@ -248,22 +240,20 @@ function initMap() {
   }).addTo(map);
 }
 
-// Dibujar colonias + todas las manzanas
 function cargarCapasEnMapa() {
   capaColonias.clearLayers();
   capaManzanasTodas.clearLayers();
   capaManzanasResaltadas.clearLayers();
   indiceColonias = {};
 
-  capaManzanasTodas.addData(manzanasFeatures); // base en gris
-  capaColonias.addData(coloniasFeatures);      // contornos por encima
+  capaManzanasTodas.addData(manzanasFeatures);
+  capaColonias.addData(coloniasFeatures);
 
   if (capaColonias.getLayers().length > 0) {
     map.fitBounds(capaColonias.getBounds());
   }
 }
 
-// Resaltar colonia y manzanas internas
 function resaltarColoniaYManzanas(alc, col, prioridad, numManz) {
   const key = alc + '|' + col;
   const layerColonia = indiceColonias[key];
@@ -272,11 +262,9 @@ function resaltarColoniaYManzanas(alc, col, prioridad, numManz) {
     return;
   }
 
-  // Reset estilo de todas las colonias (contorno base)
   capaColonias.resetStyle();
   capaColonias.eachLayer(l => l.unbindTooltip());
 
-  // Estilo según prioridad
   const est = estiloPrioridad(prioridad);
   layerColonia.setStyle({
     color: est.color,
@@ -287,14 +275,13 @@ function resaltarColoniaYManzanas(alc, col, prioridad, numManz) {
 
   const prioClass = prioridadClass(prioridad);
   const prioText  = prioridad || 'Sin dato';
-  const numText   = numManz !== '' ? numManz : '0';
+  const numText   = numManz || '0';
 
-  // Tooltip con prioridad y no. de manzanas
-  const labelHtml =
+  const tooltipHtml =
     `<div>Prioridad: ${prioText}</div>` +
     `<div>No. de manzanas: ${numText}</div>`;
 
-  layerColonia.bindTooltip(labelHtml, {
+  layerColonia.bindTooltip(tooltipHtml, {
     permanent: true,
     direction: 'center',
     className: `tooltip-prioridad ${prioClass}`
@@ -305,7 +292,7 @@ function resaltarColoniaYManzanas(alc, col, prioridad, numManz) {
   const seleccionadas = manzanasFeatures.filter(f => {
     try {
       return turf.booleanIntersects(f, geoColonia);
-    } catch(e) {
+    } catch (e) {
       return false;
     }
   });
@@ -318,16 +305,17 @@ function resaltarColoniaYManzanas(alc, col, prioridad, numManz) {
 
 // ------------ Código principal ------------ //
 document.addEventListener('DOMContentLoaded', () => {
-  const munSelect = document.getElementById('munSelector');
-  const colInput  = document.getElementById('colInput');
-  const colList   = document.getElementById('colList');
+  const munSelect    = document.getElementById('munSelector');
+  const colInput     = document.getElementById('colInput');
+  const colList      = document.getElementById('colList');
   const resultadoDiv = document.getElementById('resultado');
 
   initMap();
 
-  // Cargar GeoJSON
   Promise.all([
+    // Colonias
     fetch('COLONIAS_PRIORIZACION_LIBER.geojson').then(r => r.json()),
+    // Manzanas
     fetch('MANZANAS_LIBER_simplificado.json').then(r => r.json())
   ])
   .then(([coloniasData, manzanasData]) => {
@@ -336,15 +324,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
     coloniasFeatures.forEach(f => {
       if (!f.properties) f.properties = {};
-      f.properties.NOM_MUN    = normalizarTexto(f.properties.NOM_MUN || '');
-      f.properties.COLONIA    = normalizarTexto(f.properties.COLONIA || '');
-      f.properties.prioridad  = (f.properties.prioridad || '').trim();
+      f.properties.NOM_MUN   = normalizarTexto(f.properties.NOM_MUN || '');
+      f.properties.COLONIA   = normalizarTexto(f.properties.COLONIA || '');
+      f.properties.prioridad = (f.properties.prioridad || '').trim();
     });
 
     const alcSet = new Set(coloniasFeatures.map(f => f.properties.NOM_MUN));
     const alcaldias = Array.from(alcSet).sort((a,b) => a.localeCompare(b, 'es'));
 
-    // Llenar select de alcaldía
     const opt0 = document.createElement('option');
     opt0.value = '';
     opt0.textContent = 'Selecciona una alcaldía…';
@@ -361,11 +348,9 @@ document.addEventListener('DOMContentLoaded', () => {
   })
   .catch(err => console.error('Error cargando GeoJSON:', err));
 
-  // Cambio de alcaldía
   munSelect.addEventListener('change', () => {
     const alc = munSelect.value;
 
-    // Reset colonia y resultados
     colInput.value = '';
     colInput.disabled = true;
     colList.innerHTML = '';
@@ -379,7 +364,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (!alc) return;
 
-    // Filtrar colonias por alcaldía
     const coloniasDeAlc = coloniasFeatures
       .filter(f => f.properties.NOM_MUN === alc)
       .sort((a,b) => a.properties.COLONIA.localeCompare(b.properties.COLONIA, 'es'));
@@ -396,7 +380,6 @@ document.addEventListener('DOMContentLoaded', () => {
     colInput.disabled = false;
   });
 
-  // Selección de colonia desde autocomplete
   colInput.addEventListener('change', () => {
     const label = colInput.value;
     if (!label || !(label in colValueToIndex)) {
@@ -427,7 +410,7 @@ document.addEventListener('DOMContentLoaded', () => {
       `<div class="kpi-card">
          <p><span class="label-bold">Alcaldía:</span> ${alc}</p>
          <p><span class="label-bold">Colonia:</span> ${col}</p>
-         <p><span class="label-bold">Prioridad:</span> 
+         <p><span class="label-bold">Prioridad:</span>
            <span class="badge-prioridad ${prioClass}">${prioText}</span>
          </p>
          <p class="kpi-number-line">
@@ -447,4 +430,3 @@ document.addEventListener('DOMContentLoaded', () => {
 
 </body>
 </html>
-
