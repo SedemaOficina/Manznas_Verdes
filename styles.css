@@ -137,71 +137,75 @@ h2 {
   }
 }
 
-/* TARJETA DE RESULTADO */
+/* TARJETA KPI */
 
 .resultado {
   margin-top: 20px;
 }
 
-.card {
-  background: var(--azul-claro);
+.kpi-card {
+  background: #ffffff;
+  border-radius: 12px;
+  border: 1px solid #dde3ea;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
   padding: 14px 16px;
-  border-radius: 10px;
-  border-left: 6px solid var(--verde-sedema);
 }
 
-.card-header {
+.kpi-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  gap: 12px;
   margin-bottom: 8px;
 }
 
-.card-title {
+.kpi-title {
   display: flex;
   flex-direction: column;
 }
 
-.card-colonia {
+.kpi-colonia {
   font-size: 16px;
   font-weight: 700;
   color: #1b1b1b;
 }
 
-.card-alcaldia {
+.kpi-alcaldia {
   font-size: 13px;
   color: #555;
 }
 
-.card-prioridad {
+.kpi-prioridad {
   display: flex;
   align-items: center;
 }
 
-.card-body p {
-  margin: 4px 0;
+.kpi-body {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.kpi-metric {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+}
+
+.kpi-label {
   font-size: 13px;
+  color: #555;
 }
 
-.card-manzanas {
-  margin-top: 8px;
-}
-
-.label {
-  font-weight: 600;
-}
-
-.card h3 {
-  margin-top: 6px;
-  font-size: 17px;
-  font-weight: 700;
-  color: #111;
-}
-
-.numero {
+.kpi-value {
+  font-size: 26px;
+  font-weight: 800;
   color: #d32f2f;
-  font-weight: 700;
-  margin-left: 4px;
+}
+
+.kpi-secondary {
+  font-size: 12px;
+  color: #777;
 }
 
 /* Badge de prioridad */
@@ -216,6 +220,8 @@ h2 {
   text-transform: uppercase;
   letter-spacing: 0.5px;
 }
+
+/* Colores de prioridad */
 
 .prio-muy-baja {
   background-color: #006100;
