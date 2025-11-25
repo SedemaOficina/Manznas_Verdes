@@ -69,7 +69,7 @@
 
 <script>
 // ---------------- Variables globales ----------------
-let datos = [];           // registros del CSV (alcaldía, colonia, CP, #manzanas)
+let datos = [];           // registros del CSV (ALCALDIA, COLONIA, TIPO, CP, No. De Manzanas)
 let municipios = [];
 
 let map;
@@ -91,7 +91,14 @@ function normalizarTexto(str) {
   return fixes[str.trim()] || str.trim();
 }
 
-// ---------------- Inicializar mapa base ----------------
+// separa una fila del CSV soportando coma, punto y coma o tabulador
+function splitCsvRow(line) {
+  // elimina comillas externas si las hay
+  const cleaned = line.replace(/^[\"\']|[\"\']$/g, "");
+  return cleaned.split(/,\s*|;\s*|\t+/);
+}
+
+// ---------------- Inicializar mapa ----------------
 function initMapBase() {
   map = L.map('map').setView([19.35, -99.13], 11);
 
@@ -251,11 +258,14 @@ document.addEventListener('DOMContentLoaded', () => {
     coloniasGeojson = coloniasData;
     manzanasGeojson = manzanasData;
 
-    const lineas = csvText.split(/\r?\n/).map(l => l.trim()).filter(l => l.length > 0);
+    const lineas = csvText
+      .split(/\r?\n/)
+      .map(l => l.trim())
+      .filter(l => l.length > 0);
 
-    // CSV: ALCALDIA,COLONIA,TIPO,CP,No. De Manzanas
+    // Saltamos la primera línea (encabezado ALCALDIA, COLONIA, TIPO, CP, No. De Manzanas)
     datos = lineas.slice(1).map((l, idx) => {
-      const cols = l.split(",");
+      const cols = splitCsvRow(l);
       const ALCALDIA = normalizarTexto(cols[0] || '');
       const COLONIA  = normalizarTexto(cols[1] || '');
       const TIPO     = (cols[2] || '').trim();
