@@ -21,7 +21,7 @@
   <div class="header-inner">
     <div class="header-texto">
       <h1>SEDEMA · Manzanas por colonia</h1>
-      <p>Consulta el número de manzanas y la prioridad de reforestación por colonia en la Ciudad de México.</p>
+      <p>Consulta el número de manzanas y la prioridad de reforestación por colonia.</p>
     </div>
   </div>
   <div class="linea-oro"></div>
@@ -40,9 +40,9 @@
 
     <div class="form-item">
       <label for="colInput">Colonia</label>
-      <input id="colInput" list="colList" placeholder="Empieza a escribir la colonia…" disabled>
+      <input id="colInput" list="colList" placeholder="Escribe el nombre de la colonia…" disabled>
       <datalist id="colList"></datalist>
-      <small class="hint">Escribe el nombre de la colonia y selecciónala de la lista.</small>
+      <small class="hint">Selecciona la colonia de la lista.</small>
     </div>
   </div>
 
@@ -69,48 +69,32 @@
           </div>
           <div class="legend-item">
             <span class="legend-color manzanas-sel-color"></span>
-            <span class="legend-label">Manzanas en colonia</span>
+            <span class="legend-label">Manzanas dentro de colonia</span>
           </div>
         </div>
 
-        <div class="legend-subtitle">Prioridad de reforestación</div>
+        <div class="legend-subtitle">Prioridad</div>
         <div class="legend-group">
-          <div class="legend-item">
-            <span class="legend-color prio-muy-baja"></span>
-            <span class="legend-label">Muy baja</span>
-          </div>
-          <div class="legend-item">
-            <span class="legend-color prio-baja"></span>
-            <span class="legend-label">Baja</span>
-          </div>
-          <div class="legend-item">
-            <span class="legend-color prio-media"></span>
-            <span class="legend-label">Media</span>
-          </div>
-          <div class="legend-item">
-            <span class="legend-color prio-alta"></span>
-            <span class="legend-label">Alta</span>
-          </div>
-          <div class="legend-item">
-            <span class="legend-color prio-muy-alta"></span>
-            <span class="legend-label">Muy alta</span>
-          </div>
+          <div class="legend-item"><span class="legend-color prio-muy-baja"></span>Muy baja</div>
+          <div class="legend-item"><span class="legend-color prio-baja"></span>Baja</div>
+          <div class="legend-item"><span class="legend-color prio-media"></span>Media</div>
+          <div class="legend-item"><span class="legend-color prio-alta"></span>Alta</div>
+          <div class="legend-item"><span class="legend-color prio-muy-alta"></span>Muy alta</div>
         </div>
       </div>
-      <!-- FIN LEYENDA -->
+
     </div>
   </section>
 
 </main>
 
 <footer>
-  <p>Herramienta de consulta interna · Secretaría del Medio Ambiente de la Ciudad de México.</p>
+  <p>SEDEMA · Herramienta de consulta interna.</p>
 </footer>
 
 <!-- JS libs -->
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@turf/turf@6/turf.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/pako@2.1.0/dist/pako.min.js"></script>
 
 <script>
 // ------------ Variables globales ------------ //
@@ -118,44 +102,41 @@ let coloniasFeatures = [];
 let manzanasFeatures = [];
 
 let map;
-let baseCallesOSM, baseCallesClaras, baseSatelite, baseSinFondo;
 let capaColonias;
 let capaManzanasTodas;
 let capaManzanasResaltadas;
-let indiceColonias = {};      // clave "NOM_MUN|COLONIA" -> layer colonia
-let colValueToIndex = {};     // etiqueta del datalist -> índice en coloniasFeatures
+let indiceColonias = {};     
+let colValueToIndex = {};    
 
-// ------------ Utilidades ------------ //
+// ------------ Normalizador ------------ //
 function normalizarTexto(str) {
   if (!str) return str;
-  const raw = str.trim();
   const fixes = {
     "TL?HUAC": "TLÁHUAC",
     "?LVARO OBREG?N": "ÁLVARO OBREGÓN",
-    "COYOAC?N": "COYOACÁN",
-    "BENITO JU?REZ": "BENITO JUÁREZ"
   };
+  const raw = str.trim();
   return fixes[raw] || raw;
 }
 
-// Colores según prioridad
+// ------------ Estilos por prioridad ------------ //
 function estiloPrioridad(prioridad) {
-  const p = (prioridad || "").toLowerCase().trim();
-  if (p === "muy baja")  return { color: "#003300", fillColor: "#006100" };
-  if (p === "baja")      return { color: "#557700", fillColor: "#7aab00" };
-  if (p === "media")     return { color: "#b2b200", fillColor: "#ffff00" };
-  if (p === "alta")      return { color: "#cc6600", fillColor: "#ff9900" };
-  if (p === "muy alta")  return { color: "#b21800", fillColor: "#ff2200" };
-  return { color: "#666666", fillColor: "#cccccc" };
+  const p = prioridad.toLowerCase();
+  if (p === "muy baja")  return { color:"#003300", fill:"#006100" };
+  if (p === "baja")      return { color:"#557700", fill:"#7aab00" };
+  if (p === "media")     return { color:"#b2b200", fill:"#ffff00" };
+  if (p === "alta")      return { color:"#cc6600", fill:"#ff9900" };
+  if (p === "muy alta")  return { color:"#b21800", fill:"#ff2200" };
+  return { color:"#666666", fill:"#cccccc" };
 }
 
 function prioridadClass(prioridad) {
-  const p = (prioridad || "").toLowerCase().trim();
-  if (p === "muy baja")  return "prio-muy-baja";
-  if (p === "baja")      return "prio-baja";
-  if (p === "media")     return "prio-media";
-  if (p === "alta")      return "prio-alta";
-  if (p === "muy alta")  return "prio-muy-alta";
+  const p = prioridad.toLowerCase();
+  if (p === "muy baja") return "prio-muy-baja";
+  if (p === "baja")     return "prio-baja";
+  if (p === "media")    return "prio-media";
+  if (p === "alta")     return "prio-alta";
+  if (p === "muy alta") return "prio-muy-alta";
   return "prio-desconocida";
 }
 
@@ -163,35 +144,13 @@ function prioridadClass(prioridad) {
 function initMap() {
   map = L.map('map').setView([19.35, -99.13], 11);
 
-  baseCallesOSM = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    maxZoom: 19,
-    attribution: '&copy; OpenStreetMap'
-  });
-
-  baseCallesClaras = L.tileLayer(
-    'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',
-    {
-      maxZoom: 19,
-      attribution: '&copy; OpenStreetMap &copy; CARTO'
-    }
-  );
-
-  baseSatelite = L.tileLayer(
-    'https://server.arcgisonline.com/ArcGIS/rest/services/' +
-    'World_Imagery/MapServer/tile/{z}/{y}/{x}',
-    {
-      maxZoom: 19,
-      attribution: '&copy; Esri &mdash; Esri, Maxar, Earthstar Geographics y otros'
-    }
-  );
-
-  baseSinFondo = L.layerGroup();
-
-  baseCallesOSM.addTo(map);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    maxZoom: 19
+  }).addTo(map);
 
   capaManzanasTodas = L.geoJSON(null, {
     style: {
-      color: "#999999",
+      color: "#999",
       weight: 0.4,
       fillColor: "#d0d0d0",
       fillOpacity: 0.35
@@ -200,44 +159,24 @@ function initMap() {
 
   capaColonias = L.geoJSON(null, {
     style: {
-      color: '#00897b',
-      weight: 1.2,
-      fillOpacity: 0
+      color:"#00897b",
+      weight:1.2,
+      fillOpacity:0
     },
-    onEachFeature: function(feature, layer) {
-      const p = feature.properties || {};
-      const alc = normalizarTexto(p.NOM_MUN || '');
-      const col = normalizarTexto(p.COLONIA || '');
-      const key = alc + '|' + col;
+    onEachFeature: function(feat, layer) {
+      const p = feat.properties;
+      const key = `${p.NOM_MUN}|${p.COLONIA}`;
       indiceColonias[key] = layer;
     }
   }).addTo(map);
 
   capaManzanasResaltadas = L.geoJSON(null, {
     style: {
-      color: "#555555",
-      weight: 0.8,
-      fillColor: "#777777",
-      fillOpacity: 0.50
+      color:"#555",
+      weight:0.8,
+      fillColor:"#777",
+      fillOpacity:0.5
     }
-  }).addTo(map);
-
-  const baseMaps = {
-    "Calles (OSM)": baseCallesOSM,
-    "Calles claras": baseCallesClaras,
-    "Satélite": baseSatelite,
-    "Sin mapa base": baseSinFondo
-  };
-
-  const overlayMaps = {
-    "Colonias": capaColonias,
-    "Manzanas (todas)": capaManzanasTodas,
-    "Manzanas en colonia": capaManzanasResaltadas
-  };
-
-  L.control.layers(baseMaps, overlayMaps, {
-    position: 'topright',
-    collapsed: true
   }).addTo(map);
 }
 
@@ -245,103 +184,77 @@ function cargarCapasEnMapa() {
   capaColonias.clearLayers();
   capaManzanasTodas.clearLayers();
   capaManzanasResaltadas.clearLayers();
-  indiceColonias = {};
 
   capaManzanasTodas.addData(manzanasFeatures);
   capaColonias.addData(coloniasFeatures);
 
-  if (capaColonias.getLayers().length > 0) {
-    map.fitBounds(capaColonias.getBounds());
-  }
+  map.fitBounds(capaColonias.getBounds());
 }
 
 function resaltarColoniaYManzanas(alc, col, prioridad, numManz) {
-  const key = alc + '|' + col;
+  const key = `${alc}|${col}`;
   const layerColonia = indiceColonias[key];
-  if (!layerColonia) {
-    capaManzanasResaltadas.clearLayers();
-    return;
-  }
+  if (!layerColonia) return;
 
   capaColonias.resetStyle();
   capaColonias.eachLayer(l => l.unbindTooltip());
 
   const est = estiloPrioridad(prioridad);
+
   layerColonia.setStyle({
     color: est.color,
-    weight: 2.5,
-    fillColor: est.fillColor,
-    fillOpacity: 0.15
+    weight: 3,
+    fillColor: est.fill,
+    fillOpacity: 0.2
   });
 
-  const prioClass = prioridadClass(prioridad);
-  const prioText  = prioridad || 'Sin dato';
-  const numText   = numManz || '0';
+  layerColonia.bindTooltip(
+    `<b>${col}</b><br>Prioridad: ${prioridad}<br>Manzanas: ${numManz}`,
+    { permanent:true, direction:'center', className:`tooltip-prioridad ${prioridadClass(prioridad)}` }
+  ).openTooltip();
 
-  const tooltipHtml =
-    `<div>Prioridad: ${prioText}</div>` +
-    `<div>No. de manzanas: ${numText}</div>`;
-
-  layerColonia.bindTooltip(tooltipHtml, {
-    permanent: true,
-    direction: 'center',
-    className: `tooltip-prioridad ${prioClass}`
-  }).openTooltip();
-
-  const geoColonia = layerColonia.toGeoJSON();
+  const gCol = layerColonia.toGeoJSON();
 
   const seleccionadas = manzanasFeatures.filter(f => {
-    try {
-      return turf.booleanIntersects(f, geoColonia);
-    } catch (e) {
-      return false;
-    }
+    try { return turf.booleanIntersects(f, gCol); } catch (e) { return false; }
   });
 
   capaManzanasResaltadas.clearLayers();
   capaManzanasResaltadas.addData(seleccionadas);
 
-  map.fitBounds(layerColonia.getBounds(), { padding: [20, 20] });
+  map.fitBounds(layerColonia.getBounds(), {padding:[20,20]});
 }
 
-// ------------ Código principal ------------ //
+// ------------ Main ------------ //
 document.addEventListener('DOMContentLoaded', () => {
-  const munSelect    = document.getElementById('munSelector');
-  const colInput     = document.getElementById('colInput');
-  const colList      = document.getElementById('colList');
+  const munSelect = document.getElementById('munSelector');
+  const colInput  = document.getElementById('colInput');
+  const colList   = document.getElementById('colList');
   const resultadoDiv = document.getElementById('resultado');
 
   initMap();
 
   Promise.all([
-    // Colonias (GeoJSON normal)
     fetch('COLONIAS_PRIORIZACION_LIBER.geojson').then(r => r.json()),
-    // Manzanas (GeoJSON.gz reproyectado a WGS84)
-    fetch('mnzn_verdes_col_wgs84.geojson.gz').then(r => r.arrayBuffer())
+    fetch('mnzn_verdes_col_wgs84_sin_campos.geojson').then(r => r.json())
   ])
-  .then(([coloniasData, manzanasBuffer]) => {
+  .then(([coloniasData, manzanasData]) => {
 
-    // Descomprimir manzanas con pako
-    const uint8   = new Uint8Array(manzanasBuffer);
-    const jsonStr = pako.ungzip(uint8, { to: 'string' });
-    const manzanasData = JSON.parse(jsonStr);
-
-    coloniasFeatures = coloniasData.features || [];
-    manzanasFeatures = manzanasData.features || [];
+    coloniasFeatures = coloniasData.features;
+    manzanasFeatures = manzanasData.features;
 
     coloniasFeatures.forEach(f => {
-      if (!f.properties) f.properties = {};
-      f.properties.NOM_MUN   = normalizarTexto(f.properties.NOM_MUN || '');
-      f.properties.COLONIA   = normalizarTexto(f.properties.COLONIA || '');
-      f.properties.prioridad = (f.properties.prioridad || '').trim();
+      f.properties.NOM_MUN   = normalizarTexto(f.properties.NOM_MUN);
+      f.properties.COLONIA   = normalizarTexto(f.properties.COLONIA);
+      f.properties.prioridad = f.properties.prioridad.trim();
     });
 
     const alcSet = new Set(coloniasFeatures.map(f => f.properties.NOM_MUN));
-    const alcaldias = Array.from(alcSet).sort((a,b) => a.localeCompare(b, 'es'));
+    const alcaldias = Array.from(alcSet).sort((a,b)=>a.localeCompare(b,'es'));
 
     const opt0 = document.createElement('option');
     opt0.value = '';
-    opt0.textContent = 'Selecciona una alcaldía…';
+    opt0.textContent = 'Selecciona alcaldía…';
     munSelect.appendChild(opt0);
 
     alcaldias.forEach(a => {
@@ -352,86 +265,60 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     cargarCapasEnMapa();
-  })
-  .catch(err => console.error('Error cargando datos:', err));
+  });
 
   munSelect.addEventListener('change', () => {
     const alc = munSelect.value;
 
+    colInput.disabled = !alc;
     colInput.value = '';
-    colInput.disabled = true;
     colList.innerHTML = '';
-    colValueToIndex = {};
-    resultadoDiv.style.display = 'none';
     capaManzanasResaltadas.clearLayers();
-    if (capaColonias) {
-      capaColonias.resetStyle();
-      capaColonias.eachLayer(l => l.unbindTooltip());
-    }
+    resultadoDiv.style.display='none';
+    capaColonias.resetStyle();
+    capaColonias.eachLayer(l=>l.unbindTooltip());
 
     if (!alc) return;
 
     const coloniasDeAlc = coloniasFeatures
-      .filter(f => f.properties.NOM_MUN === alc)
-      .sort((a,b) => a.properties.COLONIA.localeCompare(b.properties.COLONIA, 'es'));
+      .filter(f=>f.properties.NOM_MUN===alc)
+      .sort((a,b)=>a.properties.COLONIA.localeCompare(b.properties.COLONIA,'es'));
 
-    coloniasDeAlc.forEach(f => {
-      const idxGlobal = coloniasFeatures.indexOf(f);
-      const label = `${f.properties.COLONIA} (CP ${f.properties.CP || ''})`;
-      const opt = document.createElement('option');
-      opt.value = label;
+    coloniasDeAlc.forEach(f=>{
+      const idx = coloniasFeatures.indexOf(f);
+      const label=`${f.properties.COLONIA} (CP ${f.properties.CP||''})`;
+      const opt=document.createElement('option');
+      opt.value=label;
       colList.appendChild(opt);
-      colValueToIndex[label] = idxGlobal;
+      colValueToIndex[label]=idx;
     });
-
-    colInput.disabled = false;
   });
 
   colInput.addEventListener('change', () => {
     const label = colInput.value;
-    if (!label || !(label in colValueToIndex)) {
-      resultadoDiv.style.display = 'none';
-      capaManzanasResaltadas.clearLayers();
-      if (capaColonias) {
-        capaColonias.resetStyle();
-        capaColonias.eachLayer(l => l.unbindTooltip());
-      }
-      return;
-    }
+    if(!(label in colValueToIndex)) return;
 
-    const idx = colValueToIndex[label];
-    const feat = coloniasFeatures[idx];
-    const p = feat.properties || {};
+    const feat = coloniasFeatures[colValueToIndex[label]];
+    const p = feat.properties;
 
-    const alc       = p.NOM_MUN || '';
-    const col       = p.COLONIA || '';
-    const cp        = p.CP || '';
-    const prioridad = p.prioridad || '';
-    const numManz   = p.CVEGEO_count != null ? p.CVEGEO_count : '';
-
-    const prioClass = prioridadClass(prioridad);
-    const prioText  = prioridad || 'Sin dato';
-    const numText   = numManz !== '' ? numManz : '0';
-
-    resultadoDiv.innerHTML =
+    resultadoDiv.innerHTML=
       `<div class="kpi-card">
-         <p><span class="label-bold">Alcaldía:</span> ${alc}</p>
-         <p><span class="label-bold">Colonia:</span> ${col}</p>
-         <p><span class="label-bold">Prioridad:</span>
-           <span class="badge-prioridad ${prioClass}">${prioText}</span>
-         </p>
-         <p class="kpi-number-line">
+        <p><span class="label-bold">Alcaldía:</span> ${p.NOM_MUN}</p>
+        <p><span class="label-bold">Colonia:</span> ${p.COLONIA}</p>
+        <p><span class="label-bold">Prioridad:</span>
+           <span class="badge-prioridad ${prioridadClass(p.prioridad)}">${p.prioridad}</span></p>
+        <p class="kpi-number-line">
            <span class="label-bold">Número de manzanas:</span>
-           <span class="kpi-value">${numText}</span>
-         </p>
-         <p class="kpi-secondary">
-           <span class="label-bold">Código Postal:</span> ${cp || 'No disponible'}
-         </p>
-       </div>`;
-    resultadoDiv.style.display = 'block';
+           <span class="kpi-value">${p.CVEGEO_count}</span>
+        </p>
+        <p class="kpi-secondary"><span class="label-bold">Código Postal:</span> ${p.CP}</p>
+      </div>`;
 
-    resaltarColoniaYManzanas(alc, col, prioridad, numText);
+    resultadoDiv.style.display='block';
+
+    resaltarColoniaYManzanas(p.NOM_MUN, p.COLONIA, p.prioridad, p.CVEGEO_count);
   });
+
 });
 </script>
 
