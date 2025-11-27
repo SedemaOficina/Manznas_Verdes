@@ -259,34 +259,30 @@ h2 {
 .leaflet-tooltip.tooltip-prioridad.prio-muy-baja {
   background-color: #006100;
 }
-
 .leaflet-tooltip.tooltip-prioridad.prio-baja {
   background-color: #7aab00;
 }
-
 .leaflet-tooltip.tooltip-prioridad.prio-media {
   background-color: #ffff00;
   color: #333;
 }
-
 .leaflet-tooltip.tooltip-prioridad.prio-alta {
   background-color: #ff9900;
 }
-
 .leaflet-tooltip.tooltip-prioridad.prio-muy-alta {
   background-color: #ff2200;
 }
-
 .leaflet-tooltip.tooltip-prioridad.prio-desconocida {
   background-color: #757575;
 }
 
-/* LEYENDA */
+/* LEYENDA DEL MAPA */
 
 .map-legend {
   position: absolute;
   bottom: 10px;
   left: 10px;
+  z-index: 1000;          /* SIEMPRE ENCIMA DEL MAPA */
   background: rgba(255, 255, 255, 0.95);
   border-radius: 8px;
   padding: 8px 10px;
@@ -354,22 +350,18 @@ h2 {
   background-color: #006100;
   border-color: #003300;
 }
-
 .legend-color.prio-baja {
   background-color: #7aab00;
   border-color: #557700;
 }
-
 .legend-color.prio-media {
   background-color: #ffff00;
   border-color: #b2b200;
 }
-
 .legend-color.prio-alta {
   background-color: #ff9900;
   border-color: #cc6600;
 }
-
 .legend-color.prio-muy-alta {
   background-color: #ff2200;
   border-color: #b21800;
