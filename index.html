@@ -110,33 +110,33 @@ let colValueToIndex = {};
 
 // ------------ Normalizador ------------ //
 function normalizarTexto(str) {
-  if (!str) return str;
+  if (!str) return "";
   const fixes = {
     "TL?HUAC": "TLÁHUAC",
     "?LVARO OBREG?N": "ÁLVARO OBREGÓN",
   };
-  const raw = str.trim();
+  const raw = String(str).trim();
   return fixes[raw] || raw;
 }
 
 // ------------ Estilos por prioridad ------------ //
-function estiloPrioridad(prioridad) {
-  const p = prioridad.toLowerCase();
-  if (p === "muy baja")  return { color:"#003300", fill:"#006100" };
-  if (p === "baja")      return { color:"#557700", fill:"#7aab00" };
-  if (p === "media")     return { color:"#b2b200", fill:"#ffff00" };
-  if (p === "alta")      return { color:"#cc6600", fill:"#ff9900" };
-  if (p === "muy alta")  return { color:"#b21800", fill:"#ff2200" };
+function estiloPrioridad(prioridadRaw) {
+  const prioridad = (prioridadRaw || "").toString().toLowerCase().trim();
+  if (prioridad === "muy baja")  return { color:"#003300", fill:"#006100" };
+  if (prioridad === "baja")      return { color:"#557700", fill:"#7aab00" };
+  if (prioridad === "media")     return { color:"#b2b200", fill:"#ffff00" };
+  if (prioridad === "alta")      return { color:"#cc6600", fill:"#ff9900" };
+  if (prioridad === "muy alta")  return { color:"#b21800", fill:"#ff2200" };
   return { color:"#666666", fill:"#cccccc" };
 }
 
-function prioridadClass(prioridad) {
-  const p = prioridad.toLowerCase();
-  if (p === "muy baja") return "prio-muy-baja";
-  if (p === "baja")     return "prio-baja";
-  if (p === "media")    return "prio-media";
-  if (p === "alta")     return "prio-alta";
-  if (p === "muy alta") return "prio-muy-alta";
+function prioridadClass(prioridadRaw) {
+  const prioridad = (prioridadRaw || "").toString().toLowerCase().trim();
+  if (prioridad === "muy baja")  return "prio-muy-baja";
+  if (prioridad === "baja")      return "prio-baja";
+  if (prioridad === "media")     return "prio-media";
+  if (prioridad === "alta")      return "prio-alta";
+  if (prioridad === "muy alta")  return "prio-muy-alta";
   return "prio-desconocida";
 }
 
@@ -164,8 +164,10 @@ function initMap() {
       fillOpacity:0
     },
     onEachFeature: function(feat, layer) {
-      const p = feat.properties;
-      const key = `${p.NOM_MUN}|${p.COLONIA}`;
+      const p = feat.properties || {};
+      const alc = p.NOM_MUN || "";
+      const col = p.COLONIA || "";
+      const key = `${alc}|${col}`;
       indiceColonias[key] = layer;
     }
   }).addTo(map);
@@ -188,18 +190,27 @@ function cargarCapasEnMapa() {
   capaManzanasTodas.addData(manzanasFeatures);
   capaColonias.addData(coloniasFeatures);
 
-  map.fitBounds(capaColonias.getBounds());
+  if (capaColonias.getLayers().length > 0) {
+    map.fitBounds(capaColonias.getBounds());
+  }
 }
 
-function resaltarColoniaYManzanas(alc, col, prioridad, numManz) {
+function resaltarColoniaYManzanas(alcRaw, colRaw, prioridadRaw, numManzRaw) {
+  const alc = alcRaw || "";
+  const col = colRaw || "";
   const key = `${alc}|${col}`;
   const layerColonia = indiceColonias[key];
-  if (!layerColonia) return;
+  if (!layerColonia) {
+    capaManzanasResaltadas.clearLayers();
+    return;
+  }
 
   capaColonias.resetStyle();
   capaColonias.eachLayer(l => l.unbindTooltip());
 
-  const est = estiloPrioridad(prioridad);
+  const est = estiloPrioridad(prioridadRaw);
+  const prioridad = (prioridadRaw || "Sin dato").toString().trim();
+  const numManz = numManzRaw != null ? numManzRaw : "0";
 
   layerColonia.setStyle({
     color: est.color,
@@ -209,8 +220,8 @@ function resaltarColoniaYManzanas(alc, col, prioridad, numManz) {
   });
 
   layerColonia.bindTooltip(
-    `<b>${col}</b><br>Prioridad: ${prioridad}<br>Manzanas: ${numManz}`,
-    { permanent:true, direction:'center', className:`tooltip-prioridad ${prioridadClass(prioridad)}` }
+    `<b>${normalizarTexto(col)}</b><br>Prioridad: ${prioridad}<br>Manzanas: ${numManz}`,
+    { permanent:true, direction:'center', className:`tooltip-prioridad ${prioridadClass(prioridadRaw)}` }
   ).openTooltip();
 
   const gCol = layerColonia.toGeoJSON();
@@ -227,9 +238,9 @@ function resaltarColoniaYManzanas(alc, col, prioridad, numManz) {
 
 // ------------ Main ------------ //
 document.addEventListener('DOMContentLoaded', () => {
-  const munSelect = document.getElementById('munSelector');
-  const colInput  = document.getElementById('colInput');
-  const colList   = document.getElementById('colList');
+  const munSelect    = document.getElementById('munSelector');
+  const colInput     = document.getElementById('colInput');
+  const colList      = document.getElementById('colList');
   const resultadoDiv = document.getElementById('resultado');
 
   initMap();
@@ -240,13 +251,13 @@ document.addEventListener('DOMContentLoaded', () => {
   ])
   .then(([coloniasData, manzanasData]) => {
 
-    coloniasFeatures = coloniasData.features;
-    manzanasFeatures = manzanasData.features;
+    coloniasFeatures = coloniasData.features || [];
+    manzanasFeatures = manzanasData.features || [];
 
+    // No cambiamos NOM_MUN / COLONIA para las claves, solo para mostrar en tarjeta.
     coloniasFeatures.forEach(f => {
-      f.properties.NOM_MUN   = normalizarTexto(f.properties.NOM_MUN);
-      f.properties.COLONIA   = normalizarTexto(f.properties.COLONIA);
-      f.properties.prioridad = f.properties.prioridad.trim();
+      if (!f.properties) f.properties = {};
+      if (!f.properties.prioridad) f.properties.prioridad = "Sin dato";
     });
 
     const alcSet = new Set(coloniasFeatures.map(f => f.properties.NOM_MUN));
@@ -265,7 +276,8 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     cargarCapasEnMapa();
-  });
+  })
+  .catch(err => console.error('Error cargando datos:', err));
 
   munSelect.addEventListener('change', () => {
     const alc = munSelect.value;
@@ -273,7 +285,9 @@ document.addEventListener('DOMContentLoaded', () => {
     colInput.disabled = !alc;
     colInput.value = '';
     colList.innerHTML = '';
+    colValueToIndex = {};
     capaManzanasResaltadas.clearLayers();
+    const resultadoDiv = document.getElementById('resultado');
     resultadoDiv.style.display='none';
     capaColonias.resetStyle();
     capaColonias.eachLayer(l=>l.unbindTooltip());
@@ -281,7 +295,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!alc) return;
 
     const coloniasDeAlc = coloniasFeatures
-      .filter(f=>f.properties.NOM_MUN===alc)
+      .filter(f=>f.properties.NOM_MUN === alc)
       .sort((a,b)=>a.properties.COLONIA.localeCompare(b.properties.COLONIA,'es'));
 
     coloniasDeAlc.forEach(f=>{
@@ -301,26 +315,34 @@ document.addEventListener('DOMContentLoaded', () => {
     const feat = coloniasFeatures[colValueToIndex[label]];
     const p = feat.properties;
 
+    const alc       = p.NOM_MUN || "";
+    const col       = p.COLONIA || "";
+    const cp        = p.CP || "";
+    const prioridad = p.prioridad || "Sin dato";
+    const numManz   = p.CVEGEO_count != null ? p.CVEGEO_count : "0";
+
+    const resultadoDiv = document.getElementById('resultado');
     resultadoDiv.innerHTML=
       `<div class="kpi-card">
-        <p><span class="label-bold">Alcaldía:</span> ${p.NOM_MUN}</p>
-        <p><span class="label-bold">Colonia:</span> ${p.COLONIA}</p>
+        <p><span class="label-bold">Alcaldía:</span> ${normalizarTexto(alc)}</p>
+        <p><span class="label-bold">Colonia:</span> ${normalizarTexto(col)}</p>
         <p><span class="label-bold">Prioridad:</span>
-           <span class="badge-prioridad ${prioridadClass(p.prioridad)}">${p.prioridad}</span></p>
+           <span class="badge-prioridad ${prioridadClass(prioridad)}">${prioridad}</span></p>
         <p class="kpi-number-line">
            <span class="label-bold">Número de manzanas:</span>
-           <span class="kpi-value">${p.CVEGEO_count}</span>
+           <span class="kpi-value">${numManz}</span>
         </p>
-        <p class="kpi-secondary"><span class="label-bold">Código Postal:</span> ${p.CP}</p>
+        <p class="kpi-secondary"><span class="label-bold">Código Postal:</span> ${cp || 'No disponible'}</p>
       </div>`;
 
     resultadoDiv.style.display='block';
 
-    resaltarColoniaYManzanas(p.NOM_MUN, p.COLONIA, p.prioridad, p.CVEGEO_count);
+    resaltarColoniaYManzanas(alc, col, prioridad, numManz);
   });
 
 });
 </script>
+
 
 </body>
 </html>
