@@ -110,6 +110,7 @@
 <!-- JS libs -->
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@turf/turf@6/turf.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/pako@2.1.0/dist/pako.min.js"></script>
 
 <script>
 // ------------ Variables globales ------------ //
@@ -313,12 +314,18 @@ document.addEventListener('DOMContentLoaded', () => {
   initMap();
 
   Promise.all([
-    // Colonias
+    // Colonias (GeoJSON normal)
     fetch('COLONIAS_PRIORIZACION_LIBER.geojson').then(r => r.json()),
-    // Manzanas
-    fetch('MANZANAS_LIBER_simplificado.json').then(r => r.json())
+    // Manzanas (GeoJSON.gz reproyectado a WGS84)
+    fetch('mnzn_verdes_col_wgs84.geojson.gz').then(r => r.arrayBuffer())
   ])
-  .then(([coloniasData, manzanasData]) => {
+  .then(([coloniasData, manzanasBuffer]) => {
+
+    // Descomprimir manzanas con pako
+    const uint8   = new Uint8Array(manzanasBuffer);
+    const jsonStr = pako.ungzip(uint8, { to: 'string' });
+    const manzanasData = JSON.parse(jsonStr);
+
     coloniasFeatures = coloniasData.features || [];
     manzanasFeatures = manzanasData.features || [];
 
@@ -346,7 +353,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     cargarCapasEnMapa();
   })
-  .catch(err => console.error('Error cargando GeoJSON:', err));
+  .catch(err => console.error('Error cargando datos:', err));
 
   munSelect.addEventListener('change', () => {
     const alc = munSelect.value;
