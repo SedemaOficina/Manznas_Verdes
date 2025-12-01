@@ -86,6 +86,40 @@
     </div>
   </section>
 
+  <!-- NUEVA SECCIÓN: TABLA DE COLONIAS -->
+  <section class="table-section">
+    <h3>Colonias – Manzanas verdes y superficie</h3>
+
+    <div class="table-filters">
+      <div class="table-filter-item">
+        <label for="filtroAlcaldiaTabla">Filtrar por alcaldía</label>
+        <input id="filtroAlcaldiaTabla" type="text" placeholder="Escribe una alcaldía…">
+      </div>
+      <div class="table-filter-item">
+        <label for="filtroColoniaTabla">Filtrar por colonia</label>
+        <input id="filtroColoniaTabla" type="text" placeholder="Escribe una colonia…">
+      </div>
+    </div>
+
+    <div class="table-wrapper">
+      <table id="tablaColonias">
+        <thead>
+          <tr>
+            <th>Alcaldía</th>
+            <th>Colonia</th>
+            <th>CP</th>
+            <th>Prioridad Manzanas Verdes</th>
+            <th>Población 2020</th>
+            <th>Superficie ha</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- Filas generadas dinámicamente -->
+        </tbody>
+      </table>
+    </div>
+  </section>
+
 </main>
 
 <footer>
@@ -169,10 +203,8 @@ function initMap() {
 
   baseEmpty = L.layerGroup();
 
-  // Base por defecto
   baseOSM.addTo(map);
 
-  // Capa de manzanas (todas)
   capaManzanasTodas = L.geoJSON(null, {
     pane: 'overlayPane',
     style: {
@@ -183,7 +215,6 @@ function initMap() {
     }
   }).addTo(map);
 
-  // Capa de colonias
   capaColonias = L.geoJSON(null, {
     pane: 'overlayPane',
     style: {
@@ -193,14 +224,11 @@ function initMap() {
     },
     onEachFeature: function(feat, layer) {
       const p = feat.properties || {};
-      const alc = p.NOM_MUN || "";
-      const col = p.COLONIA || "";
-      const key = `${alc}|${col}`;
+      const key = `${p.NOM_MUN || ""}|${p.COLONIA || ""}`;
       indiceColonias[key] = layer;
     }
   }).addTo(map);
 
-  // Capa de manzanas dentro de colonia
   capaManzanasResaltadas = L.geoJSON(null, {
     pane: 'overlayPane',
     style: {
@@ -211,7 +239,6 @@ function initMap() {
     }
   }).addTo(map);
 
-  // Control de capas
   const baseMaps = {
     "Calles (OSM)": baseOSM,
     "Calles claras": baseLight,
@@ -231,7 +258,7 @@ function initMap() {
   }).addTo(map);
 }
 
-// ------------ Cargar capas ------------ //
+// ------------ Cargar capas en el mapa ------------ //
 function cargarCapasEnMapa() {
   capaColonias.clearLayers();
   capaManzanasTodas.clearLayers();
@@ -244,6 +271,50 @@ function cargarCapasEnMapa() {
   if (capaColonias.getLayers().length > 0) {
     map.fitBounds(capaColonias.getBounds());
   }
+}
+
+// ------------ Construir tabla de colonias ------------ //
+function actualizarTablaColonias() {
+  const filtroA = document.getElementById('filtroAlcaldiaTabla').value.toLowerCase();
+  const filtroC = document.getElementById('filtroColoniaTabla').value.toLowerCase();
+  const tbody   = document.querySelector('#tablaColonias tbody');
+
+  let html = "";
+
+  coloniasFeatures.forEach(f => {
+    const p = f.properties || {};
+    const alc = p.NOM_MUN || "";
+    const col = p.COLONIA || "";
+    const cp  = p.CP || "";
+    const pr  = p.prioridad || "Sin dato";
+    const pob = (p.POBTOT != null) ? p.POBTOT : "";
+    const areaKm2 = p.area_km2 != null ? p.area_km2 : null;
+    const ha  = areaKm2 != null ? (areaKm2 * 100) : null;
+
+    if (
+      (!filtroA || alc.toLowerCase().includes(filtroA)) &&
+      (!filtroC || col.toLowerCase().includes(filtroC))
+    ) {
+      html += `<tr>
+        <td>${normalizarTexto(alc)}</td>
+        <td>${normalizarTexto(col)}</td>
+        <td>${cp}</td>
+        <td>${pr}</td>
+        <td>${pob !== "" ? pob.toLocaleString("es-MX") : ""}</td>
+        <td>${ha != null ? ha.toFixed(2) : ""}</td>
+      </tr>`;
+    }
+  });
+
+  tbody.innerHTML = html;
+}
+
+function inicializarTablaColonias() {
+  actualizarTablaColonias();
+  document.getElementById('filtroAlcaldiaTabla')
+    .addEventListener('input', actualizarTablaColonias);
+  document.getElementById('filtroColoniaTabla')
+    .addEventListener('input', actualizarTablaColonias);
 }
 
 // ------------ Resaltar colonia y manzanas internas ------------ //
@@ -332,6 +403,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     cargarCapasEnMapa();
+    inicializarTablaColonias();   // ← aquí construimos la tabla completa
   })
   .catch(err => console.error('Error cargando datos:', err));
 
