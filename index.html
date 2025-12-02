@@ -464,7 +464,6 @@ function textoContextoFiltros() {
   return `Ciudad completa`;
 }
 
-// ------------ Actualizar KPIs globales, gráficas y resumen ------------ //
 function actualizarKPIsyCharts(filas) {
   const totalColonias = filas.length;
   const prKeys = ["muy alta","alta","media","baja","muy baja"];
@@ -476,6 +475,7 @@ function actualizarKPIsyCharts(filas) {
     "muy alta":  "#ff2200"
   };
 
+  // Conteos por prioridad SOLO para la selección (tablas/gráficas/resumen)
   const porPrio = {};
   const porPrioPob = {};
   const porPrioHa  = {};
@@ -487,16 +487,15 @@ function actualizarKPIsyCharts(filas) {
     porPrioHa[pr]  = (porPrioHa[pr]  || 0) + (r.ha  || 0);
   });
 
-  const totalAltaMuyAlta = (porPrio["alta"] || 0) + (porPrio["muy alta"] || 0);
-  const pobAltaMuyAlta   = (porPrioPob["alta"] || 0) + (porPrioPob["muy alta"] || 0);
-  const haAltaMuyAlta    = (porPrioHa["alta"] || 0) + (porPrioHa["muy alta"] || 0);
+  // ---------- KPIs GLOBALES (toda la ciudad, NO dependen de filtros) ----------
+  const totalAltaMuyAlta   = globalAltaMuyAltaColonias;
+  const pobAltaMuyAlta     = globalAltaMuyAltaPob;
+  const haAltaMuyAlta      = globalAltaMuyAltaHa;
 
-  // porcentajes globales (respecto al total de la ciudad)
-  const porcColoniasAlta = totalColoniasBase ? ((totalAltaMuyAlta / totalColoniasBase) * 100).toFixed(1) : 0;
-  const porcPobAlta      = totalPobBase      ? ((pobAltaMuyAlta   / totalPobBase)   * 100).toFixed(1) : 0;
-  const porcHaAlta       = totalHaBase       ? ((haAltaMuyAlta    / totalHaBase)    * 100).toFixed(1) : 0;
+  const porcColoniasAlta   = totalColoniasBase ? ((totalAltaMuyAlta / totalColoniasBase) * 100).toFixed(1) : 0;
+  const porcPobAlta        = totalPobBase      ? ((pobAltaMuyAlta   / totalPobBase)      * 100).toFixed(1) : 0;
+  const porcHaAlta         = totalHaBase       ? ((haAltaMuyAlta    / totalHaBase)       * 100).toFixed(1) : 0;
 
-  // KPIs globales
   document.getElementById('kpiTotalColonias').textContent =
     totalColoniasBase.toLocaleString("es-MX");
   document.getElementById('kpiColoniasAlta').textContent  =
@@ -504,23 +503,33 @@ function actualizarKPIsyCharts(filas) {
   document.getElementById('kpiPobAlta').textContent       =
     `${pobAltaMuyAlta.toLocaleString("es-MX")} (${porcPobAlta}%)`;
   document.getElementById('kpiHaAlta').textContent        =
-    `${haAltaMuyAlta.toLocaleString("es-MX")} (${porcHaAlta}%)`;
+    `${haAltaMuyAlta.toFixed(3).toLocaleString("es-MX")} (${porcHaAlta}%)`;
 
-  // Resumen bajo la tabla: cuántas colonias se ven y contexto
+  // ---------- TEXTO CONTEXTO (para tabla / gráficas / resumen) ----------
+  const selAlc  = document.getElementById('filtroAlc');
+  const selPrio = document.getElementById('filtroPrio');
+  const a = selAlc.value;
+  const p = selPrio.value;
+
+  let contexto = "Ciudad completa";
+  if (a && p) contexto = `Alcaldía: ${a} · Prioridad: ${p}`;
+  else if (a && !p) contexto = `Alcaldía: ${a}`;
+  else if (!a && p) contexto = `Prioridad: ${p}`;
+
+  // Resumen bajo la tabla
   const resumenEl = document.getElementById('tablaResumen');
   if (resumenEl) {
     resumenEl.textContent =
-      `Mostrando ${totalColonias.toLocaleString('es-MX')} colonias de ${totalColoniasBase.toLocaleString('es-MX')} (${textoContextoFiltros()}).`;
+      `Mostrando ${totalColonias.toLocaleString('es-MX')} colonias de ${totalColoniasBase.toLocaleString('es-MX')} (${contexto}).`;
   }
 
-  // texto dinámico de títulos de gráficas basado en filtros de la tabla
-  const contexto = textoContextoFiltros();
+  // Títulos de gráficas
   document.getElementById('chartTitleColonias').textContent  =
     `Colonias por prioridad – ${contexto}`;
   document.getElementById('chartTitlePoblacion').textContent =
     `Población por prioridad – ${contexto}`;
 
-  // Datos para charts (en el subconjunto filtrado)
+  // ---------- Gráficas (según selección) ----------
   const labels = [];
   const dataColonias = [];
   const dataPoblacion = [];
@@ -536,7 +545,7 @@ function actualizarKPIsyCharts(filas) {
     }
   });
 
-  // Gráfica de colonias
+  // Colonias (barras)
   const ctx1 = document.getElementById('chartColonias').getContext('2d');
   if (chartColonias) chartColonias.destroy();
   chartColonias = new Chart(ctx1, {
@@ -565,7 +574,7 @@ function actualizarKPIsyCharts(filas) {
     }
   });
 
-  // Gráfica de población
+  // Población (donut)
   const ctx2 = document.getElementById('chartPoblacion').getContext('2d');
   if (chartPoblacion) chartPoblacion.destroy();
   chartPoblacion = new Chart(ctx2, {
@@ -585,12 +594,12 @@ function actualizarKPIsyCharts(filas) {
     }
   });
 
-  // Resumen general como tarjetas KPI (porcentaje relativo a la selección)
+  // ---------- Resumen general (porcentaje relativo a la selección) ----------
   const cont = document.getElementById('statsResumen');
   if (!cont) return;
 
   let html = `<h4>Resumen general</h4>`;
-  html += `<p class="stats-contexto"><strong>Contexto:</strong> ${textoContextoFiltros()} (porcentajes relativos a la selección mostrada).</p>`;
+  html += `<p class="stats-contexto"><strong>Contexto:</strong> ${contexto} (porcentajes relativos a la selección mostrada).</p>`;
   html += `<p><strong>Total de colonias en la selección:</strong> ${totalColonias.toLocaleString("es-MX")}</p>`;
 
   html += `<div class="stats-grid">`;
@@ -619,6 +628,7 @@ function actualizarKPIsyCharts(filas) {
 
   cont.innerHTML = html;
 }
+
 
 // ------------ Actualizar tabla según filtros ------------ //
 function actualizarTablaColonias() {
