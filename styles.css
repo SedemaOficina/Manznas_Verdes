@@ -180,7 +180,7 @@ h2 {
 .kpi-global-label {
   font-size: 13px;
   font-weight: 700;
-  color: #00695c; /* verde oscuro para distinguirse del valor */
+  color: #00695c;
   margin-bottom: 4px;
 }
 
@@ -221,9 +221,9 @@ h2 {
 }
 
 .kpi-value {
-  font-size: 14px; /* mismo tamaño que el texto */
+  font-size: 14px;
   font-weight: 700;
-  color: #c62828; /* rojo sobrio */
+  color: #c62828;
 }
 
 .kpi-secondary {
@@ -266,7 +266,7 @@ h2 {
   background-color: #757575;
 }
 
-/* MAPA + GRÁFICAS */
+/* MAPA */
 
 .map-section {
   margin-top: 22px;
@@ -276,15 +276,6 @@ h2 {
   margin-bottom: 8px;
   font-weight: 500;
   color: #004d40;
-}
-
-/* Mapa + panel de gráficas en 2 columnas */
-
-.map-and-charts {
-  display: grid;
-  grid-template-columns: minmax(0, 2fr) minmax(0, 1.5fr);
-  gap: 16px;
-  align-items: flex-start;
 }
 
 .map-wrapper {
@@ -307,7 +298,7 @@ h2 {
   left: 0;
   right: 0;
   bottom: 0;
-  display: none;            /* JS la cambia a flex */
+  display: none;
   align-items: center;
   justify-content: center;
   background: rgba(255,255,255,0.7);
@@ -404,7 +395,7 @@ h2 {
   font-size: 11px;
 }
 
-/* Colores de la leyenda (ya usan la misma paleta) */
+/* Colores de la leyenda */
 
 .colonias-color {
   border-color: #00897b;
@@ -442,61 +433,6 @@ h2 {
   border-color: #b21800;
 }
 
-/* GRÁFICAS (_chart.js_) Y KPI DE COLONIA EN PANEL DERECHO */
-
-.charts-wrapper {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 10px;
-}
-
-/* KPI de colonia arriba de las gráficas */
-.charts-wrapper #resultado {
-  grid-column: 1 / -1;
-}
-
-.charts-wrapper h3 {
-  grid-column: 1 / -1;
-  margin: 0 0 4px 0;
-  font-size: 15px;
-  font-weight: 500;
-  color: #004d40;
-}
-
-.chart-card {
-  background: #ffffff;
-  border-radius: 10px;
-  border: 1px solid #dde3ea;
-  padding: 8px 10px;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.04);
-  min-height: 210px;
-  display: flex;
-  flex-direction: column;
-}
-
-.chart-card h4 {
-  margin: 0 0 2px 0;
-  font-size: 12px;
-  font-weight: 600;
-  color: #333;
-}
-
-.chart-card canvas {
-  flex: 1;
-  max-height: 180px;
-}
-
-/* Layout móvil: mapa arriba, gráficas abajo */
-
-@media (max-width: 768px) {
-  .map-and-charts {
-    grid-template-columns: 1fr;
-  }
-  .charts-wrapper {
-    grid-template-columns: 1fr;
-  }
-}
-
 /* TABLA DE COLONIAS */
 
 .table-section {
@@ -507,6 +443,26 @@ h2 {
   margin-bottom: 10px;
   font-weight: 500;
   color: #004d40;
+}
+
+/* Botón limpiar filtros */
+
+.table-filters-actions {
+  margin: 4px 0 6px 0;
+  text-align: right;
+}
+
+#btnLimpiarFiltros {
+  padding: 4px 10px;
+  border-radius: 999px;
+  border: 1px solid #b0bec5;
+  background: #eceff1;
+  font-size: 11px;
+  cursor: pointer;
+}
+
+#btnLimpiarFiltros:hover {
+  background: #e0e0e0;
 }
 
 /* Contenedor scrollable */
@@ -591,37 +547,6 @@ h2 {
   vertical-align: middle;
 }
 
-/* Botón limpiar filtros (usa un icono: 🗑 en el texto) */
-
-.table-filters-actions {
-  margin-top: 6px;
-  text-align: right;
-}
-
-#btnLimpiarFiltros {
-  padding: 4px 10px;
-  border-radius: 999px;
-  border: 1px solid #b0bec5;
-  background: #eceff1;
-  font-size: 11px;
-  cursor: pointer;
-}
-
-#btnLimpiarFiltros:hover {
-  background: #e0e0e0;
-}
-
-/* Responsive tabla en móvil */
-
-@media (max-width: 768px) {
-  .table-section h3 {
-    font-size: 14px;
-  }
-  #tablaColonias {
-    font-size: 11px;
-  }
-}
-
 /* SECCIÓN DE ESTADÍSTICAS / RESUMEN GENERAL */
 
 .stats-section {
@@ -678,6 +603,57 @@ h2 {
 }
 .stats-muy-baja {
   border-left: 4px solid #006100;
+}
+
+/* SECCIÓN DE GRÁFICAS / ANÁLISIS */
+
+.analysis-section {
+  margin-top: 26px;
+}
+
+.analysis-section h3 {
+  margin-bottom: 6px;
+  font-weight: 500;
+  color: #004d40;
+}
+
+/* Contenedor de gráficas en 2 columnas */
+
+.charts-wrapper {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.chart-card {
+  background: #ffffff;
+  border-radius: 10px;
+  border: 1px solid #dde3ea;
+  padding: 8px 10px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.04);
+  min-height: 210px;
+  display: flex;
+  flex-direction: column;
+}
+
+.chart-card h4 {
+  margin: 0 0 2px 0;
+  font-size: 12px;
+  font-weight: 600;
+  color: #333;
+}
+
+.chart-card canvas {
+  flex: 1;
+  max-height: 180px;
+}
+
+/* Layout móvil: gráficas apiladas */
+
+@media (max-width: 768px) {
+  .charts-wrapper {
+    grid-template-columns: 1fr;
+  }
 }
 
 /* FOOTER */
