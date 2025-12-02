@@ -89,61 +89,40 @@
   <!-- KPI de colonia seleccionada -->
   <section id="resultado" class="resultado" style="display:none;"></section>
 
-  <!-- MAPA + GRÁFICAS -->
+  <!-- MAPA SOLO -->
   <section class="map-section">
     <h3>Mapa de colonias y manzanas</h3>
 
-    <div class="map-and-charts">
-      <div class="map-wrapper">
-        <div id="map"></div>
-        <div id="mapLoading" class="map-loading">Procesando manzanas…</div>
+    <div class="map-wrapper">
+      <div id="map"></div>
+      <div id="mapLoading" class="map-loading">Procesando manzanas…</div>
 
-        <!-- LEYENDA -->
-        <div class="map-legend">
-          <div class="legend-title">Simbología</div>
+      <!-- LEYENDA -->
+      <div class="map-legend">
+        <div class="legend-title">Simbología</div>
 
-          <div class="legend-group">
-            <div class="legend-item">
-              <span class="legend-color colonias-color"></span>
-              <span class="legend-label">Colonias (contorno)</span>
-            </div>
-            <div class="legend-item">
-              <span class="legend-color manzanas-color"></span>
-              <span class="legend-label">Manzanas (todas)</span>
-            </div>
-            <div class="legend-item">
-              <span class="legend-color manzanas-sel-color"></span>
-              <span class="legend-label">Manzanas dentro de la colonia seleccionada</span>
-            </div>
+        <div class="legend-group">
+          <div class="legend-item">
+            <span class="legend-color colonias-color"></span>
+            <span class="legend-label">Colonias (contorno)</span>
           </div>
-
-          <div class="legend-subtitle">Prioridad de reforestación</div>
-          <div class="legend-group">
-            <div class="legend-item"><span class="legend-color prio-muy-baja"></span>Muy baja</div>
-            <div class="legend-item"><span class="legend-color prio-baja"></span>Baja</div>
-            <div class="legend-item"><span class="legend-color prio-media"></span>Media</div>
-            <div class="legend-item"><span class="legend-color prio-alta"></span>Alta</div>
-            <div class="legend-item"><span class="legend-color prio-muy-alta"></span>Muy alta</div>
+          <div class="legend-item">
+            <span class="legend-color manzanas-color"></span>
+            <span class="legend-label">Manzanas (todas)</span>
+          </div>
+          <div class="legend-item">
+            <span class="legend-color manzanas-sel-color"></span>
+            <span class="legend-label">Manzanas dentro de la colonia seleccionada</span>
           </div>
         </div>
-      </div>
 
-      <!-- Panel derecho: KPI de colonia + gráficas -->
-      <div class="charts-wrapper">
-        <!-- Aquí se inyecta el KPI de colonia -->
-        <section id="resultadoCharts" class="resultado" style="display:none;"></section>
-
-        <h3>Distribución por prioridad</h3>
-        <p class="hint">
-          Las gráficas se actualizan con los filtros de la tabla de colonias.
-        </p>
-        <div class="chart-card">
-          <h4 id="chartTitleColonias">Colonias por prioridad – Ciudad completa</h4>
-          <canvas id="chartColonias"></canvas>
-        </div>
-        <div class="chart-card">
-          <h4 id="chartTitlePoblacion">Población por prioridad – Ciudad completa</h4>
-          <canvas id="chartPoblacion"></canvas>
+        <div class="legend-subtitle">Prioridad de reforestación</div>
+        <div class="legend-group">
+          <div class="legend-item"><span class="legend-color prio-muy-baja"></span>Muy baja</div>
+          <div class="legend-item"><span class="legend-color prio-baja"></span>Baja</div>
+          <div class="legend-item"><span class="legend-color prio-media"></span>Media</div>
+          <div class="legend-item"><span class="legend-color prio-alta"></span>Alta</div>
+          <div class="legend-item"><span class="legend-color prio-muy-alta"></span>Muy alta</div>
         </div>
       </div>
     </div>
@@ -209,6 +188,26 @@
     </section>
   </section>
 
+  <!-- ANÁLISIS POR PRIORIDAD (GRÁFICAS) -->
+  <section class="analysis-section">
+    <h3>Distribución por prioridad</h3>
+    <p class="hint">
+      Las gráficas muestran la distribución de colonias y población por nivel de prioridad,
+      de acuerdo con los filtros aplicados en la tabla de colonias.
+    </p>
+
+    <div class="charts-wrapper">
+      <div class="chart-card">
+        <h4 id="chartTitleColonias">Colonias por prioridad – Ciudad completa</h4>
+        <canvas id="chartColonias"></canvas>
+      </div>
+      <div class="chart-card">
+        <h4 id="chartTitlePoblacion">Población por prioridad – Ciudad completa</h4>
+        <canvas id="chartPoblacion"></canvas>
+      </div>
+    </div>
+  </section>
+
 </main>
 
 <footer>
@@ -236,7 +235,6 @@ let tablaDatosColonias = []; // datos para tabla
 let currentSort = { col: null, dir: 'asc' };
 let chartColonias = null;
 let chartPoblacion = null;
-let coloniasPorClave = {}; // clave "NOM_MUN|COLONIA" -> idx
 
 // ------------ Utilidades ------------ //
 function normalizarTexto(str) {
@@ -323,7 +321,6 @@ function initMap() {
       const p = feat.properties || {};
       const key = `${p.NOM_MUN || ""}|${p.COLONIA || ""}`;
       indiceColonias[key] = layer;
-      coloniasPorClave[key] = coloniasFeatures.indexOf(feat);
     }
   }).addTo(map);
 
@@ -362,7 +359,6 @@ function cargarCapasEnMapa() {
   capaManzanasTodas.clearLayers();
   capaManzanasResaltadas.clearLayers();
   indiceColonias = {};
-  coloniasPorClave = {};
 
   capaManzanasTodas.addData(manzanasFeatures);
   capaColonias.addData(coloniasFeatures);
@@ -713,7 +709,6 @@ document.addEventListener('DOMContentLoaded', () => {
   const colInput     = document.getElementById('colInput');
   const colList      = document.getElementById('colList');
   const resultadoDiv = document.getElementById('resultado');
-  const resultadoCharts = document.getElementById('resultadoCharts');
 
   initMap();
 
@@ -762,7 +757,6 @@ document.addEventListener('DOMContentLoaded', () => {
     colList.innerHTML = '';
     capaManzanasResaltadas.clearLayers();
     resultadoDiv.style.display='none';
-    resultadoCharts.style.display='none';
     capaColonias.resetStyle();
     capaColonias.eachLayer(l=>l.unbindTooltip());
 
@@ -773,14 +767,11 @@ document.addEventListener('DOMContentLoaded', () => {
       .sort((a,b)=>a.properties.COLONIA.localeCompare(b.properties.COLONIA,'es'));
 
     coloniasDeAlc.forEach(f=>{
-      const idx = coloniasFeatures.indexOf(f);
+      const label = `${f.properties.COLONIA} (CP ${f.properties.CP||''})`;
       const opt = document.createElement('option');
-      opt.value = `${f.properties.COLONIA} (CP ${f.properties.CP||''})`;
-      opt.datasetIdx = idx;  // no se puede leer luego, por eso usaremos diccionario
+      opt.value = label;
       colList.appendChild(opt);
     });
-
-    // mapa ya se ajustó con cargarCapasEnMapa
   });
 
   // Cambio de colonia vía input + datalist
@@ -788,9 +779,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const label = colInput.value;
     if (!label) return;
 
-    // buscar en coloniasFeatures la que matchee texto de COLONIA (ignorando CP)
     const textoCol = label.split('(CP')[0].trim().toLowerCase();
-
     let idx = -1;
     for (let i=0; i<coloniasFeatures.length; i++) {
       const col = (coloniasFeatures[i].properties.COLONIA || "").toLowerCase();
@@ -820,13 +809,8 @@ document.addEventListener('DOMContentLoaded', () => {
         </p>
       </div>`;
 
-    // KPI debajo de "Consulta por alcaldía y colonia"
     resultadoDiv.innerHTML = kpiHtml;
     resultadoDiv.style.display='block';
-
-    // KPI arriba de gráficas a la derecha
-    resultadoCharts.innerHTML = kpiHtml;
-    resultadoCharts.style.display='block';
 
     resaltarColoniaYManzanas(alc, col, prioridad, numManz, idx);
   });
