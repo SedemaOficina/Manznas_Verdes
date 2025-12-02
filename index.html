@@ -644,11 +644,15 @@ function inicializarTablaColonias() {
 function resaltarFilaTabla(idx) {
   const tbody = document.querySelector('#tablaColonias tbody');
   if (!tbody) return;
-  tbody.querySelectorAll('tr.selected-row').forEach(tr => tr.classList.remove('selected-row'));
+
+  // Quitar selección previa
+  tbody.querySelectorAll('tr.selected-row')
+    .forEach(tr => tr.classList.remove('selected-row'));
+
+  // Solo resaltar, sin hacer scroll automático
   const fila = tbody.querySelector(`tr[data-idx="${idx}"]`);
   if (fila) {
     fila.classList.add('selected-row');
-    fila.scrollIntoView({ behavior: 'smooth', block: 'center' });
   }
 }
 
