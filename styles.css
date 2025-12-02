@@ -8,40 +8,6 @@
   --azul-fondo: #e6f2ff;
 }
 
-.filters-row select,
-.filters-row input {
-  width: 100%;
-  padding: 3px 4px;
-  border-radius: 4px;
-  border: 1px solid #c2c9d6;
-  font-size: 10px; /* Tabla ~12px, filtros 10px */
-  font-family: 'Roboto', sans-serif;
-}
-
-.prio-dot {
-  display: inline-block;
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  margin-right: 4px;
-  vertical-align: middle;
-}
-
-.header-logos {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  margin-bottom: 6px;
-}
-
-.logo-sedema {
-  height: 36px;
-}
-
-.logo-manzanas {
-  height: 36px;
-}
-
 * {
   box-sizing: border-box;
 }
@@ -63,7 +29,22 @@ header {
 .header-inner {
   max-width: 1100px;
   margin: 0 auto;
-  padding: 16px 16px 10px 16px;
+  padding: 12px 16px 10px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.header-logos {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.logo-sedema,
+.logo-manzanas {
+  height: 36px;
+  object-fit: contain;
 }
 
 .header-texto h1 {
@@ -111,7 +92,12 @@ h2 {
   color: var(--verde-oscuro);
 }
 
-/* FORMULARIO */
+.intro-section p {
+  font-size: 13px;
+  color: #555;
+}
+
+/* FORMULARIO PRINCIPAL (ALCALDÍA / COLONIA) */
 
 .form-grid {
   display: grid;
@@ -133,9 +119,12 @@ h2 {
   border-radius: 6px;
   border: 1px solid #bdbdbd;
   font-size: 14px;
+  font-family: 'Roboto', sans-serif;
+  background-color: #fff;
 }
 
-.form-item input[list]:disabled {
+.form-item input[list]:disabled,
+.form-item select:disabled {
   background-color: #f0f0f0;
 }
 
@@ -171,7 +160,36 @@ h2 {
   }
 }
 
-/* TARJETA KPI */
+/* KPI GLOBAL (arriba del mapa) */
+
+.kpi-global-section {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0,1fr));
+  gap: 12px;
+  margin: 16px 0 24px 0;
+}
+
+.kpi-global-card {
+  background: #ffffff;
+  border-radius: 10px;
+  border: 1px solid #dde3ea;
+  padding: 8px 10px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+}
+
+.kpi-global-label {
+  font-size: 11px;
+  color: #555;
+  margin-bottom: 3px;
+}
+
+.kpi-global-value {
+  font-size: 16px;
+  font-weight: 700;
+  color: #222;
+}
+
+/* KPI DE COLONIA SELECCIONADA */
 
 .resultado {
   margin-top: 20px;
@@ -182,7 +200,7 @@ h2 {
   border-radius: 12px;
   border: 1px solid #dde3ea;
   box-shadow: 0 2px 8px rgba(0,0,0,0.06);
-  padding: 16px 20px;
+  padding: 14px 16px;
 }
 
 .kpi-card p {
@@ -198,13 +216,13 @@ h2 {
   display: flex;
   align-items: baseline;
   gap: 6px;
-  margin-top: 10px;
+  margin-top: 6px;
 }
 
 .kpi-value {
-  font-size: 24px;
-  font-weight: 800;
-  color: #d32f2f;
+  font-size: 14px; /* mismo tamaño que el resto */
+  font-weight: 700;
+  color: #c62828; /* rojo pero sobrio */
 }
 
 .kpi-secondary {
@@ -216,7 +234,7 @@ h2 {
 
 .badge-prioridad {
   display: inline-block;
-  padding: 4px 10px;
+  padding: 3px 10px;
   border-radius: 999px;
   font-size: 11px;
   font-weight: 600;
@@ -247,7 +265,7 @@ h2 {
   background-color: #757575;
 }
 
-/* MAPA */
+/* MAPA + GRÁFICAS */
 
 .map-section {
   margin-top: 22px;
@@ -257,6 +275,13 @@ h2 {
   margin-bottom: 8px;
   font-weight: 500;
   color: #004d40;
+}
+
+.map-and-charts {
+  display: grid;
+  grid-template-columns: minmax(0, 2.1fr) minmax(0, 1.4fr);
+  gap: 16px;
+  align-items: flex-start;
 }
 
 .map-wrapper {
@@ -271,7 +296,7 @@ h2 {
   overflow: hidden;
 }
 
-/* Overlay de “procesando” */
+/* Overlay de carga */
 
 .map-loading {
   position: absolute;
@@ -284,7 +309,7 @@ h2 {
   justify-content: center;
   background: rgba(255,255,255,0.7);
   z-index: 900;
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 600;
   color: #333;
 }
@@ -329,7 +354,7 @@ h2 {
   position: absolute;
   bottom: 10px;
   left: 10px;
-  z-index: 1000;          /* SIEMPRE ENCIMA DEL MAPA */
+  z-index: 1000;
   background: rgba(255, 255, 255, 0.95);
   border-radius: 8px;
   padding: 8px 10px;
@@ -414,11 +439,44 @@ h2 {
   border-color: #b21800;
 }
 
-/* En móvil, hacer la leyenda un poco más compacta */
+/* GRÁFICAS (Chart.js) */
+
+.charts-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.charts-wrapper h3 {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 500;
+  color: #004d40;
+}
+
+.chart-card {
+  background: #ffffff;
+  border-radius: 10px;
+  border: 1px solid #dde3ea;
+  padding: 8px 10px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.04);
+}
+
+.chart-card h4 {
+  margin: 0 0 4px 0;
+  font-size: 13px;
+  font-weight: 600;
+  color: #333;
+}
+
+/* Layout móvil: mapa arriba, gráficas abajo */
+
 @media (max-width: 768px) {
-  .map-legend {
-    font-size: 10px;
-    max-width: 180px;
+  .map-and-charts {
+    grid-template-columns: 1fr;
+  }
+  .charts-wrapper {
+    margin-top: 12px;
   }
 }
 
@@ -434,13 +492,16 @@ h2 {
   color: #004d40;
 }
 
-/* Filtros integrados en los encabezados */
+/* Contenedor scrollable */
+
 .table-wrapper {
   max-height: 380px;
   overflow: auto;
   border-radius: 8px;
   border: 1px solid #e0e0e0;
 }
+
+/* Tabla y filtros */
 
 #tablaColonias {
   width: 100%;
@@ -485,20 +546,37 @@ h2 {
   background-color: #fff3cd !important;
 }
 
-/* Fila de filtros dentro del thead */
+/* Fila de filtros */
 .filters-row th {
   padding: 2px 4px;
 }
 
+/* Filtros: misma fuente, 2px menos que tabla */
+
+.filters-row select,
 .filters-row input {
   width: 100%;
   padding: 3px 4px;
   border-radius: 4px;
   border: 1px solid #c2c9d6;
-  font-size: 11px;
+  font-size: 10px; /* tabla ~12px, filtros ~10px */
+  font-family: 'Roboto', sans-serif;
+  background-color: #fff;
+}
+
+/* Punto de color para prioridad en la tabla */
+
+.prio-dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  margin-right: 4px;
+  vertical-align: middle;
 }
 
 /* Botón limpiar filtros */
+
 .table-filters-actions {
   margin-top: 6px;
   text-align: right;
@@ -518,14 +596,33 @@ h2 {
 }
 
 /* Responsive tabla en móvil */
+
 @media (max-width: 768px) {
   .table-section h3 {
     font-size: 14px;
   }
-
   #tablaColonias {
     font-size: 11px;
   }
+}
+
+/* SECCIÓN DE ESTADÍSTICAS */
+
+.stats-section {
+  margin-top: 14px;
+  font-size: 12px;
+  color: #444;
+}
+
+.stats-section h4 {
+  margin: 0 0 4px 0;
+  font-weight: 600;
+  color: #333;
+}
+
+.stats-section ul {
+  margin: 4px 0 4px 18px;
+  padding: 0;
 }
 
 /* FOOTER */
@@ -535,4 +632,12 @@ footer {
   font-size: 11px;
   color: #777;
   padding-bottom: 16px;
+}
+
+/* Ajustes generales en móvil */
+
+@media (max-width: 768px) {
+  .kpi-global-section {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
 }
