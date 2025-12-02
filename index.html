@@ -25,7 +25,10 @@
     </div>
     <div class="header-texto">
       <h1>SEDEMA · Manzanas por colonia</h1>
-      <p>Consulta el número de manzanas y la prioridad de reforestación por colonia.</p>
+      <p>
+        Herramienta para consultar el número de manzanas y la prioridad de reforestación
+        por colonia en la Ciudad de México.
+      </p>
     </div>
   </div>
   <div class="linea-oro"></div>
@@ -33,24 +36,39 @@
 
 <main class="container">
 
+  <!-- Sección de ayuda breve -->
+  <section class="intro-section">
+    <h2>¿Cómo funciona esta herramienta?</h2>
+    <p>
+      Selecciona primero una <strong>alcaldía</strong> y después una <strong>colonia</strong> para
+      visualizar en el mapa su ubicación, sus manzanas urbanas y la prioridad de reforestación asignada.
+      Debajo del mapa encontrarás una tabla con todas las colonias, donde puedes filtrar, ordenar y
+      consultar información de forma independiente al mapa.
+    </p>
+  </section>
+
   <h2>Consulta por alcaldía y colonia</h2>
 
   <div class="form-grid">
     <div class="form-item">
       <label for="munSelector">Alcaldía</label>
       <select id="munSelector"></select>
-      <small class="hint">Selecciona la alcaldía.</small>
+      <small class="hint">Elige una alcaldía para filtrar las colonias disponibles.</small>
     </div>
 
     <div class="form-item">
       <label for="colSelector">Colonia</label>
-      <select id="colSelector" disabled></select>
-      <small class="hint">Selecciona la colonia.</small>
+      <select id="colSelector" disabled>
+        <option value="">Selecciona una alcaldía primero…</option>
+      </select>
+      <small class="hint">Selecciona la colonia para ver el detalle en el mapa y en el panel de resultados.</small>
     </div>
   </div>
 
+  <!-- KPI -->
   <section id="resultado" class="resultado" style="display:none;"></section>
 
+  <!-- MAPA -->
   <section class="map-section">
     <h3>Mapa de colonias y manzanas</h3>
 
@@ -75,11 +93,11 @@
           </div>
           <div class="legend-item">
             <span class="legend-color manzanas-sel-color"></span>
-            <span class="legend-label">Manzanas dentro de colonia</span>
+            <span class="legend-label">Manzanas dentro de la colonia seleccionada</span>
           </div>
         </div>
 
-        <div class="legend-subtitle">Prioridad</div>
+        <div class="legend-subtitle">Prioridad de reforestación</div>
         <div class="legend-group">
           <div class="legend-item"><span class="legend-color prio-muy-baja"></span>Muy baja</div>
           <div class="legend-item"><span class="legend-color prio-baja"></span>Baja</div>
@@ -95,17 +113,21 @@
   <!-- TABLA DE COLONIAS -->
   <section class="table-section">
     <h3>Colonias – Manzanas verdes y superficie</h3>
+    <p class="hint">
+      Usa los filtros en cada encabezado para buscar por alcaldía, colonia, código postal y prioridad.
+      Haz clic en el título de cada columna para ordenar los datos (↕ indica que la columna es ordenable).
+    </p>
 
     <div class="table-wrapper">
       <table id="tablaColonias">
         <thead>
           <tr>
-            <th data-col="alc">Alcaldía</th>
-            <th data-col="col">Colonia</th>
-            <th data-col="cp">CP</th>
-            <th data-col="prio">Prioridad Manzanas Verdes</th>
-            <th data-col="pob">Población 2020</th>
-            <th data-col="ha">Superficie ha</th>
+            <th data-col="alc">Alcaldía ↕</th>
+            <th data-col="col">Colonia ↕</th>
+            <th data-col="cp">CP ↕</th>
+            <th data-col="prio">Prioridad Manzanas Verdes ↕</th>
+            <th data-col="pob">Población 2020 ↕</th>
+            <th data-col="ha">Superficie ha ↕</th>
           </tr>
           <tr class="filters-row">
             <!-- Alcaldía: select -->
@@ -116,11 +138,11 @@
             </th>
             <!-- Colonia: texto -->
             <th>
-              <input id="filtroCol" type="text" placeholder="Filtrar…">
+              <input id="filtroCol" type="text" placeholder="Filtrar colonia…">
             </th>
             <!-- CP: texto -->
             <th>
-              <input id="filtroCP" type="text" placeholder="Filtrar…">
+              <input id="filtroCP" type="text" placeholder="Filtrar CP…">
             </th>
             <!-- Prioridad: select -->
             <th>
@@ -141,6 +163,11 @@
     <div class="table-filters-actions">
       <button id="btnLimpiarFiltros">Limpiar filtros</button>
     </div>
+
+    <!-- RESUMEN ESTADÍSTICO -->
+    <section id="statsResumen" class="stats-section">
+      <!-- Se llena por JS -->
+    </section>
   </section>
 
 </main>
@@ -311,7 +338,8 @@ function construirDatosTabla() {
     const pob = p.POBTOT != null ? p.POBTOT : null;
     const areaKm2 = p.area_km2 != null ? p.area_km2 : null;
     const ha = areaKm2 != null ? areaKm2 * 100 : null;
-    return { idx, alc, col, cp, pr, pob, ha };
+    const manz = p.CVEGEO_count != null ? p.CVEGEO_count : 0;
+    return { idx, alc, col, cp, pr, pob, ha, manz };
   });
 }
 
@@ -371,7 +399,7 @@ function actualizarTablaColonias() {
       if (va == null && vb == null) return 0;
       if (va == null) return 1;
       if (vb == null) return -1;
-      if (col === 'pob' || col === 'ha') return (va - vb) * dir;
+      if (col === 'pob' || col === 'ha' || col === 'manz') return (va - vb) * dir;
       if (col === 'cp') return String(va).localeCompare(String(vb),'es') * dir;
       return String(va).localeCompare(String(vb),'es') * dir;
     });
@@ -379,11 +407,15 @@ function actualizarTablaColonias() {
 
   let html = "";
   filas.forEach(r => {
+    const prClass = prioridadClass(r.pr);
     html += `<tr data-idx="${r.idx}">
       <td>${normalizarTexto(r.alc)}</td>
       <td>${normalizarTexto(r.col)}</td>
       <td>${r.cp}</td>
-      <td>${r.pr}</td>
+      <td>
+        <span class="prio-dot ${prClass}"></span>
+        <span>${r.pr}</span>
+      </td>
       <td>${r.pob != null ? r.pob.toLocaleString("es-MX") : ""}</td>
       <td>${r.ha != null ? r.ha.toFixed(2) : ""}</td>
     </tr>`;
@@ -392,11 +424,79 @@ function actualizarTablaColonias() {
   tbody.innerHTML = html;
 }
 
+// ------------ Estadísticas resumen ------------ //
+function renderEstadisticas() {
+  const cont = document.getElementById('statsResumen');
+  if (!cont) return;
+
+  const totalColonias = tablaDatosColonias.length;
+  const porPrio = {};
+  const porPrioPob = {};
+  const porPrioHa  = {};
+  const muyAltaPorAlc = {};
+
+  tablaDatosColonias.forEach(r => {
+    const pr = (r.pr || "Sin dato").toLowerCase();
+    porPrio[pr]     = (porPrio[pr]    || 0) + 1;
+    porPrioPob[pr]  = (porPrioPob[pr] || 0) + (r.pob || 0);
+    porPrioHa[pr]   = (porPrioHa[pr]  || 0) + (r.ha  || 0);
+
+    if (pr === "muy alta") {
+      muyAltaPorAlc[r.alc] = (muyAltaPorAlc[r.alc] || 0) + (r.manz || 0);
+    }
+  });
+
+  let alcTop = "";
+  let manzTop = 0;
+  Object.keys(muyAltaPorAlc).forEach(alc => {
+    if (muyAltaPorAlc[alc] > manzTop) {
+      manzTop = muyAltaPorAlc[alc];
+      alcTop  = alc;
+    }
+  });
+
+  function prLabel(p) {
+    if (p === "muy baja") return "Muy baja";
+    if (p === "baja")     return "Baja";
+    if (p === "media")    return "Media";
+    if (p === "alta")     return "Alta";
+    if (p === "muy alta") return "Muy alta";
+    return p;
+  }
+
+  const ordenPrio = ["muy alta","alta","media","baja","muy baja"];
+  let html = `<h4>Resumen general</h4>`;
+  html += `<p><strong>Total de colonias:</strong> ${totalColonias.toLocaleString("es-MX")}</p>`;
+
+  html += `<ul>`;
+  ordenPrio.forEach(p => {
+    if (porPrio[p]) {
+      const n = porPrio[p];
+      const perc = ((n / totalColonias) * 100).toFixed(1);
+      const pob = porPrioPob[p] || 0;
+      const ha  = porPrioHa[p]  || 0;
+      html += `<li>
+        <strong>${prLabel(p)}:</strong> ${n.toLocaleString("es-MX")} colonias
+        (${perc}%); población ${pob.toLocaleString("es-MX")} habitantes;
+        superficie ${ha.toFixed(2)} ha.
+      </li>`;
+    }
+  });
+  html += `</ul>`;
+
+  if (alcTop) {
+    html += `<p><strong>Alcaldía con más manzanas en prioridad muy alta:</strong> ${normalizarTexto(alcTop)} (${manzTop.toLocaleString("es-MX")} manzanas).</p>`;
+  }
+
+  cont.innerHTML = html;
+}
+
 // ------------ Inicializar tabla ------------ //
 function inicializarTablaColonias() {
   construirDatosTabla();
   poblarSelectFiltrosTabla();
   actualizarTablaColonias();
+  renderEstadisticas();
 
   document.getElementById('filtroAlc').addEventListener('change', actualizarTablaColonias);
   document.getElementById('filtroCol').addEventListener('input', actualizarTablaColonias);
@@ -578,7 +678,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const prioridad = p.prioridad || "Sin dato";
     const numManz   = p.CVEGEO_count != null ? p.CVEGEO_count : "0";
 
-    resultadoDiv.innerHTML=
+    const resultadoDiv = document.getElementById('resultado');
+    resultadoDiv.innerHTML =
       `<div class="kpi-card">
         <p><span class="label-bold">Alcaldía:</span> ${normalizarTexto(alc)}</p>
         <p><span class="label-bold">Colonia:</span> ${normalizarTexto(col)}</p>
