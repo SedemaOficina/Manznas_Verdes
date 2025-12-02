@@ -160,12 +160,12 @@
       <table id="tablaColonias">
         <thead>
           <tr>
-            <th data-col="alc" title="Haz clic para ordenar">Alcaldía ↕</th>
-            <th data-col="col" title="Haz clic para ordenar">Colonia ↕</th>
-            <th data-col="cp"  title="Haz clic para ordenar">CP ↕</th>
+            <th data-col="alc"  title="Haz clic para ordenar">Alcaldía ↕</th>
+            <th data-col="col"  title="Haz clic para ordenar">Colonia ↕</th>
+            <th data-col="manz" title="Haz clic para ordenar">No. de manzanas ↕</th>
             <th data-col="prio" title="Haz clic para ordenar">Prioridad de intervención (Manzanas Verdes) ↕</th>
-            <th data-col="pob" title="Haz clic para ordenar">Población 2020 ↕</th>
-            <th data-col="ha"  title="Haz clic para ordenar">Superficie ha ↕</th>
+            <th data-col="pob"  title="Haz clic para ordenar">Población 2020 ↕</th>
+            <th data-col="ha"   title="Haz clic para ordenar">Superficie ha ↕</th>
           </tr>
           <tr class="filters-row">
             <!-- Alcaldía: select -->
@@ -178,7 +178,7 @@
             <th>
               <input id="filtroCol" type="text" placeholder="Filtrar colonia…">
             </th>
-            <!-- CP: sin filtro -->
+            <!-- No. de manzanas: sin filtro -->
             <th></th>
             <!-- Prioridad: select -->
             <th>
@@ -246,7 +246,7 @@ let baseOSM, baseLight, baseSat, baseEmpty;
 let capaColonias;
 let capaManzanasTodas;
 let capaManzanasResaltadas;
-let indiceColonias = {};   // clave "NOM_MUN|COLONIA"
+let indiceColonias = {};   // clave "ALCALDIA|COLONIA"
 let tablaDatosColonias = []; // datos para tabla
 
 let currentSort = { col: null, dir: 'asc' };
@@ -343,7 +343,7 @@ function initMap() {
 
   baseOSM.addTo(map);
 
-  // Manzanas base (más visibles)
+  // Manzanas base
   capaManzanasTodas = L.geoJSON(null, {
     pane: 'overlayPane',
     style: {
@@ -363,7 +363,7 @@ function initMap() {
     },
     onEachFeature: function(feat, layer) {
       const p = feat.properties || {};
-      const key = `${p.NOM_MUN || ""}|${p.COLONIA || ""}`;
+      const key = `${p.ALCALDIA || ""}|${p.COLONIA || ""}`;
       indiceColonias[key] = layer;
     }
   }).addTo(map);
@@ -418,15 +418,13 @@ function cargarCapasEnMapa() {
 function construirDatosTabla() {
   tablaDatosColonias = coloniasFeatures.map((f, idx) => {
     const p = f.properties || {};
-    const alc = p.NOM_MUN || "";
+    const alc = p.ALCALDIA || "";
     const col = p.COLONIA || "";
-    const cp  = p.CP || "";
-    const pr  = p.prioridad || "Sin dato";
-    const pob = p.POBTOT != null ? Math.round(p.POBTOT) : 0;
-    const areaKm2 = p.area_km2 != null ? p.area_km2 : 0;
-    const ha = areaKm2 * 100;
-    const manz = p.CVEGEO_count != null ? p.CVEGEO_count : 0;
-    return { idx, alc, col, cp, pr, pob, ha, manz };
+    const pr  = p.PRIORIDAD_ || "Sin dato";
+    const pob = p.POB_COLONI != null ? Math.round(p.POB_COLONI) : 0;
+    const ha  = p.area_ha != null ? p.area_ha : 0;
+    const manz = p.NO_DE_MZNA != null ? p.NO_DE_MZNA : 0;
+    return { idx, alc, col, pr, pob, ha, manz };
   });
 
   totalColoniasBase = tablaDatosColonias.length;
@@ -504,7 +502,7 @@ function actualizarKPIsyCharts(filas) {
 
   const porcColoniasAlta   = totalColoniasBase ? ((totalAltaMuyAlta / totalColoniasBase) * 100).toFixed(1) : 0;
   const porcPobAlta        = totalPobBase      ? ((pobAltaMuyAlta   / totalPobBase)      * 100).toFixed(1) : 0;
-  const porcHaAlta         = totalHaBase       ? ((haAltaMuyAlta    / totalHaBase)       * 100).toFixed(1) : 0;
+  const porcHaAlta         = totalHaBase       ? ((haAltaMuyAlta    / totalHaBase       ) * 100).toFixed(1) : 0;
 
   document.getElementById('kpiTotalColonias').textContent =
     totalColoniasBase.toLocaleString("es-MX");
@@ -529,7 +527,7 @@ function actualizarKPIsyCharts(filas) {
   document.getElementById('chartTitlePoblacion').textContent =
     `Población por prioridad – ${contexto}`;
 
-  // Gráficas (según selección)
+  // Gráficas
   const labels = [];
   const dataColonias = [];
   const dataPoblacion = [];
@@ -594,7 +592,7 @@ function actualizarKPIsyCharts(filas) {
     }
   });
 
-  // Resumen general (porcentaje relativo a la selección)
+  // Resumen general
   const cont = document.getElementById('statsResumen');
   if (!cont) return;
 
@@ -616,7 +614,7 @@ function actualizarKPIsyCharts(filas) {
                   pr === "baja"     ? "stats-baja" :
                   pr === "muy baja" ? "stats-muy-baja" : "";
 
-      html += `<div class="stats-card ${cls}">
+      html += `<div class="stats-card ${cls}"> 
         <h5>${label}</h5>
         <p><strong>Colonias:</strong> ${n.toLocaleString("es-MX")} (${perc}%)</p>
         <p><strong>Población:</strong> ${pob.toLocaleString("es-MX")} hab.</p>
@@ -662,7 +660,6 @@ function actualizarTablaColonias() {
       if (va == null) return 1;
       if (vb == null) return -1;
       if (col === 'pob' || col === 'ha' || col === 'manz') return (va - vb) * dir;
-      if (col === 'cp') return String(va).localeCompare(String(vb),'es') * dir;
       return String(va).localeCompare(String(vb),'es') * dir;
     });
   }
@@ -673,7 +670,7 @@ function actualizarTablaColonias() {
     html += `<tr data-idx="${r.idx}">
       <td>${normalizarTexto(r.alc)}</td>
       <td>${normalizarTexto(r.col)}</td>
-      <td>${r.cp}</td>
+      <td>${r.manz != null ? r.manz.toLocaleString("es-MX") : ""}</td>
       <td>
         <span class="prio-dot ${prClass}"></span>
         <span>${r.pr}</span>
@@ -781,7 +778,7 @@ function resaltarColoniaYManzanas(alcRaw, colRaw, prioridadRaw, numManzRaw, idxF
       `Prioridad: ${prio}<br>` +
       `Manzanas: ${num.toLocaleString("es-MX")}<br>` +
       (pobTxt ? `Población: ${pobTxt} hab.<br>` : "") +
-      (haTxt  ? `Superficie: ${haTxt} ha` : ""),
+      (haTxt  ? `Superficie: ${haTxt} ha` : "" ),
       { permanent: true, direction: 'center', className: `tooltip-prioridad ${prioridadClass(prio)}` }
     ).openTooltip();
 
@@ -850,8 +847,8 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   Promise.all([
-    fetch('COLONIAS_PRIORIZACION_LIBER.geojson').then(r => r.json()),
-    fetch('mnzn_verdes_col_wgs84_sin_campos.geojson').then(r => r.json())
+    fetch('colonias_manzanas_verdes.geojson').then(r => r.json()),
+    fetch('manzanas_manzanas_verdes.geojson').then(r => r.json())
   ])
   .then(([coloniasData, manzanasData]) => {
 
@@ -860,11 +857,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
     coloniasFeatures.forEach(f => {
       if (!f.properties) f.properties = {};
-      if (!f.properties.prioridad) f.properties.prioridad = "Sin dato";
+      if (!f.properties.PRIORIDAD_) f.properties.PRIORIDAD_ = "Sin dato";
     });
 
     // Selector de alcaldías (arriba)
-    const alcSet = new Set(coloniasFeatures.map(f => f.properties.NOM_MUN));
+    const alcSet = new Set(coloniasFeatures.map(f => f.properties.ALCALDIA));
     const alcaldias = Array.from(alcSet).sort((a,b)=>a.localeCompare(b,'es'));
 
     const opt0 = document.createElement('option');
@@ -900,11 +897,11 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!alc) return;
 
     const coloniasDeAlc = coloniasFeatures
-      .filter(f=>f.properties.NOM_MUN === alc)
+      .filter(f=>f.properties.ALCALDIA === alc)
       .sort((a,b)=>a.properties.COLONIA.localeCompare(b.properties.COLONIA,'es'));
 
     coloniasDeAlc.forEach(f=>{
-      const label = `${f.properties.COLONIA} (CP ${f.properties.CP||''})`;
+      const label = `${f.properties.COLONIA}`;
       const opt = document.createElement('option');
       opt.value = label;
       colList.appendChild(opt);
@@ -916,7 +913,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const label = colInput.value;
     if (!label) return;
 
-    const textoCol = label.split('(CP')[0].trim().toLowerCase();
+    const textoCol = label.toLowerCase().trim();
     let idx = -1;
     for (let i=0; i<coloniasFeatures.length; i++) {
       const col = (coloniasFeatures[i].properties.COLONIA || "").toLowerCase();
@@ -927,17 +924,15 @@ document.addEventListener('DOMContentLoaded', () => {
     const feat = coloniasFeatures[idx];
     const p = feat.properties || {};
 
-    const alc       = p.NOM_MUN || "";
+    const alc       = p.ALCALDIA || "";
     const col       = p.COLONIA || "";
-    const cp        = p.CP || "";
-    const prioridad = p.prioridad || "Sin dato";
-    const numManz   = p.CVEGEO_count != null ? p.CVEGEO_count : 0;
+    const prioridad = p.PRIORIDAD_ || "Sin dato";
+    const numManz   = p.NO_DE_MZNA != null ? p.NO_DE_MZNA : 0;
 
     const kpiHtml =
       `<div class="kpi-card">
         <p><span class="label-bold">Alcaldía:</span> ${normalizarTexto(alc)}</p>
         <p><span class="label-bold">Colonia:</span> ${normalizarTexto(col)}</p>
-        <p><span class="label-bold">CP:</span> ${cp || 'No disponible'}</p>
         <p><span class="label-bold">Prioridad de intervención (Manzanas Verdes):</span>
            <span class="badge-prioridad ${prioridadClass(prioridad)}">${prioridad}</span></p>
         <p class="kpi-number-line">
