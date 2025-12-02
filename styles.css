@@ -85,6 +85,14 @@ header {
   box-shadow: 0 4px 14px rgba(0,0,0,0.12);
 }
 
+/* Separadores de sección */
+
+.section-block {
+  border-top: 1px solid #e0e0e0;
+  padding-top: 16px;
+  margin-top: 24px;
+}
+
 h2 {
   margin-top: 0;
   margin-bottom: 16px;
@@ -95,6 +103,12 @@ h2 {
 .intro-section p {
   font-size: 13px;
   color: #555;
+}
+
+.intro-pasos {
+  margin: 8px 0 0 18px;
+  padding: 0;
+  font-size: 13px;
 }
 
 /* FORMULARIO PRINCIPAL (ALCALDÍA / COLONIA) */
@@ -268,10 +282,6 @@ h2 {
 
 /* MAPA */
 
-.map-section {
-  margin-top: 22px;
-}
-
 .map-section h3 {
   margin-bottom: 8px;
   font-weight: 500;
@@ -435,10 +445,6 @@ h2 {
 
 /* TABLA DE COLONIAS */
 
-.table-section {
-  margin-top: 26px;
-}
-
 .table-section h3 {
   margin-bottom: 10px;
   font-weight: 500;
@@ -463,6 +469,14 @@ h2 {
 
 #btnLimpiarFiltros:hover {
   background: #e0e0e0;
+}
+
+/* Resumen de tabla (“Mostrando X de Y…”) */
+
+.tabla-resumen {
+  margin: 2px 0 6px 0;
+  font-size: 11px;
+  color: #555;
 }
 
 /* Contenedor scrollable */
@@ -507,6 +521,12 @@ h2 {
 #tablaColonias th.sort-desc::after {
   content: " ▼";
   font-size: 10px;
+}
+
+/* Hover en filas para mejor lectura */
+
+#tablaColonias tbody tr:hover {
+  background-color: #e8f4ff;
 }
 
 #tablaColonias tbody tr:nth-child(even) {
@@ -606,10 +626,6 @@ h2 {
 }
 
 /* SECCIÓN DE GRÁFICAS / ANÁLISIS */
-
-.analysis-section {
-  margin-top: 26px;
-}
 
 .analysis-section h3 {
   margin-bottom: 6px;
