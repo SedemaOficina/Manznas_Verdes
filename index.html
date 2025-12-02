@@ -383,6 +383,14 @@ function cargarCapasEnMapa() {
 }
 
 // ------------ Construir datos base para tabla y KPIs ------------ //
+// Totales globales (para porcentajes)
+let totalColoniasBase = 0;
+let totalPobBase = 0;
+let totalHaBase = 0;
+let globalAltaMuyAltaColonias = 0;
+let globalAltaMuyAltaPob = 0;
+let globalAltaMuyAltaHa  = 0;
+
 function construirDatosTabla() {
   tablaDatosColonias = coloniasFeatures.map((f, idx) => {
     const p = f.properties || {};
@@ -390,16 +398,33 @@ function construirDatosTabla() {
     const col = p.COLONIA || "";
     const cp  = p.CP || "";
     const pr  = p.prioridad || "Sin dato";
+    // redondear población
     const pob = p.POBTOT != null ? Math.round(p.POBTOT) : 0;
     const areaKm2 = p.area_km2 != null ? p.area_km2 : 0;
     const ha = areaKm2 * 100;
     const manz = p.CVEGEO_count != null ? p.CVEGEO_count : 0;
+
     return { idx, alc, col, cp, pr, pob, ha, manz };
   });
 
+  // Totales globales (toda la ciudad)
   totalColoniasBase = tablaDatosColonias.length;
   totalPobBase = tablaDatosColonias.reduce((acc, r) => acc + (r.pob || 0), 0);
   totalHaBase  = tablaDatosColonias.reduce((acc, r) => acc + (r.ha  || 0), 0);
+
+  // Totales globales solo alta + muy alta
+  globalAltaMuyAltaColonias = 0;
+  globalAltaMuyAltaPob = 0;
+  globalAltaMuyAltaHa  = 0;
+
+  tablaDatosColonias.forEach(r => {
+    const pr = (r.pr || "").toLowerCase();
+    if (pr === "alta" || pr === "muy alta") {
+      globalAltaMuyAltaColonias += 1;
+      globalAltaMuyAltaPob += (r.pob || 0);
+      globalAltaMuyAltaHa  += (r.ha  || 0);
+    }
+  });
 }
 
 // ------------ Poblar selects de filtros de la tabla ------------ //
