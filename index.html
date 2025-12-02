@@ -26,7 +26,7 @@
     <div class="header-texto">
       <h1>SEDEMA · Manzanas por colonia</h1>
       <p>
-        Herramienta para consultar el número de manzanas y la prioridad de reforestación
+        Herramienta para consultar el número de manzanas y la prioridad de intervención (Manzanas Verdes)
         por colonia en la Ciudad de México.
       </p>
     </div>
@@ -40,11 +40,15 @@
   <section class="intro-section section-block">
     <h2>¿Cómo funciona esta herramienta?</h2>
     <p>
-      Selecciona primero una <strong>alcaldía</strong> y después una <strong>colonia</strong> para
-      visualizar en el mapa su ubicación, las manzanas urbanas que contiene y la prioridad de reforestación.
-      Debajo del mapa encontrarás una <strong>tabla interactiva</strong> con todas las colonias, donde
-      puedes filtrar, ordenar y revisar la información de forma independiente al mapa.
+      Esta herramienta permite visualizar manzanas urbanas y su prioridad de intervención en colonias de la Ciudad de México.
     </p>
+    <ol class="intro-pasos">
+      <li>Selecciona una <strong>alcaldía</strong>.</li>
+      <li>Escribe y selecciona una <strong>colonia</strong> de la lista.</li>
+      <li>Revisa el <strong>mapa</strong> para ver la ubicación y las manzanas de la colonia.</li>
+      <li>Usa la <strong>tabla</strong> para explorar todas las colonias y filtrar por prioridad.</li>
+      <li>Consulta el <strong>resumen y las gráficas</strong> para interpretar la información agregada.</li>
+    </ol>
   </section>
 
   <!-- KPIs globales -->
@@ -118,7 +122,7 @@
           </div>
         </div>
 
-        <div class="legend-subtitle">Prioridad de reforestación</div>
+        <div class="legend-subtitle">Prioridad de intervención (Manzanas Verdes)</div>
         <div class="legend-group">
           <div class="legend-item"><span class="legend-color prio-muy-baja"></span>Muy baja</div>
           <div class="legend-item"><span class="legend-color prio-baja"></span>Baja</div>
@@ -134,24 +138,26 @@
   <section class="table-section section-block">
     <h3>Colonias – Manzanas verdes y superficie</h3>
     <p class="hint">
-      Usa los filtros en los encabezados para buscar por alcaldía, colonia y prioridad.
+      Usa los filtros en los encabezados para buscar por alcaldía, colonia y prioridad de intervención.
       Haz clic en el título de cada columna para ordenar los datos (↕ indica columna ordenable).
     </p>
 
     <div class="table-filters-actions">
-      <button id="btnLimpiarFiltros">🗑 Limpiar filtros</button>
+      <button id="btnLimpiarFiltros" aria-label="Limpiar filtros de la tabla">🗑 Limpiar filtros de la tabla</button>
     </div>
+
+    <p id="tablaResumen" class="tabla-resumen"></p>
 
     <div class="table-wrapper">
       <table id="tablaColonias">
         <thead>
           <tr>
-            <th data-col="alc">Alcaldía ↕</th>
-            <th data-col="col">Colonia ↕</th>
-            <th data-col="cp">CP ↕</th>
-            <th data-col="prio">Prioridad Manzanas Verdes ↕</th>
-            <th data-col="pob">Población 2020 ↕</th>
-            <th data-col="ha">Superficie ha ↕</th>
+            <th data-col="alc" title="Haz clic para ordenar">Alcaldía ↕</th>
+            <th data-col="col" title="Haz clic para ordenar">Colonia ↕</th>
+            <th data-col="cp"  title="Haz clic para ordenar">CP ↕</th>
+            <th data-col="prio" title="Haz clic para ordenar">Prioridad de intervención (Manzanas Verdes) ↕</th>
+            <th data-col="pob" title="Haz clic para ordenar">Población 2020 ↕</th>
+            <th data-col="ha"  title="Haz clic para ordenar">Superficie ha ↕</th>
           </tr>
           <tr class="filters-row">
             <!-- Alcaldía: select -->
@@ -190,9 +196,9 @@
 
   <!-- ANÁLISIS POR PRIORIDAD (GRÁFICAS) -->
   <section class="analysis-section section-block">
-    <h3>Distribución por prioridad</h3>
+    <h3>Distribución por prioridad de intervención</h3>
     <p class="hint">
-      Las gráficas muestran la distribución de colonias y población por nivel de prioridad,
+      Las gráficas muestran la distribución de colonias y población por nivel de prioridad de intervención,
       de acuerdo con los filtros aplicados en la tabla de colonias.
     </p>
 
@@ -445,11 +451,12 @@ function actualizarKPIsyCharts(filas) {
   const pobAltaMuyAlta   = (porPrioPob["alta"] || 0) + (porPrioPob["muy alta"] || 0);
   const haAltaMuyAlta    = (porPrioHa["alta"] || 0) + (porPrioHa["muy alta"] || 0);
 
-  // porcentajes globales (respecto al total de la ciudad, no del filtro)
+  // porcentajes globales (respecto al total de la ciudad, NO al filtro)
   const porcColoniasAlta = totalColoniasBase ? ((totalAltaMuyAlta / totalColoniasBase) * 100).toFixed(1) : 0;
   const porcPobAlta      = totalPobBase      ? ((pobAltaMuyAlta   / totalPobBase)   * 100).toFixed(1) : 0;
   const porcHaAlta       = totalHaBase       ? ((haAltaMuyAlta    / totalHaBase)    * 100).toFixed(1) : 0;
 
+  // KPIs globales
   document.getElementById('kpiTotalColonias').textContent =
     totalColoniasBase.toLocaleString("es-MX");
   document.getElementById('kpiColoniasAlta').textContent  =
@@ -458,6 +465,13 @@ function actualizarKPIsyCharts(filas) {
     `${pobAltaMuyAlta.toLocaleString("es-MX")} (${porcPobAlta}%)`;
   document.getElementById('kpiHaAlta').textContent        =
     `${haAltaMuyAlta.toFixed(2)} (${porcHaAlta}%)`;
+
+  // Resumen bajo la tabla: cuántas colonias se ven
+  const resumenEl = document.getElementById('tablaResumen');
+  if (resumenEl) {
+    resumenEl.textContent =
+      `Mostrando ${totalColonias.toLocaleString('es-MX')} colonias de ${totalColoniasBase.toLocaleString('es-MX')} (según filtros aplicados).`;
+  }
 
   // texto dinámico de títulos de gráficas basado en filtros de la tabla
   const selAlc  = document.getElementById('filtroAlc');
@@ -506,16 +520,10 @@ function actualizarKPIsyCharts(filas) {
       scales: {
         y: {
           beginAtZero: true,
-          title: {
-            display: true,
-            text: 'Colonias'
-          }
+          title: { display: true, text: 'Colonias' }
         },
         x: {
-          title: {
-            display: true,
-            text: 'Prioridad'
-          }
+          title: { display: true, text: 'Prioridad' }
         }
       }
     }
@@ -677,12 +685,11 @@ function resaltarFilaTabla(idx) {
   }
 }
 
-// ------------ Resaltar colonia y manzanas ------------ //
+// ------------ Resaltar colonia y manzanas (con filtro por bounding box) ------------ //
 function resaltarColoniaYManzanas(alcRaw, colRaw, prioridadRaw, numManzRaw, idxFilaTabla) {
   showMapLoading(true);
 
   setTimeout(() => {
-
     const alc = alcRaw || "";
     const col = colRaw || "";
     const key = `${alc}|${col}`;
@@ -708,39 +715,33 @@ function resaltarColoniaYManzanas(alcRaw, colRaw, prioridadRaw, numManzRaw, idxF
       fillOpacity: 0.2
     });
 
+    // Tooltip más explícito
     layerColonia.bindTooltip(
-      `<b>${normalizarTexto(col)}</b><br>Prioridad: ${prio}<br>Manzanas: ${num}`,
+      `<b>${normalizarTexto(col)}</b><br>` +
+      `Prioridad de intervención (Manzanas Verdes): ${prio}<br>` +
+      `Manzanas: ${num}`,
       { permanent: true, direction: 'center', className: `tooltip-prioridad ${prioridadClass(prio)}` }
     ).openTooltip();
 
     const gCol = layerColonia.toGeoJSON();
 
-    // -------------------------------
-    // 1) BOUNDING BOX DEL POLÍGONO
-    // -------------------------------
-    const bboxCol = turf.bbox(gCol); 
-    const [minX, minY, maxX, maxY] = bboxCol;
+    // PREFILTRO POR BOUNDING BOX
+    const bboxColonia = turf.bbox(gCol);
+    const [minX, minY, maxX, maxY] = bboxColonia;
 
-    // ------------------------------------
-    // 2) PREFILTRAR MANZANAS POR BOUNDING
-    // ------------------------------------
     const candidatas = manzanasFeatures.filter(f => {
       try {
         const [mx1, my1, mx2, my2] = turf.bbox(f);
-        // descartamos rápidamente las que no se cruzan con el bounding box
-        if (mx2 < minX) return false;   // está totalmente a la izquierda
-        if (mx1 > maxX) return false;   // totalmente a la derecha
-        if (my2 < minY) return false;   // completamente abajo
-        if (my1 > maxY) return false;   // completamente arriba
-        return true; // es candidata
+        if (mx2 < minX) return false;
+        if (mx1 > maxX) return false;
+        if (my2 < minY) return false;
+        if (my1 > maxY) return false;
+        return true;
       } catch {
         return false;
       }
     });
 
-    // ---------------------------------------
-    // 3) INTERSECCIÓN REAL (MUCHO MÁS RÁPIDA)
-    // ---------------------------------------
     const seleccionadas = candidatas.filter(f => {
       try {
         return turf.booleanIntersects(f, gCol);
@@ -754,43 +755,6 @@ function resaltarColoniaYManzanas(alcRaw, colRaw, prioridadRaw, numManzRaw, idxF
 
     map.fitBounds(layerColonia.getBounds(), { padding: [20, 20] });
 
-    showMapLoading(false);
-
-    if (typeof idxFilaTabla === "number") {
-      resaltarFilaTabla(idxFilaTabla);
-    }
-  }, 0);
-}
-
-    capaColonias.resetStyle();
-    capaColonias.eachLayer(l => l.unbindTooltip());
-
-    const est   = estiloPrioridad(prioridadRaw);
-    const prio  = (prioridadRaw || "Sin dato").toString().trim();
-    const num   = numManzRaw != null ? numManzRaw : "0";
-
-    layerColonia.setStyle({
-      color: est.color,
-      weight: 3,
-      fillColor: est.fill,
-      fillOpacity: 0.2
-    });
-
-    layerColonia.bindTooltip(
-      `<b>${normalizarTexto(col)}</b><br>Prioridad: ${prio}<br>Manzanas: ${num}`,
-      { permanent:true, direction:'center', className:`tooltip-prioridad ${prioridadClass(prio)}` }
-    ).openTooltip();
-
-    const gCol = layerColonia.toGeoJSON();
-    const seleccionadas = manzanasFeatures.filter(f => {
-      try { return turf.booleanIntersects(f, gCol); }
-      catch (e) { return false; }
-    });
-
-    capaManzanasResaltadas.clearLayers();
-    capaManzanasResaltadas.addData(seleccionadas);
-
-    map.fitBounds(layerColonia.getBounds(), { padding:[20,20] });
     showMapLoading(false);
 
     if (typeof idxFilaTabla === "number") {
@@ -844,7 +808,7 @@ document.addEventListener('DOMContentLoaded', () => {
   })
   .catch(err => console.error('Error cargando datos:', err));
 
-  // Cambiar alcaldía: actualiza datalist de colonias para el input
+  // Cambiar alcaldía: actualiza datalist de colonias
   munSelect.addEventListener('change', () => {
     const alc = munSelect.value;
 
@@ -897,7 +861,7 @@ document.addEventListener('DOMContentLoaded', () => {
         <p><span class="label-bold">Alcaldía:</span> ${normalizarTexto(alc)}</p>
         <p><span class="label-bold">Colonia:</span> ${normalizarTexto(col)}</p>
         <p><span class="label-bold">CP:</span> ${cp || 'No disponible'}</p>
-        <p><span class="label-bold">Prioridad Manzanas Verdes:</span>
+        <p><span class="label-bold">Prioridad de intervención (Manzanas Verdes):</span>
            <span class="badge-prioridad ${prioridadClass(prioridad)}">${prioridad}</span></p>
         <p class="kpi-number-line">
            <span class="label-bold">No. de manzanas dentro de la colonia:</span>
