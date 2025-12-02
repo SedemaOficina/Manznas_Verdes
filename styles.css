@@ -249,7 +249,7 @@ h2 {
   color: #777;
 }
 
-/* Badge de prioridad */
+/* Badge prioridad */
 
 .badge-prioridad {
   display: inline-block;
@@ -311,7 +311,7 @@ h2 {
   overflow: hidden;
 }
 
-/* Mapa en pantalla completa */
+/* Mapa pantalla completa */
 
 .map-fullscreen {
   position: fixed !important;
@@ -368,7 +368,7 @@ h2 {
 .leaflet-tooltip.tooltip-prioridad.prio-muy-alta { background-color: #ff2200; }
 .leaflet-tooltip.tooltip-prioridad.prio-desconocida { background-color: #757575; }
 
-/* LEYENDA */
+/* LEYENDA COMPACTA */
 
 .map-legend {
   position: absolute;
@@ -463,7 +463,7 @@ h2 {
   background: #ffcdd2;
 }
 
-/* Resumen de tabla */
+/* Resumen tabla */
 
 .tabla-resumen {
   margin: 2px 0 6px 0;
@@ -546,7 +546,7 @@ h2 {
   background-color: #fff;
 }
 
-/* Punto de color en prioridad tabla */
+/* Punto de prioridad en tabla */
 
 .prio-dot {
   display: inline-block;
@@ -602,15 +602,13 @@ h2 {
   margin: 2px 0;
 }
 
-/* Colores en tarjetas */
-
 .stats-muy-alta { border-left: 4px solid #ff2200; }
 .stats-alta     { border-left: 4px solid #ff9900; }
 .stats-media    { border-left: 4px solid #ffff00; }
 .stats-baja     { border-left: 4px solid #7aab00; }
 .stats-muy-baja { border-left: 4px solid #006100; }
 
-/* ANÁLISIS / GRÁFICAS */
+/* GRÁFICAS / ANÁLISIS */
 
 .analysis-section h3 {
   margin-bottom: 6px;
@@ -647,7 +645,7 @@ h2 {
   max-height: 180px;
 }
 
-/* Layout móvil: gráficas apiladas */
+/* Layout móvil: gráficas apiladas + KPIs en 2 columnas */
 
 @media (max-width: 768px) {
   .charts-wrapper {
