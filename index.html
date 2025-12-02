@@ -680,16 +680,87 @@ function resaltarFilaTabla(idx) {
 // ------------ Resaltar colonia y manzanas ------------ //
 function resaltarColoniaYManzanas(alcRaw, colRaw, prioridadRaw, numManzRaw, idxFilaTabla) {
   showMapLoading(true);
+
   setTimeout(() => {
+
     const alc = alcRaw || "";
     const col = colRaw || "";
     const key = `${alc}|${col}`;
     const layerColonia = indiceColonias[key];
+
     if (!layerColonia) {
       capaManzanasResaltadas.clearLayers();
       showMapLoading(false);
       return;
     }
+
+    capaColonias.resetStyle();
+    capaColonias.eachLayer(l => l.unbindTooltip());
+
+    const est = estiloPrioridad(prioridadRaw);
+    const prio = (prioridadRaw || "Sin dato").trim();
+    const num = numManzRaw != null ? numManzRaw : "0";
+
+    layerColonia.setStyle({
+      color: est.color,
+      weight: 3,
+      fillColor: est.fill,
+      fillOpacity: 0.2
+    });
+
+    layerColonia.bindTooltip(
+      `<b>${normalizarTexto(col)}</b><br>Prioridad: ${prio}<br>Manzanas: ${num}`,
+      { permanent: true, direction: 'center', className: `tooltip-prioridad ${prioridadClass(prio)}` }
+    ).openTooltip();
+
+    const gCol = layerColonia.toGeoJSON();
+
+    // -------------------------------
+    // 1) BOUNDING BOX DEL POLÍGONO
+    // -------------------------------
+    const bboxCol = turf.bbox(gCol); 
+    const [minX, minY, maxX, maxY] = bboxCol;
+
+    // ------------------------------------
+    // 2) PREFILTRAR MANZANAS POR BOUNDING
+    // ------------------------------------
+    const candidatas = manzanasFeatures.filter(f => {
+      try {
+        const [mx1, my1, mx2, my2] = turf.bbox(f);
+        // descartamos rápidamente las que no se cruzan con el bounding box
+        if (mx2 < minX) return false;   // está totalmente a la izquierda
+        if (mx1 > maxX) return false;   // totalmente a la derecha
+        if (my2 < minY) return false;   // completamente abajo
+        if (my1 > maxY) return false;   // completamente arriba
+        return true; // es candidata
+      } catch {
+        return false;
+      }
+    });
+
+    // ---------------------------------------
+    // 3) INTERSECCIÓN REAL (MUCHO MÁS RÁPIDA)
+    // ---------------------------------------
+    const seleccionadas = candidatas.filter(f => {
+      try {
+        return turf.booleanIntersects(f, gCol);
+      } catch {
+        return false;
+      }
+    });
+
+    capaManzanasResaltadas.clearLayers();
+    capaManzanasResaltadas.addData(seleccionadas);
+
+    map.fitBounds(layerColonia.getBounds(), { padding: [20, 20] });
+
+    showMapLoading(false);
+
+    if (typeof idxFilaTabla === "number") {
+      resaltarFilaTabla(idxFilaTabla);
+    }
+  }, 0);
+}
 
     capaColonias.resetStyle();
     capaColonias.eachLayer(l => l.unbindTooltip());
