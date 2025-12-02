@@ -173,20 +173,21 @@ h2 {
   background: #ffffff;
   border-radius: 10px;
   border: 1px solid #dde3ea;
-  padding: 8px 10px;
+  padding: 10px 12px;
   box-shadow: 0 1px 4px rgba(0,0,0,0.04);
 }
 
 .kpi-global-label {
-  font-size: 11px;
-  color: #555;
-  margin-bottom: 3px;
+  font-size: 13px;
+  font-weight: 700;
+  color: #00695c; /* verde oscuro para distinguirse del valor */
+  margin-bottom: 4px;
 }
 
 .kpi-global-value {
-  font-size: 16px;
+  font-size: 18px;
   font-weight: 700;
-  color: #222;
+  color: #212121;
 }
 
 /* KPI DE COLONIA SELECCIONADA */
@@ -220,7 +221,7 @@ h2 {
 }
 
 .kpi-value {
-  font-size: 14px; /* mismo tamaño que el resto */
+  font-size: 14px; /* mismo tamaño que el texto */
   font-weight: 700;
   color: #c62828; /* rojo sobrio */
 }
@@ -277,7 +278,7 @@ h2 {
   color: #004d40;
 }
 
-/* Mapa + panel de gráficas */
+/* Mapa + panel de gráficas en 2 columnas */
 
 .map-and-charts {
   display: grid;
@@ -403,7 +404,7 @@ h2 {
   font-size: 11px;
 }
 
-/* Colores de la leyenda */
+/* Colores de la leyenda (ya usan la misma paleta) */
 
 .colonias-color {
   border-color: #00897b;
@@ -441,12 +442,17 @@ h2 {
   border-color: #b21800;
 }
 
-/* GRÁFICAS (Chart.js) */
+/* GRÁFICAS (_chart.js_) Y KPI DE COLONIA EN PANEL DERECHO */
 
 .charts-wrapper {
   display: grid;
-  grid-template-columns: 1fr 1fr; /* 2 columnas en desktop */
+  grid-template-columns: 1fr 1fr;
   gap: 10px;
+}
+
+/* KPI de colonia arriba de las gráficas */
+.charts-wrapper #resultado {
+  grid-column: 1 / -1;
 }
 
 .charts-wrapper h3 {
@@ -512,8 +518,6 @@ h2 {
   border: 1px solid #e0e0e0;
 }
 
-/* Tabla y filtros */
-
 #tablaColonias {
   width: 100%;
   border-collapse: collapse;
@@ -557,12 +561,13 @@ h2 {
   background-color: #fff3cd !important;
 }
 
-/* Fila de filtros */
+/* Fila de filtros en encabezado */
+
 .filters-row th {
   padding: 2px 4px;
 }
 
-/* Filtros: misma fuente, 2px menos que tabla */
+/* Filtros: misma fuente que tabla, 2px menos */
 
 .filters-row select,
 .filters-row input {
@@ -586,7 +591,7 @@ h2 {
   vertical-align: middle;
 }
 
-/* Botón limpiar filtros */
+/* Botón limpiar filtros (usa un icono: 🗑 en el texto) */
 
 .table-filters-actions {
   margin-top: 6px;
@@ -617,7 +622,7 @@ h2 {
   }
 }
 
-/* SECCIÓN DE ESTADÍSTICAS */
+/* SECCIÓN DE ESTADÍSTICAS / RESUMEN GENERAL */
 
 .stats-section {
   margin-top: 14px;
