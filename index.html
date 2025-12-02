@@ -37,7 +37,7 @@
 <main class="container">
 
   <!-- Sección de ayuda -->
-  <section class="intro-section">
+  <section class="intro-section section-block">
     <h2>¿Cómo funciona esta herramienta?</h2>
     <p>
       Selecciona primero una <strong>alcaldía</strong> y después una <strong>colonia</strong> para
@@ -48,7 +48,7 @@
   </section>
 
   <!-- KPIs globales -->
-  <section class="kpi-global-section">
+  <section class="kpi-global-section section-block">
     <div class="kpi-global-card">
       <div class="kpi-global-label">Colonias totales</div>
       <div id="kpiTotalColonias" class="kpi-global-value">–</div>
@@ -67,30 +67,32 @@
     </div>
   </section>
 
-  <h2>Consulta por alcaldía y colonia</h2>
+  <section class="section-block">
+    <h2>Consulta por alcaldía y colonia</h2>
 
-  <div class="form-grid">
-    <div class="form-item">
-      <label for="munSelector">Alcaldía</label>
-      <select id="munSelector"></select>
-      <small class="hint">Elige una alcaldía para filtrar la lista de colonias.</small>
+    <div class="form-grid">
+      <div class="form-item">
+        <label for="munSelector">Alcaldía</label>
+        <select id="munSelector"></select>
+        <small class="hint">Elige una alcaldía para filtrar la lista de colonias.</small>
+      </div>
+
+      <div class="form-item">
+        <label for="colInput">Colonia</label>
+        <input id="colInput" list="colList" placeholder="Empieza a escribir el nombre de la colonia…" disabled>
+        <datalist id="colList"></datalist>
+        <small class="hint">
+          Escribe parte del nombre y selecciona la colonia de la lista desplegable.
+        </small>
+      </div>
     </div>
 
-    <div class="form-item">
-      <label for="colInput">Colonia</label>
-      <input id="colInput" list="colList" placeholder="Empieza a escribir el nombre de la colonia…" disabled>
-      <datalist id="colList"></datalist>
-      <small class="hint">
-        Escribe parte del nombre y selecciona la colonia de la lista desplegable.
-      </small>
-    </div>
-  </div>
-
-  <!-- KPI de colonia seleccionada -->
-  <section id="resultado" class="resultado" style="display:none;"></section>
+    <!-- KPI de colonia seleccionada -->
+    <section id="resultado" class="resultado" style="display:none;"></section>
+  </section>
 
   <!-- MAPA SOLO -->
-  <section class="map-section">
+  <section class="map-section section-block">
     <h3>Mapa de colonias y manzanas</h3>
 
     <div class="map-wrapper">
@@ -129,10 +131,10 @@
   </section>
 
   <!-- TABLA DE COLONIAS -->
-  <section class="table-section">
+  <section class="table-section section-block">
     <h3>Colonias – Manzanas verdes y superficie</h3>
     <p class="hint">
-      Usa los filtros en los encabezados para buscar por alcaldía, colonia, código postal y prioridad.
+      Usa los filtros en los encabezados para buscar por alcaldía, colonia y prioridad.
       Haz clic en el título de cada columna para ordenar los datos (↕ indica columna ordenable).
     </p>
 
@@ -162,10 +164,8 @@
             <th>
               <input id="filtroCol" type="text" placeholder="Filtrar colonia…">
             </th>
-            <!-- CP: texto -->
-            <th>
-              <input id="filtroCP" type="text" placeholder="Filtrar CP…">
-            </th>
+            <!-- CP: sin filtro -->
+            <th></th>
             <!-- Prioridad: select -->
             <th>
               <select id="filtroPrio">
@@ -189,7 +189,7 @@
   </section>
 
   <!-- ANÁLISIS POR PRIORIDAD (GRÁFICAS) -->
-  <section class="analysis-section">
+  <section class="analysis-section section-block">
     <h3>Distribución por prioridad</h3>
     <p class="hint">
       Las gráficas muestran la distribución de colonias y población por nivel de prioridad,
@@ -235,6 +235,11 @@ let tablaDatosColonias = []; // datos para tabla
 let currentSort = { col: null, dir: 'asc' };
 let chartColonias = null;
 let chartPoblacion = null;
+
+// Totales globales (para porcentajes)
+let totalColoniasBase = 0;
+let totalPobBase = 0;
+let totalHaBase = 0;
 
 // ------------ Utilidades ------------ //
 function normalizarTexto(str) {
@@ -376,12 +381,17 @@ function construirDatosTabla() {
     const col = p.COLONIA || "";
     const cp  = p.CP || "";
     const pr  = p.prioridad || "Sin dato";
-    const pob = p.POBTOT != null ? p.POBTOT : null;
-    const areaKm2 = p.area_km2 != null ? p.area_km2 : null;
-    const ha = areaKm2 != null ? areaKm2 * 100 : null;
+    const pob = p.POBTOT != null ? p.POBTOT : 0;
+    const areaKm2 = p.area_km2 != null ? p.area_km2 : 0;
+    const ha = areaKm2 * 100;
     const manz = p.CVEGEO_count != null ? p.CVEGEO_count : 0;
     return { idx, alc, col, cp, pr, pob, ha, manz };
   });
+
+  // Totales globales
+  totalColoniasBase = tablaDatosColonias.length;
+  totalPobBase = tablaDatosColonias.reduce((acc, r) => acc + (r.pob || 0), 0);
+  totalHaBase  = tablaDatosColonias.reduce((acc, r) => acc + (r.ha  || 0), 0);
 }
 
 // ------------ Poblar selects de filtros de la tabla ------------ //
@@ -435,10 +445,19 @@ function actualizarKPIsyCharts(filas) {
   const pobAltaMuyAlta   = (porPrioPob["alta"] || 0) + (porPrioPob["muy alta"] || 0);
   const haAltaMuyAlta    = (porPrioHa["alta"] || 0) + (porPrioHa["muy alta"] || 0);
 
-  document.getElementById('kpiTotalColonias').textContent = totalColonias.toLocaleString("es-MX");
-  document.getElementById('kpiColoniasAlta').textContent  = totalAltaMuyAlta.toLocaleString("es-MX");
-  document.getElementById('kpiPobAlta').textContent       = pobAltaMuyAlta.toLocaleString("es-MX");
-  document.getElementById('kpiHaAlta').textContent        = haAltaMuyAlta.toFixed(2);
+  // porcentajes globales (respecto al total de la ciudad, no del filtro)
+  const porcColoniasAlta = totalColoniasBase ? ((totalAltaMuyAlta / totalColoniasBase) * 100).toFixed(1) : 0;
+  const porcPobAlta      = totalPobBase      ? ((pobAltaMuyAlta   / totalPobBase)   * 100).toFixed(1) : 0;
+  const porcHaAlta       = totalHaBase       ? ((haAltaMuyAlta    / totalHaBase)    * 100).toFixed(1) : 0;
+
+  document.getElementById('kpiTotalColonias').textContent =
+    totalColoniasBase.toLocaleString("es-MX");
+  document.getElementById('kpiColoniasAlta').textContent  =
+    `${totalAltaMuyAlta.toLocaleString("es-MX")} (${porcColoniasAlta}%)`;
+  document.getElementById('kpiPobAlta').textContent       =
+    `${pobAltaMuyAlta.toLocaleString("es-MX")} (${porcPobAlta}%)`;
+  document.getElementById('kpiHaAlta').textContent        =
+    `${haAltaMuyAlta.toFixed(2)} (${porcHaAlta}%)`;
 
   // texto dinámico de títulos de gráficas basado en filtros de la tabla
   const selAlc  = document.getElementById('filtroAlc');
@@ -485,7 +504,19 @@ function actualizarKPIsyCharts(filas) {
       maintainAspectRatio: false,
       plugins: { legend: { display: false } },
       scales: {
-        y: { beginAtZero: true }
+        y: {
+          beginAtZero: true,
+          title: {
+            display: true,
+            text: 'Colonias'
+          }
+        },
+        x: {
+          title: {
+            display: true,
+            text: 'Prioridad'
+          }
+        }
       }
     }
   });
@@ -548,13 +579,11 @@ function actualizarKPIsyCharts(filas) {
 function actualizarTablaColonias() {
   const selAlc  = document.getElementById('filtroAlc');
   const txtCol  = document.getElementById('filtroCol');
-  const txtCP   = document.getElementById('filtroCP');
   const selPrio = document.getElementById('filtroPrio');
   const tbody   = document.querySelector('#tablaColonias tbody');
 
   const fAlc  = selAlc.value;
   const fCol  = txtCol.value.toLowerCase();
-  const fCP   = txtCP.value.toLowerCase();
   const fPrio = selPrio.value;
 
   let filas = tablaDatosColonias.slice();
@@ -562,9 +591,8 @@ function actualizarTablaColonias() {
   filas = filas.filter(r => {
     const alcOk  = !fAlc  || r.alc === fAlc;
     const colOk  = !fCol  || r.col.toLowerCase().includes(fCol);
-    const cpOk   = !fCP   || r.cp.toLowerCase().includes(fCP);
     const prioOk = !fPrio || r.pr === fPrio;
-    return alcOk && colOk && cpOk && prioOk;
+    return alcOk && colOk && prioOk;
   });
 
   if (currentSort.col) {
@@ -610,13 +638,11 @@ function inicializarTablaColonias() {
 
   document.getElementById('filtroAlc').addEventListener('change', actualizarTablaColonias);
   document.getElementById('filtroCol').addEventListener('input', actualizarTablaColonias);
-  document.getElementById('filtroCP').addEventListener('input', actualizarTablaColonias);
   document.getElementById('filtroPrio').addEventListener('change', actualizarTablaColonias);
 
   document.getElementById('btnLimpiarFiltros').addEventListener('click', () => {
     document.getElementById('filtroAlc').value = "";
     document.getElementById('filtroCol').value = "";
-    document.getElementById('filtroCP').value = "";
     document.getElementById('filtroPrio').value = "";
     currentSort = { col:null, dir:'asc' };
     document.querySelectorAll('#tablaColonias th').forEach(th => th.classList.remove('sort-asc','sort-desc'));
@@ -640,16 +666,11 @@ function inicializarTablaColonias() {
   });
 }
 
-// ------------ Resaltar fila de tabla ------------ //
+// ------------ Resaltar fila de tabla (sin scroll automático) ------------ //
 function resaltarFilaTabla(idx) {
   const tbody = document.querySelector('#tablaColonias tbody');
   if (!tbody) return;
-
-  // Quitar selección previa
-  tbody.querySelectorAll('tr.selected-row')
-    .forEach(tr => tr.classList.remove('selected-row'));
-
-  // Solo resaltar, sin hacer scroll automático
+  tbody.querySelectorAll('tr.selected-row').forEach(tr => tr.classList.remove('selected-row'));
   const fila = tbody.querySelector(`tr[data-idx="${idx}"]`);
   if (fila) {
     fila.classList.add('selected-row');
