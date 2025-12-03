@@ -26,8 +26,7 @@
     <div class="header-texto">
       <h1>SEDEMA · Manzanas por colonia</h1>
       <p>
-        Herramienta para consultar el número de manzanas y la prioridad de intervención (Manzanas Verdes)
-        por colonia en la Ciudad de México.
+        Herramienta para consultar manzanas y prioridad de intervención por colonia en la Ciudad de México.
       </p>
     </div>
   </div>
@@ -45,13 +44,13 @@
     <ol class="intro-pasos">
       <li>Selecciona una <strong>alcaldía</strong>.</li>
       <li>Escribe y selecciona una <strong>colonia</strong> de la lista.</li>
-      <li>Revisa el <strong>mapa</strong> para ver la ubicación y las manzanas de la colonia.</li>
-      <li>Usa la <strong>tabla</strong> para explorar todas las colonias y filtrar por prioridad.</li>
+      <li>Revisa el <strong>mapa</strong> para ver las manzanas dentro de la colonia y su prioridad.</li>
+      <li>Usa la <strong>tabla</strong> para explorar todas las colonias y filtrar por prioridad y marginación.</li>
       <li>Consulta el <strong>resumen y las gráficas</strong> para interpretar la información agregada.</li>
     </ol>
   </section>
 
-  <!-- KPIs globales (foto ciudad completa, no dependen de filtros) -->
+  <!-- KPIs globales (ciudad completa) -->
   <section class="kpi-global-section section-block">
     <div class="kpi-global-card">
       <div class="kpi-global-label">Colonias totales</div>
@@ -92,7 +91,7 @@
       </div>
     </div>
 
-    <!-- KPI de colonia seleccionada (centrado, ancho contenido) -->
+    <!-- KPI de colonia seleccionada -->
     <section id="resultado" class="resultado" style="display:none;"></section>
   </section>
 
@@ -124,7 +123,7 @@
           </div>
           <div class="legend-item">
             <span class="legend-color manzanas-sel-color"></span>
-            <span class="legend-label">Manzanas dentro de la colonia seleccionada (coloreadas por prioridad)</span>
+            <span class="legend-label">Manzanas dentro de la colonia seleccionada</span>
           </div>
         </div>
 
@@ -142,10 +141,9 @@
 
   <!-- TABLA -->
   <section class="table-section section-block">
-    <h3>Colonias – Manzanas verdes y superficie</h3>
+    <h3>Colonias – Prioridad, margen social y superficie</h3>
     <p class="hint">
-      Usa los filtros en los encabezados para buscar por alcaldía, colonia y prioridad de intervención (a nivel colonia).
-      Haz clic en el título de cada columna para ordenar los datos (↕ indica columna ordenable).
+      Usa los filtros en los encabezados para buscar por alcaldía, colonia, prioridad y grado de marginación.
     </p>
 
     <div class="table-filters-actions">
@@ -160,34 +158,43 @@
       <table id="tablaColonias">
         <thead>
           <tr>
-            <th data-col="alc"  title="Haz clic para ordenar">Alcaldía ↕</th>
-            <th data-col="col"  title="Haz clic para ordenar">Colonia ↕</th>
-            <th data-col="manz" title="Haz clic para ordenar">No. de manzanas ↕</th>
-            <th data-col="prio" title="Haz clic para ordenar">Prioridad (colonia) ↕</th>
-            <th data-col="pob"  title="Haz clic para ordenar">Población 2020 ↕</th>
-            <th data-col="ha"   title="Haz clic para ordenar">Superficie ha ↕</th>
+            <th data-col="alc"   title="Haz clic para ordenar">Alcaldía ↕</th>
+            <th data-col="col"   title="Haz clic para ordenar">Colonia ↕</th>
+            <th data-col="manz"  title="Haz clic para ordenar">No. de manzanas ↕</th>
+            <th data-col="prio"  title="Haz clic para ordenar">Prioridad (colonia) ↕</th>
+            <th data-col="gm"    title="Haz clic para ordenar">GM_2020 ↕</th>
+            <th data-col="pob"   title="Haz clic para ordenar">Población 2020 ↕</th>
+            <th data-col="ha"    title="Haz clic para ordenar">Superficie ha ↕</th>
           </tr>
           <tr class="filters-row">
-            <!-- Alcaldía: select -->
+            <!-- Alcaldía -->
             <th>
               <select id="filtroAlc">
                 <option value="">Todas</option>
               </select>
             </th>
-            <!-- Colonia: texto -->
+            <!-- Colonia -->
             <th>
               <input id="filtroCol" type="text" placeholder="Filtrar colonia…">
             </th>
-            <!-- No. de manzanas: sin filtro -->
+            <!-- No. manzanas -->
             <th></th>
-            <!-- Prioridad colonia: select -->
+            <!-- Prioridad colonia -->
             <th>
               <select id="filtroPrio">
                 <option value="">Todas</option>
               </select>
             </th>
-            <th><!-- sin filtro específico --></th>
-            <th><!-- sin filtro específico --></th>
+            <!-- GM_2020 -->
+            <th>
+              <select id="filtroGM">
+                <option value="">Todos</option>
+              </select>
+            </th>
+            <!-- Población -->
+            <th></th>
+            <!-- Ha -->
+            <th></th>
           </tr>
         </thead>
         <tbody>
@@ -227,6 +234,8 @@
 <footer>
   <p>SEDEMA · Herramienta de consulta interna.</p>
 </footer>
+
+<!-- JS libs -->
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@turf/turf@6/turf.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -239,23 +248,23 @@
 let coloniasFeatures = [];
 let manzanasFeatures = [];
 
-// agregados por colonia
-let coloniasAgg = [];          // arreglo de objetos agregados
-let coloniasAggByKey = {};     // key "NOMDT|NOMUT" -> objeto agregado
+let coloniasAgg = [];      // arreglo de colonias agregadas
+let coloniasAggByKey = {}; // key "NOM_MUN|COLONIA" -> entry
 
 let map;
 let baseOSM, baseLight, baseSat, baseEmpty;
 let capaColonias;
 let capaManzanasTodas;
 let capaManzanasResaltadas;
-let indiceColonias = {};   // clave "NOMDT|NOMUT" -> layer Leaflet
-let tablaDatosColonias = []; // datos para tabla
+let indiceColonias = {};   // key "NOM_MUN|COLONIA" -> layer
+
+let tablaDatosColonias = [];
 
 let currentSort = { col: null, dir: 'asc' };
 let chartColonias = null;
 let chartPoblacion = null;
 
-// Totales globales (foto ciudad completa, a nivel colonia agregada)
+// Totales globales
 let totalColoniasBase = 0;
 let totalPobBase = 0;
 let totalHaBase = 0;
@@ -306,89 +315,63 @@ function textoContextoFiltros() {
   const a = selAlc?.value || "";
   const p = selPrio?.value || "";
 
-  if (a && p) return `Alcaldía: ${a} · Prioridad: ${p}`;
+  if (a && p) return `Alcaldía: ${a} · Prioridad colonia: ${p}`;
   if (a && !p) return `Alcaldía: ${a}`;
-  if (!a && p) return `Prioridad: ${p}`;
+  if (!a && p) return `Prioridad colonia: ${p}`;
   return `Ciudad completa`;
 }
 
 // =======================
-// AGREGACIÓN COLONIAS A PARTIR DE MANZANAS
+// AGREGACIÓN COLONIAS (a partir de la capa de colonias + conteo de manzanas)
 // =======================
 
 function construirAgregadosColonias() {
   coloniasAgg = [];
   coloniasAggByKey = {};
 
-  // 1) Crear entrada base por cada colonia (área, nombres, id)
+  // 1) crear entrada base por colonia
   coloniasFeatures.forEach((feat, idx) => {
     const p = feat.properties || {};
-    const alc = p.NOMDT || "";   // alcaldía
-    const col = p.NOMUT || "";   // colonia
+    const alc = p.NOM_MUN || "";
+    const col = p.COLONIA || "";
     const key = `${alc}|${col}`;
 
-    const area_m2 = turf.area(feat);         // área geográfica
-    const area_ha = area_m2 / 10000.0;
+    const area_km2 = Number(p.area_km2) || 0;
+    const area_ha  = area_km2 * 100;
+    const pob      = Number(p.POBTOT) || 0;
+    const prCol    = (p.prioridad || "Sin dato").toString().trim();
+    const gm       = p.GM_2020 || "";
 
     const entry = {
-      idx,              // índice paralelo a coloniasFeatures
+      idx,
       key,
-      ent: p.ENT,
-      cvedt: p.CVEDT,
-      nomdt: alc,
-      cveut: p.CVEUT,
-      nomut: col,
-      id: p.ID,
-      n_manz: 0,
-      pob_coloni: 0,
+      nom_mun: alc,
+      colonia: col,
+      pob_colonia: pob,
       area_ha: area_ha,
-      prio_counts: {},      // conteo de prioridades de manzanas (M. ALTA, ALTA, etc.)
-      prio_colonia: "Sin dato"
+      gm_2020: gm,
+      prio_colonia: prCol,
+      n_manz: 0
     };
 
     coloniasAgg.push(entry);
     coloniasAggByKey[key] = entry;
   });
 
-  // 2) Acumular a partir de manzanas
+  // 2) conteo de manzanas por colonia (por atributos NOM_MUN + COLONIA)
   manzanasFeatures.forEach(f => {
     const p = f.properties || {};
-    const alcM = p.NOM_MUN || "";
-    const colM = p.COLONIA || "";
-    const key = `${alcM}|${colM}`;
+    const alc = p.NOM_MUN || "";
+    const col = p.COLONIA || "";
+    const key = `${alc}|${col}`;
     const entry = coloniasAggByKey[key];
-    if (!entry) return; // manzana sin colonia mapeada
-
+    if (!entry) return;
     entry.n_manz += 1;
-
-    const pob = Number(p.POB);
-    if (!isNaN(pob)) entry.pob_coloni += pob;
-
-    const prRaw = (p.PRIORIDAD || "").toString().trim();
-    if (prRaw) {
-      const prUpper = prRaw.toUpperCase();
-      entry.prio_counts[prUpper] = (entry.prio_counts[prUpper] || 0) + 1;
-    }
   });
 
-  // 3) Derivar prioridad de colonia por máxima severidad presente
-  const ordenSeveridad = ["MUY ALTA", "ALTA", "MEDIA", "BAJA", "MUY BAJA"];
-
-  coloniasAgg.forEach(entry => {
-    let prio = "Sin dato";
-    for (const cat of ordenSeveridad) {
-      if (entry.prio_counts[cat] > 0) {
-        const lower = cat.toLowerCase();
-        prio = lower.charAt(0).toUpperCase() + lower.slice(1); // "Muy alta", etc.
-        break;
-      }
-    }
-    entry.prio_colonia = prio;
-  });
-
-  // 4) Totales globales
+  // 3) totales globales
   totalColoniasBase = coloniasAgg.length;
-  totalPobBase = coloniasAgg.reduce((acc, e) => acc + (e.pob_coloni || 0), 0);
+  totalPobBase = coloniasAgg.reduce((acc, e) => acc + (e.pob_colonia || 0), 0);
   totalHaBase  = coloniasAgg.reduce((acc, e) => acc + (e.area_ha    || 0), 0);
 
   globalAltaMuyAltaColonias = 0;
@@ -399,8 +382,8 @@ function construirAgregadosColonias() {
     const pr = (e.prio_colonia || "").toLowerCase();
     if (pr === "alta" || pr === "muy alta") {
       globalAltaMuyAltaColonias += 1;
-      globalAltaMuyAltaPob += (e.pob_coloni || 0);
-      globalAltaMuyAltaHa  += (e.area_ha    || 0);
+      globalAltaMuyAltaPob += (e.pob_colonia || 0);
+      globalAltaMuyAltaHa  += (e.area_ha     || 0);
     }
   });
 }
@@ -438,7 +421,7 @@ function initMap() {
 
   baseOSM.addTo(map);
 
-  // Manzanas base (todas en gris claro)
+  // Manzanas base en gris
   capaManzanasTodas = L.geoJSON(null, {
     pane: 'overlayPane',
     style: {
@@ -449,7 +432,7 @@ function initMap() {
     }
   }).addTo(map);
 
-  // Colonias (solo contorno)
+  // Colonias (contorno)
   capaColonias = L.geoJSON(null, {
     pane: 'overlayPane',
     style: {
@@ -459,12 +442,12 @@ function initMap() {
     },
     onEachFeature: function(feat, layer) {
       const p = feat.properties || {};
-      const key = `${p.NOMDT || ""}|${p.NOMUT || ""}`;
+      const key = `${p.NOM_MUN || ""}|${p.COLONIA || ""}`;
       indiceColonias[key] = layer;
     }
   }).addTo(map);
 
-  // Manzanas resaltadas por prioridad (dentro de colonia seleccionada)
+  // Manzanas destacadas según PRIORIDAD
   capaManzanasResaltadas = L.geoJSON(null, {
     pane: 'overlayPane',
     style: function(feature) {
@@ -545,10 +528,11 @@ function cargarCapasEnMapa() {
 function construirDatosTabla() {
   tablaDatosColonias = coloniasAgg.map(e => ({
     idx:  e.idx,
-    alc:  e.nomdt,
-    col:  e.nomut,
+    alc:  e.nom_mun,
+    col:  e.colonia,
     pr:   e.prio_colonia,
-    pob:  Math.round(e.pob_coloni || 0),
+    gm:   e.gm_2020,
+    pob:  Math.round(e.pob_colonia || 0),
     ha:   e.area_ha || 0,
     manz: e.n_manz || 0
   }));
@@ -557,10 +541,10 @@ function construirDatosTabla() {
 function poblarSelectFiltrosTabla() {
   const selAlc  = document.getElementById('filtroAlc');
   const selPrio = document.getElementById('filtroPrio');
+  const selGM   = document.getElementById('filtroGM');
 
   const alcSet = new Set(tablaDatosColonias.map(r => r.alc).filter(Boolean));
-  const alcList = Array.from(alcSet).sort((a,b)=>a.localeCompare(b,'es'));
-  alcList.forEach(a => {
+  Array.from(alcSet).sort((a,b)=>a.localeCompare(b,'es')).forEach(a => {
     const opt = document.createElement('option');
     opt.value = a;
     opt.textContent = a;
@@ -568,12 +552,19 @@ function poblarSelectFiltrosTabla() {
   });
 
   const prSet = new Set(tablaDatosColonias.map(r => r.pr).filter(Boolean));
-  const prList = Array.from(prSet).sort((a,b)=>a.localeCompare(b,'es'));
-  prList.forEach(p => {
+  Array.from(prSet).sort((a,b)=>a.localeCompare(b,'es')).forEach(p => {
     const opt = document.createElement('option');
     opt.value = p;
     opt.textContent = p;
     selPrio.appendChild(opt);
+  });
+
+  const gmSet = new Set(tablaDatosColonias.map(r => r.gm).filter(Boolean));
+  Array.from(gmSet).sort((a,b)=>a.localeCompare(b,'es')).forEach(g => {
+    const opt = document.createElement('option');
+    opt.value = g;
+    opt.textContent = g;
+    selGM.appendChild(opt);
   });
 }
 
@@ -599,7 +590,6 @@ function actualizarKPIsyCharts(filas) {
     porPrioHa[pr]  = (porPrioHa[pr]  || 0) + (r.ha  || 0);
   });
 
-  // KPIs globales (ciudad completa)
   const totalAltaMuyAlta   = globalAltaMuyAltaColonias;
   const pobAltaMuyAlta     = globalAltaMuyAltaPob;
   const haAltaMuyAlta      = globalAltaMuyAltaHa;
@@ -617,9 +607,7 @@ function actualizarKPIsyCharts(filas) {
   document.getElementById('kpiHaAlta').textContent        =
     `${haAltaMuyAlta.toFixed(3).toLocaleString("es-MX")} (${porcHaAlta}%)`;
 
-  // Contexto de filtros
   const contexto = textoContextoFiltros();
-
   const resumenEl = document.getElementById('tablaResumen');
   if (resumenEl) {
     resumenEl.textContent =
@@ -631,7 +619,6 @@ function actualizarKPIsyCharts(filas) {
   document.getElementById('chartTitlePoblacion').textContent =
     `Población por prioridad – ${contexto}`;
 
-  // Gráficas
   const labels = [];
   const dataColonias = [];
   const dataPoblacion = [];
@@ -647,7 +634,6 @@ function actualizarKPIsyCharts(filas) {
     }
   });
 
-  // Colonias (barras)
   const ctx1 = document.getElementById('chartColonias').getContext('2d');
   if (chartColonias) chartColonias.destroy();
   chartColonias = new Chart(ctx1, {
@@ -665,18 +651,12 @@ function actualizarKPIsyCharts(filas) {
       maintainAspectRatio: false,
       plugins: { legend: { display: false } },
       scales: {
-        y: {
-          beginAtZero: true,
-          title: { display: true, text: 'Colonias' }
-        },
-        x: {
-          title: { display: true, text: 'Prioridad (colonia, máxima severidad de sus manzanas)' }
-        }
+        y: { beginAtZero: true, title: { display: true, text: 'Colonias' } },
+        x: { title: { display: true, text: 'Prioridad (colonia)' } }
       }
     }
   });
 
-  // Población (donut)
   const ctx2 = document.getElementById('chartPoblacion').getContext('2d');
   if (chartPoblacion) chartPoblacion.destroy();
   chartPoblacion = new Chart(ctx2, {
@@ -696,14 +676,12 @@ function actualizarKPIsyCharts(filas) {
     }
   });
 
-  // Resumen general
   const cont = document.getElementById('statsResumen');
   if (!cont) return;
 
   let html = `<h4>Resumen general</h4>`;
   html += `<p class="stats-contexto"><strong>Contexto:</strong> ${contexto} (porcentajes relativos a la selección mostrada).</p>`;
   html += `<p><strong>Total de colonias en la selección:</strong> ${totalColonias.toLocaleString("es-MX")}</p>`;
-
   html += `<div class="stats-grid">`;
   prKeys.forEach(pr => {
     if (porPrio[pr]) {
@@ -713,10 +691,10 @@ function actualizarKPIsyCharts(filas) {
       const ha  = porPrioHa[pr]  || 0;
       const label = pr.charAt(0).toUpperCase() + pr.slice(1);
       const cls = pr === "muy alta" ? "stats-muy-alta" :
-                  pr === "alta"     ? "stats-alta" :
-                  pr === "media"    ? "stats-media" :
-                  pr === "baja"     ? "stats-baja" :
-                  pr === "muy baja" ? "stats-muy-baja" : "";
+                  pr === "alta"     ? "stats-alta"     :
+                  pr === "media"    ? "stats-media"    :
+                  pr === "baja"     ? "stats-baja"     :
+                  "stats-muy-baja";
 
       html += `<div class="stats-card ${cls}">
         <h5>${label}</h5>
@@ -727,7 +705,6 @@ function actualizarKPIsyCharts(filas) {
     }
   });
   html += `</div>`;
-
   cont.innerHTML = html;
 }
 
@@ -739,11 +716,13 @@ function actualizarTablaColonias() {
   const selAlc  = document.getElementById('filtroAlc');
   const txtCol  = document.getElementById('filtroCol');
   const selPrio = document.getElementById('filtroPrio');
+  const selGM   = document.getElementById('filtroGM');
   const tbody   = document.querySelector('#tablaColonias tbody');
 
   const fAlc  = selAlc.value;
   const fCol  = txtCol.value.toLowerCase();
   const fPrio = selPrio.value;
+  const fGM   = selGM.value;
 
   let filas = tablaDatosColonias.slice();
 
@@ -751,7 +730,8 @@ function actualizarTablaColonias() {
     const alcOk  = !fAlc  || r.alc === fAlc;
     const colOk  = !fCol  || r.col.toLowerCase().includes(fCol);
     const prioOk = !fPrio || r.pr === fPrio;
-    return alcOk && colOk && prioOk;
+    const gmOk   = !fGM   || r.gm === fGM;
+    return alcOk && colOk && prioOk && gmOk;
   });
 
   if (currentSort.col) {
@@ -775,10 +755,8 @@ function actualizarTablaColonias() {
       <td>${normalizarTexto(r.alc)}</td>
       <td>${normalizarTexto(r.col)}</td>
       <td>${r.manz != null ? r.manz.toLocaleString("es-MX") : ""}</td>
-      <td>
-        <span class="prio-dot ${prClass}"></span>
-        <span>${r.pr}</span>
-      </td>
+      <td><span class="prio-dot ${prClass}"></span>${r.pr}</td>
+      <td>${r.gm || ""}</td>
       <td>${r.pob != null ? r.pob.toLocaleString("es-MX") : ""}</td>
       <td>${r.ha != null ? r.ha.toFixed(2) : ""}</td>
     </tr>`;
@@ -796,11 +774,13 @@ function inicializarTablaColonias() {
   document.getElementById('filtroAlc').addEventListener('change', actualizarTablaColonias);
   document.getElementById('filtroCol').addEventListener('input', actualizarTablaColonias);
   document.getElementById('filtroPrio').addEventListener('change', actualizarTablaColonias);
+  document.getElementById('filtroGM').addEventListener('change', actualizarTablaColonias);
 
   document.getElementById('btnLimpiarFiltros').addEventListener('click', () => {
     document.getElementById('filtroAlc').value = "";
     document.getElementById('filtroCol').value = "";
     document.getElementById('filtroPrio').value = "";
+    document.getElementById('filtroGM').value = "";
     currentSort = { col:null, dir:'asc' };
     document.querySelectorAll('#tablaColonias th').forEach(th => th.classList.remove('sort-asc','sort-desc'));
     actualizarTablaColonias();
@@ -823,10 +803,6 @@ function inicializarTablaColonias() {
   });
 }
 
-// =======================
-// TABLA: SELECCIÓN
-// =======================
-
 function resaltarFilaTabla(idx) {
   const tbody = document.querySelector('#tablaColonias tbody');
   if (!tbody) return;
@@ -841,15 +817,15 @@ function resaltarFilaTabla(idx) {
 
 function resaltarColoniaYManzanas(entryAgg) {
   if (!entryAgg) return;
-  const alcRaw = entryAgg.nomdt;
-  const colRaw = entryAgg.nomut;
+  const alc = entryAgg.nom_mun;
+  const col = entryAgg.colonia;
   const prioridadColonia = entryAgg.prio_colonia;
   const numManzCol = entryAgg.n_manz;
 
   showMapLoading(true);
 
   setTimeout(() => {
-    const key = `${alcRaw}|${colRaw}`;
+    const key = `${alc}|${col}`;
     const layerColonia = indiceColonias[key];
 
     if (!layerColonia) {
@@ -871,22 +847,23 @@ function resaltarColoniaYManzanas(entryAgg) {
       fillOpacity: 0.15
     });
 
-    // Tooltip de colonia (usa agregados)
-    const pobTxt = entryAgg.pob_coloni ? entryAgg.pob_coloni.toLocaleString("es-MX") : "";
+    const pobTxt = entryAgg.pob_colonia ? entryAgg.pob_colonia.toLocaleString("es-MX") : "";
     const haTxt  = entryAgg.area_ha    ? entryAgg.area_ha.toFixed(2)                : "";
+    const gmTxt  = entryAgg.gm_2020    || "";
 
     layerColonia.bindTooltip(
-      `<b>${normalizarTexto(colRaw)}</b><br>` +
+      `<b>${normalizarTexto(col)}</b><br>` +
       `Prioridad (colonia): ${prioCol}<br>` +
+      (gmTxt ? `GM_2020: ${gmTxt}<br>` : "") +
       `Manzanas (colonia): ${numManzCol.toLocaleString("es-MX")}<br>` +
-      (pobTxt ? `Población (estimada): ${pobTxt} hab.<br>` : "") +
+      (pobTxt ? `Población: ${pobTxt} hab.<br>` : "") +
       (haTxt  ? `Superficie: ${haTxt} ha` : "" ),
       { permanent: true, direction: 'center', className: `tooltip-prioridad ${prioridadClass(prioCol)}` }
     ).openTooltip();
 
     const gCol = layerColonia.toGeoJSON();
 
-    // PREFILTRO POR BOUNDING BOX
+    // PREFILTRO por bbox para acelerar
     const bboxColonia = turf.bbox(gCol);
     const [minX, minY, maxX, maxY] = bboxColonia;
 
@@ -903,7 +880,7 @@ function resaltarColoniaYManzanas(entryAgg) {
       }
     });
 
-    // Manzanas que intersectan la colonia (cada una con su propia PRIORIDAD)
+    // Manzanas que intersectan la colonia
     const seleccionadas = candidatas.filter(f => {
       try {
         return turf.booleanIntersects(f, gCol);
@@ -934,7 +911,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
   initMap();
 
-  // Botón pantalla completa
   btnFullscreen.addEventListener('click', () => {
     mapWrapper.classList.toggle('map-fullscreen');
     if (mapWrapper.classList.contains('map-fullscreen')) {
@@ -954,11 +930,10 @@ document.addEventListener('DOMContentLoaded', () => {
     coloniasFeatures = coloniasData.features || [];
     manzanasFeatures = manzanasData.features || [];
 
-    // construir agregados a partir de la nueva estructura
     construirAgregadosColonias();
 
-    // Selector de alcaldías (arriba) desde coloniasAgg
-    const alcSet = new Set(coloniasAgg.map(e => e.nomdt).filter(Boolean));
+    // Selector de alcaldías desde coloniasAgg
+    const alcSet = new Set(coloniasAgg.map(e => e.nom_mun).filter(Boolean));
     const alcaldias = Array.from(alcSet).sort((a,b)=>a.localeCompare(b,'es'));
 
     const opt0 = document.createElement('option');
@@ -973,13 +948,12 @@ document.addEventListener('DOMContentLoaded', () => {
       munSelect.appendChild(opt);
     });
 
-    // Mapa + tabla
     cargarCapasEnMapa();
     inicializarTablaColonias();
   })
   .catch(err => console.error('Error cargando datos:', err));
 
-  // Cambiar alcaldía: actualizar datalist de colonias
+  // Cambiar alcaldía: actualiza lista de colonias
   munSelect.addEventListener('change', () => {
     const alc = munSelect.value;
 
@@ -994,18 +968,18 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!alc) return;
 
     const coloniasDeAlc = coloniasAgg
-      .filter(e => e.nomdt === alc)
-      .sort((a,b)=>a.nomut.localeCompare(b.nomut,'es'));
+      .filter(e => e.nom_mun === alc)
+      .sort((a,b)=>a.colonia.localeCompare(b.colonia,'es'));
 
     coloniasDeAlc.forEach(e => {
-      const label = e.nomut;
+      const label = e.colonia;
       const opt = document.createElement('option');
       opt.value = label;
       colList.appendChild(opt);
     });
   });
 
-  // Cambio de colonia vía input + datalist
+  // Cambio de colonia
   colInput.addEventListener('change', () => {
     const label = colInput.value;
     if (!label) return;
@@ -1014,22 +988,28 @@ document.addEventListener('DOMContentLoaded', () => {
     const alcSel   = document.getElementById('munSelector').value || "";
 
     const entry = coloniasAgg.find(e =>
-      e.nomdt === alcSel &&
-      e.nomut.toLowerCase() === textoCol
+      e.nom_mun === alcSel &&
+      e.colonia.toLowerCase() === textoCol
     );
     if (!entry) return;
 
-    const alc       = entry.nomdt;
-    const col       = entry.nomut;
+    const alc       = entry.nom_mun;
+    const col       = entry.colonia;
     const prioridad = entry.prio_colonia;
     const numManz   = entry.n_manz || 0;
+    const gm        = entry.gm_2020 || "";
+    const pob       = entry.pob_colonia || 0;
+    const ha        = entry.area_ha || 0;
 
     const kpiHtml =
       `<div class="kpi-card">
         <p><span class="label-bold">Alcaldía:</span> ${normalizarTexto(alc)}</p>
         <p><span class="label-bold">Colonia:</span> ${normalizarTexto(col)}</p>
-        <p><span class="label-bold">Prioridad de intervención (colonia, máxima severidad de sus manzanas):</span>
+        <p><span class="label-bold">Prioridad (colonia):</span>
            <span class="badge-prioridad ${prioridadClass(prioridad)}">${prioridad}</span></p>
+        <p><span class="label-bold">GM_2020:</span> ${gm || 'Sin dato'}</p>
+        <p><span class="label-bold">Población 2020:</span> ${pob.toLocaleString("es-MX")} hab.</p>
+        <p><span class="label-bold">Superficie:</span> ${ha.toFixed(2)} ha</p>
         <p class="kpi-number-line">
            <span class="label-bold">No. de manzanas dentro de la colonia:</span>
            <span class="kpi-value">${numManz.toLocaleString("es-MX")}</span>
@@ -1048,7 +1028,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
 });
 </script>
-
 
 </body>
 </html>
