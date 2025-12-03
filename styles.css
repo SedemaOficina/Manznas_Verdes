@@ -41,9 +41,8 @@ header {
   gap: 12px;
 }
 
-.logo-sedema,
-.logo-manzanas {
-  height: 36px;
+.logo-sedema-manzanas {
+  height: 40px;
   object-fit: contain;
 }
 
@@ -93,10 +92,18 @@ header {
   margin-top: 24px;
 }
 
-h2 {
+/* Subtítulos institucionales (todos iguales) */
+
+h2,
+.map-section h3,
+.table-section h3,
+.analysis-section h3,
+.stats-section h4,
+.metodologia-section h3 {
   margin-top: 0;
-  margin-bottom: 16px;
-  font-weight: 500;
+  margin-bottom: 12px;
+  font-weight: 600;
+  font-size: 16px;
   color: var(--verde-oscuro);
 }
 
@@ -249,8 +256,6 @@ h2 {
   color: #777;
 }
 
-
-
 /* Badge prioridad */
 
 .badge-prioridad {
@@ -272,18 +277,11 @@ h2 {
 .prio-alta     { background-color: #ff9900; }  /* Alta       */
 .prio-muy-alta { background-color: #ff2200; }  /* Muy Alta   */
 .prio-desconocida { background-color: #b0b0b0; color: #333; } /* Sin dato (gris) */
+
 /* MAPA */
 
 .map-section h3 {
-  margin-bottom: 8px;
-  font-weight: 500;
-  color: #004d40;
-}
-
-.map-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
+  /* hereda estilo institucional de regla global */
 }
 
 .btn-fullscreen {
@@ -352,7 +350,7 @@ h2 {
   color: #333;
 }
 
-/* Tooltip prioridad */
+/* Tooltip prioridad (ya casi no se usa, pero se conserva) */
 
 .leaflet-tooltip.tooltip-prioridad {
   border: none;
@@ -372,6 +370,27 @@ h2 {
 .leaflet-tooltip.tooltip-prioridad.prio-alta     { background-color: #ff9900; }
 .leaflet-tooltip.tooltip-prioridad.prio-muy-alta { background-color: #ff2200; }
 .leaflet-tooltip.tooltip-prioridad.prio-desconocida { background-color: #b0b0b0; color: #333; }
+
+/* Popup de colonia (fondo blanco, borde por prioridad) */
+
+.popup-colonia .leaflet-popup-content-wrapper {
+  background: #ffffff;
+  border-radius: 10px;
+  border: 2px solid #cccccc;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.25);
+}
+
+.popup-colonia.prio-muy-baja .leaflet-popup-content-wrapper { border-color: #006100; }
+.popup-colonia.prio-baja     .leaflet-popup-content-wrapper { border-color: #7aab00; }
+.popup-colonia.prio-media    .leaflet-popup-content-wrapper { border-color: #ffff00; }
+.popup-colonia.prio-alta     .leaflet-popup-content-wrapper { border-color: #ff9900; }
+.popup-colonia.prio-muy-alta .leaflet-popup-content-wrapper { border-color: #ff2200; }
+.popup-colonia.prio-desconocida .leaflet-popup-content-wrapper { border-color: #b0b0b0; }
+
+.popup-colonia-content {
+  font-size: 11px;
+  line-height: 1.4;
+}
 
 /* LEYENDA COMPACTA */
 
@@ -441,12 +460,34 @@ h2 {
   background-color: #777777;
 }
 
+/* Panel de información de manzana (control personalizado) */
+
+.manzana-info {
+  background: rgba(255,255,255,0.96);
+  border-radius: 8px;
+  padding: 6px 8px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.25);
+  font-size: 11px;
+  line-height: 1.4;
+  max-width: 230px;
+  border: 2px solid #cccccc;
+}
+
+.manzana-info p {
+  margin: 0;
+}
+
+.manzana-info.prio-muy-baja { border-color: #006100; }
+.manzana-info.prio-baja     { border-color: #7aab00; }
+.manzana-info.prio-media    { border-color: #ffff00; }
+.manzana-info.prio-alta     { border-color: #ff9900; }
+.manzana-info.prio-muy-alta { border-color: #ff2200; }
+.manzana-info.prio-desconocida { border-color: #b0b0b0; }
+
 /* TABLA */
 
 .table-section h3 {
-  margin-bottom: 10px;
-  font-weight: 500;
-  color: #004d40;
+  /* hereda estilo institucional */
 }
 
 .table-filters-actions {
@@ -571,10 +612,8 @@ h2 {
 }
 
 .stats-section h4 {
+  /* ya alineado en regla global */
   margin: 0 0 8px 0;
-  font-weight: 500;
-  color: #004d40; /* mismo tono que otros subtítulos */
-  font-size: 16px;
 }
 
 .stats-contexto {
@@ -613,12 +652,11 @@ h2 {
 .stats-media    { border-left: 4px solid #ffff00; }
 .stats-baja     { border-left: 4px solid #7aab00; }
 .stats-muy-baja { border-left: 4px solid #006100; }
+
 /* GRÁFICAS / ANÁLISIS */
 
 .analysis-section h3 {
-  margin-bottom: 6px;
-  font-weight: 500;
-  color: #004d40;
+  /* hereda estilo institucional */
 }
 
 .charts-wrapper {
@@ -659,6 +697,25 @@ h2 {
   .kpi-global-section {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
+}
+
+/* NOTAS METODOLÓGICAS */
+
+.metodologia-section {
+  font-size: 11px;
+  color: #555;
+}
+
+.hint-metodologia {
+  font-size: 11px;
+  color: #666;
+  margin-bottom: 6px;
+}
+
+.metodologia-lista {
+  margin: 0 0 4px 18px;
+  padding-left: 0;
+  font-size: 11px;
 }
 
 /* FOOTER */
