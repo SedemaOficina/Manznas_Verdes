@@ -285,12 +285,16 @@ function normalizarTexto(str) {
 
 function estiloPrioridad(prioridadRaw) {
   const prioridad = (prioridadRaw || "").toString().toLowerCase().trim();
-  if (prioridad === "muy baja")  return { color:"#003300", fill:"#006100" };
-  if (prioridad === "baja")      return { color:"#557700", fill:"#7aab00" };
-  if (prioridad === "media")     return { color:"#b2b200", fill:"#ffff00" };
-  if (prioridad === "alta")      return { color:"#cc6600", fill:"#ff9900" };
-  if (prioridad === "muy alta")  return { color:"#b21800", fill:"#ff2200" };
-  return { color:"#666666", fill:"#cccccc" };
+
+  // Mapeo único de colores
+  if (prioridad === "muy baja")  return { color:"#006100", fill:"#006100" };  // Muy Baja
+  if (prioridad === "baja")      return { color:"#7aab00", fill:"#7aab00" };  // Baja
+  if (prioridad === "media")     return { color:"#ffff00", fill:"#ffff00" };  // Media
+  if (prioridad === "alta")      return { color:"#ff9900", fill:"#ff9900" };  // Alta
+  if (prioridad === "muy alta")  return { color:"#ff2200", fill:"#ff2200" };  // Muy Alta
+
+  // Sin dato: gris
+  return { color:"#999999", fill:"#b0b0b0" };
 }
 
 function prioridadClass(prioridadRaw) {
@@ -300,9 +304,8 @@ function prioridadClass(prioridadRaw) {
   if (prioridad === "media")     return "prio-media";
   if (prioridad === "alta")      return "prio-alta";
   if (prioridad === "muy alta")  return "prio-muy-alta";
-  return "prio-desconocida";
+  return "prio-desconocida"; // gris
 }
-
 function showMapLoading(show) {
   const el = document.getElementById('mapLoading');
   if (!el) return;
@@ -571,13 +574,13 @@ function poblarSelectFiltrosTabla() {
 function actualizarKPIsyCharts(filas) {
   const totalColonias = filas.length;
   const prKeys = ["muy alta","alta","media","baja","muy baja"];
-  const prColors = {
-    "muy baja":  "#006100",
-    "baja":      "#7aab00",
-    "media":     "#ffff00",
-    "alta":      "#ff9900",
-    "muy alta":  "#ff2200"
-  };
+ const prColors = {
+  "muy baja":  "#006100",
+  "baja":      "#7aab00",
+  "media":     "#ffff00",
+  "alta":      "#ff9900",
+  "muy alta":  "#ff2200"
+};
 
   const porPrio = {};
   const porPrioPob = {};
