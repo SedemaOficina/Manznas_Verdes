@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!DOCTYPE html> 
 <html lang="es">
 <head>
   <meta charset="UTF-8">
@@ -20,8 +20,10 @@
 <header>
   <div class="header-inner">
     <div class="header-logos">
-      <img src="logo_sedema.png" alt="SEDEMA" class="logo-sedema">
-      <img src="logo_manzanas_verdes.png" alt="Manzanas Verdes" class="logo-manzanas">
+      <!-- Un solo archivo combinado -->
+      <img src="logo_manzanas_verdes.png"
+           alt="SEDEMA · Manzanas Verdes"
+           class="logo-sedema-manzanas">
     </div>
     <div class="header-texto">
       <h1>SEDEMA · Manzanas por colonia</h1>
@@ -42,12 +44,12 @@
       Esta herramienta permite visualizar manzanas urbanas y su prioridad de intervención en colonias de la Ciudad de México.
     </p>
     <ol class="intro-pasos">
-  <li>Selecciona una <strong>alcaldía</strong>.</li>
-  <li>Escribe y selecciona una <strong>colonia</strong> de la lista.</li>
-  <li>Revisa el <strong>mapa</strong> para ver la ubicación y las manzanas de la colonia.</li>
-  <li>Usa la <strong>tabla</strong> para explorar todas las colonias y filtrar por <strong>prioridad de intervención</strong> y <strong>grado de marginación</strong>.</li>
-  <li>Consulta el <strong>resumen y las gráficas</strong> para interpretar la información agregada.</li>
-</ol>
+      <li>Selecciona una <strong>alcaldía</strong>.</li>
+      <li>Escribe y selecciona una <strong>colonia</strong> de la lista.</li>
+      <li>Revisa el <strong>mapa</strong> para ver la ubicación y las manzanas de la colonia.</li>
+      <li>Usa la <strong>tabla</strong> para explorar todas las colonias y filtrar por <strong>prioridad de intervención</strong> y <strong>grado de marginación 2020</strong>.</li>
+      <li>Consulta el <strong>resumen y las gráficas</strong> para interpretar la información agregada.</li>
+    </ol>
   </section>
 
   <!-- KPIs globales (ciudad completa) -->
@@ -97,15 +99,15 @@
 
   <!-- MAPA -->
   <section class="map-section section-block">
-   
     <h3>Mapa de colonias y manzanas</h3>
 
-<div class="map-wrapper" id="mapWrapper">
-  <button id="btnFullscreen" class="btn-fullscreen" aria-label="Ver mapa en pantalla completa">
-    ⤢ Ver mapa grande
-  </button>
-  <div id="map"></div>
-  <div id="mapLoading" class="map-loading">Procesando manzanas…</div>
+    <div class="map-wrapper" id="mapWrapper">
+      <button id="btnFullscreen" class="btn-fullscreen" aria-label="Ver mapa en pantalla completa">
+        ⤢ Ver mapa grande
+      </button>
+
+      <div id="map"></div>
+      <div id="mapLoading" class="map-loading">Procesando manzanas…</div>
 
       <!-- LEYENDA -->
       <div class="map-legend">
@@ -140,9 +142,9 @@
 
   <!-- TABLA -->
   <section class="table-section section-block">
-   <h3>Colonias – Prioridad, grado de marginación y superficie</h3>
+    <h3>Colonias – Prioridad, grado de marginación y superficie</h3>
     <p class="hint">
-      Usa los filtros en los encabezados para buscar por alcaldía, colonia, prioridad y grado de marginación.
+      Usa los filtros en los encabezados para buscar por alcaldía, colonia, prioridad y grado de marginación 2020.
     </p>
 
     <div class="table-filters-actions">
@@ -161,8 +163,8 @@
             <th data-col="col"   title="Haz clic para ordenar">Colonia ↕</th>
             <th data-col="manz"  title="Haz clic para ordenar">No. de manzanas ↕</th>
             <th data-col="prio"  title="Haz clic para ordenar">Prioridad (colonia) ↕</th>
-           <th data-col="gm" title="Haz clic para ordenar">Grado de marginación ↕</th>
-            <th data-col="pob"   title="Haz clic para ordenar">Población ↕</th>
+            <th data-col="gm"    title="Haz clic para ordenar">Grado de marginación 2020 ↕</th>
+            <th data-col="pob"   title="Haz clic para ordenar">Población 2020 ↕</th>
             <th data-col="ha"    title="Haz clic para ordenar">Superficie ha ↕</th>
           </tr>
           <tr class="filters-row">
@@ -228,6 +230,35 @@
     </div>
   </section>
 
+  <!-- NOTAS METODOLÓGICAS -->
+  <section class="metodologia-section section-block">
+    <h3>Notas metodológicas</h3>
+    <p class="hint-metodologia">
+      Esta sección resume criterios y fuentes de los indicadores mostrados en el dashboard.
+    </p>
+    <ul class="metodologia-lista">
+      <li>
+        La <strong>prioridad de intervención (Manzanas Verdes)</strong> se define a partir del diagnóstico territorial de manzanas urbanas
+        (infraestructura, espacio público y condiciones socioambientales) elaborado por la Secretaría del Medio Ambiente.
+      </li>
+      <li>
+        El <strong>Grado de marginación 2020</strong> corresponde al indicador GM_2020, calculado con base en la información oficial más reciente
+        disponible para colonias de la Ciudad de México.
+      </li>
+      <li>
+        La <strong>superficie</strong> se calcula a partir del campo <code>area_km2</code> de las colonias, convertido a hectáreas (ha) mediante la relación:
+        1 km² = 100 ha.
+      </li>
+      <li>
+        La <strong>población</strong> de cada colonia proviene del campo <code>POBTOT</code> del archivo de colonias.
+      </li>
+      <li>
+        El <strong>Resumen general</strong> y las <strong>gráficas</strong> se calculan únicamente sobre las colonias
+        visibles en la tabla (es decir, respetan los filtros activos de alcaldía, prioridad y grado de marginación 2020).
+      </li>
+    </ul>
+  </section>
+
 </main>
 
 <footer>
@@ -256,6 +287,7 @@ let capaColonias;
 let capaManzanasTodas;
 let capaManzanasResaltadas;
 let indiceColonias = {};   // key "NOM_MUN|COLONIA" -> layer
+let manzanaInfoControl;
 
 let currentSort = { col: null, dir: 'asc' };
 let chartColonias = null;
@@ -331,11 +363,22 @@ function construirAgregadosColonias() {
   coloniasAgg = [];
   coloniasAggByKey = {};
 
+  // 0) Conteo de manzanas por colonia (NOM_MUN + COLONIA)
+  const manzanasPorColonia = {};
+  manzanasFeatures.forEach((feat) => {
+    const p = feat.properties || {};
+    const alc = normalizarTexto(p.NOM_MUN || "");
+    const col = normalizarTexto(p.COLONIA || "");
+    if (!alc || !col) return;
+    const key = `${alc}|${col}`;
+    manzanasPorColonia[key] = (manzanasPorColonia[key] || 0) + 1;
+  });
+
   // 1) Base por colonia
   coloniasFeatures.forEach((feat, idx) => {
     const p = feat.properties || {};
-    const alc = p.NOM_MUN || "";
-    const col = p.COLONIA || "";
+    const alc = normalizarTexto(p.NOM_MUN || "");
+    const col = normalizarTexto(p.COLONIA || "");
     const cp  = p.CP || "";
     const key = `${alc}|${col}`;
 
@@ -344,7 +387,7 @@ function construirAgregadosColonias() {
     const pob      = p.POBTOT != null ? Math.round(p.POBTOT) : 0;
     const prCol    = (p.prioridad || "Sin dato").toString().trim();
     const gm       = p.GM_2020 || "";
-    const nManzCol = p.CVEGEO_count != null ? Number(p.CVEGEO_count) : 0;
+    const nManzCol = manzanasPorColonia[key] || 0; // calculado a partir de manzanas
 
     const entry = {
       idx,           // índice de la feature de colonia
@@ -434,7 +477,9 @@ function initMap() {
     },
     onEachFeature: function(feat, layer) {
       const p = feat.properties || {};
-      const key = `${p.NOM_MUN || ""}|${p.COLONIA || ""}`;
+      const alc = normalizarTexto(p.NOM_MUN || "");
+      const col = normalizarTexto(p.COLONIA || "");
+      const key = `${alc}|${col}`;
       indiceColonias[key] = layer;
     }
   }).addTo(map);
@@ -452,31 +497,10 @@ function initMap() {
       };
     },
     onEachFeature: function(feat, layer) {
-      const p   = feat.properties || {};
-      const alc = p.NOM_MUN || "";
-      const col = p.COLONIA || "";
-      const pr  = p.PRIORIDAD || "Sin dato";
-      const pob = p.POB;
-      const viv = p.VIV;
-      const inf = p.Inf_Azul;
-      const id  = p.CVEGEO;
-
-      let popup = "";
-      popup += `<b>Colonia:</b> ${normalizarTexto(col)}<br>`;
-      if (alc) popup += `<b>Alcaldía:</b> ${normalizarTexto(alc)}<br>`;
-      popup += `<b>ID manzana:</b> ${id || "Sin dato"}<br>`;
-      popup += `<b>Prioridad (manzana):</b> ${pr}<br>`;
-      if (pob != null) {
-        popup += `<b>Población (manzana):</b> ${Number(pob).toLocaleString("es-MX")} hab.<br>`;
-      }
-      if (viv != null) {
-        popup += `<b>Viviendas (manzana):</b> ${Number(viv).toLocaleString("es-MX")}<br>`;
-      }
-      if (inf) {
-        popup += `<b>Infraestructura azul:</b> ${inf}<br>`;
-      }
-
-      layer.bindPopup(popup);
+      const p = feat.properties || {};
+      const actualizar = () => actualizarPanelManzana(p);
+      layer.on('mouseover', actualizar);
+      layer.on('click', actualizar);
     }
   }).addTo(map);
 
@@ -497,6 +521,55 @@ function initMap() {
     position: 'topright',
     collapsed: true
   }).addTo(map);
+
+  // Control personalizado de información de manzana
+  manzanaInfoControl = L.control({ position: 'bottomright' });
+  manzanaInfoControl.onAdd = function(map) {
+    const div = L.DomUtil.create('div', 'manzana-info');
+    div.innerHTML = '<p class="manzana-info-empty">Pasa el cursor o haz clic sobre una manzana para ver detalles.</p>';
+    return div;
+  };
+  manzanaInfoControl.addTo(map);
+}
+
+function limpiarPanelManzana() {
+  if (!manzanaInfoControl) return;
+  const div = manzanaInfoControl.getContainer();
+  if (!div) return;
+  div.className = 'manzana-info';
+  div.innerHTML = '<p class="manzana-info-empty">Pasa el cursor o haz clic sobre una manzana para ver detalles.</p>';
+}
+
+function actualizarPanelManzana(p) {
+  if (!manzanaInfoControl) return;
+  const div = manzanaInfoControl.getContainer();
+  if (!div) return;
+
+  const alc = normalizarTexto(p.NOM_MUN || "");
+  const col = normalizarTexto(p.COLONIA || "");
+  const pr  = p.PRIORIDAD || "Sin dato";
+  const pob = p.POB;
+  const viv = p.VIV;
+  const inf = p.Inf_Azul;
+  const id  = p.CVEGEO;
+
+  const pobTxt = (pob != null)
+    ? `${Number(pob).toLocaleString("es-MX")} hab.`
+    : 'Sin dato';
+  const vivTxt = (viv != null)
+    ? Number(viv).toLocaleString("es-MX")
+    : 'Sin dato';
+  const badgeClass = prioridadClass(pr);
+
+  div.className = 'manzana-info ' + badgeClass;
+  div.innerHTML =
+    `<b>Colonia:</b> ${col || 'Sin dato'}<br>` +
+    `<b>Alcaldía:</b> ${alc || 'Sin dato'}<br>` +
+    `<b>ID manzana:</b> ${id || 'Sin dato'}<br>` +
+    `<b>Prioridad (manzana):</b> <span class="badge-prioridad ${badgeClass}">${pr}</span><br>` +
+    `<b>Población (manzana):</b> ${pobTxt}<br>` +
+    `<b>Viviendas (manzana):</b> ${vivTxt}<br>` +
+    `<b>Infraestructura azul:</b> ${inf || 'Sin dato'}`;
 }
 
 function cargarCapasEnMapa() {
@@ -504,6 +577,7 @@ function cargarCapasEnMapa() {
   capaManzanasTodas.clearLayers();
   capaManzanasResaltadas.clearLayers();
   indiceColonias = {};
+  limpiarPanelManzana();
 
   capaManzanasTodas.addData(manzanasFeatures);
   capaColonias.addData(coloniasFeatures);
@@ -593,7 +667,7 @@ function actualizarTablaColonias() {
       <td><span class="prio-dot ${prClass}"></span>${r.prio_colonia}</td>
       <td>${r.gm_2020 || ""}</td>
       <td>${r.pob_colonia.toLocaleString("es-MX")}</td>
-      <td>${r.area_ha.toFixed(2)}</td>
+      <td>${r.area_ha.toLocaleString("es-MX", {minimumFractionDigits:2, maximumFractionDigits:2})}</td>
     </tr>`;
   });
   tbody.innerHTML = html;
@@ -653,12 +727,15 @@ function inicializarTablaColonias() {
     const feat = coloniasFeatures[idx];
     if (!feat) return;
     const p = feat.properties || {};
-    const alc = p.NOM_MUN || "";
-    const col = p.COLONIA || "";
-    const gm  = p.GM_2020 || "";
-    const cp  = p.CP || "";
-    const prio = p.prioridad || "Sin dato";
-    const nManz = p.CVEGEO_count != null ? Number(p.CVEGEO_count) : 0;
+    const entryAgg = coloniasAgg.find(e => e.idx === idx);
+
+    const alc = entryAgg ? entryAgg.nom_mun : normalizarTexto(p.NOM_MUN || "");
+    const col = entryAgg ? entryAgg.colonia : normalizarTexto(p.COLONIA || "");
+    const gm  = entryAgg ? entryAgg.gm_2020 : (p.GM_2020 || "");
+    const cp  = entryAgg ? entryAgg.cp : (p.CP || "");
+    const prio = entryAgg ? entryAgg.prio_colonia : (p.prioridad || "Sin dato");
+    const nManz = entryAgg ? (entryAgg.n_manz || 0) : (p.CVEGEO_count != null ? Number(p.CVEGEO_count) : 0);
+    const pobCol = entryAgg ? (entryAgg.pob_colonia || 0) : (p.POBTOT || 0);
 
     const kpiHtml =
       `<div class="kpi-card">
@@ -672,13 +749,16 @@ function inicializarTablaColonias() {
            <span class="label-bold">No. de manzanas dentro de la colonia:</span>
            <span class="kpi-value">${nManz.toLocaleString("es-MX")}</span>
         </p>
+        <p class="kpi-number-line">
+           <span class="label-bold">Población total de la colonia:</span>
+           <span class="kpi-value">${Number(pobCol).toLocaleString("es-MX")}</span>
+        </p>
       </div>`;
 
     const resultadoDiv = document.getElementById('resultado');
     resultadoDiv.innerHTML = kpiHtml;
     resultadoDiv.style.display = 'block';
 
-    const entryAgg = coloniasAgg.find(e => e.idx === idx);
     resaltarColoniaYManzanas(entryAgg);
     resaltarFilaTabla(idx);
   });
@@ -722,7 +802,7 @@ function actualizarKPIsyCharts(filas) {
   document.getElementById('kpiPobAlta').textContent       =
     `${pobAltaMuyAlta.toLocaleString("es-MX")} (${porcPobAlta}%)`;
   document.getElementById('kpiHaAlta').textContent        =
-    `${Number(haAltaMuyAlta.toFixed(3)).toLocaleString("es-MX")} (${porcHaAlta}%)`;
+    `${haAltaMuyAlta.toLocaleString("es-MX", {minimumFractionDigits:3, maximumFractionDigits:3})} (${porcHaAlta}%)`;
 
   // contexto string
   const contexto = textoContextoFiltros();
@@ -800,7 +880,7 @@ function actualizarKPIsyCharts(filas) {
   if (!cont) return;
 
   let html = `<h4>Resumen general</h4>`;
-  html += `<p class="stats-contexto"><strong>Contexto:</strong> ${contexto} (porcentajes relativos a la selección mostrada).</p>`;
+  html += `<p class="stats-contexto"><strong>Contexto:</strong> ${contexto} (porcentajes relativos a las colonias visibles en la tabla).</p>`;
   html += `<p><strong>Total de colonias en la selección:</strong> ${totalColonias.toLocaleString("es-MX")}</p>`;
 
   html += `<div class="stats-grid">`;
@@ -821,7 +901,7 @@ function actualizarKPIsyCharts(filas) {
         <h5>${label}</h5>
         <p><strong>Colonias:</strong> ${n.toLocaleString("es-MX")} (${perc}%)</p>
         <p><strong>Población:</strong> ${pob.toLocaleString("es-MX")} hab.</p>
-        <p><strong>Superficie:</strong> ${ha.toFixed(2)} ha.</p>
+        <p><strong>Superficie:</strong> ${ha.toLocaleString("es-MX", {minimumFractionDigits:2, maximumFractionDigits:2})} ha.</p>
       </div>`;
     }
   });
@@ -852,12 +932,16 @@ function resaltarColoniaYManzanas(entryAgg) {
 
     if (!layerColonia) {
       capaManzanasResaltadas.clearLayers();
+      limpiarPanelManzana();
       showMapLoading(false);
       return;
     }
 
     capaColonias.resetStyle();
-    capaColonias.eachLayer(l => l.unbindTooltip());
+    capaColonias.eachLayer(l => {
+      l.unbindTooltip();
+      l.unbindPopup();
+    });
 
     const est = estiloPrioridad(prio);
 
@@ -870,17 +954,21 @@ function resaltarColoniaYManzanas(entryAgg) {
     });
 
     const pobTxt = pob ? pob.toLocaleString("es-MX") : "";
-    const haTxt  = ha  ? ha.toFixed(2)                : "";
+    const haTxt  = ha  ? ha.toLocaleString("es-MX", {minimumFractionDigits:2, maximumFractionDigits:2}) : "";
 
-    layerColonia.bindTooltip(
-      `<b>${normalizarTexto(col)}</b><br>` +
-      `Prioridad: ${prio}<br>` +
-      (gm     ? `Grado de marginación 2020: ${gm}<br>` : "") +
-      `Manzanas (colonia): ${numManz.toLocaleString("es-MX")}<br>` +
-      (pobTxt ? `Población: ${pobTxt} hab.<br>` : "") +
-      (haTxt  ? `Superficie: ${haTxt} ha` : ""),
-      { permanent: true, direction: 'center', className: `tooltip-prioridad ${prioridadClass(prio)}` }
-    ).openTooltip();
+    const popupHtml =
+      `<div class="popup-colonia-content">
+        <b>Colonia:</b> ${normalizarTexto(col)}<br>
+        <b>Prioridad:</b> ${prio}<br>` +
+        (gm ? `<b>Grado de marginación 2020:</b> ${gm}<br>` : "") +
+        `<b>Manzanas dentro de la colonia:</b> ${numManz.toLocaleString("es-MX")}<br>` +
+        (pobTxt ? `<b>Población:</b> ${pobTxt} hab.<br>` : "") +
+        (haTxt  ? `<b>Superficie:</b> ${haTxt} ha` : "") +
+      `</div>`;
+
+    layerColonia.bindPopup(popupHtml, {
+      className: `popup-colonia ${prioridadClass(prio)}`
+    }).openPopup();
 
     const gCol = layerColonia.toGeoJSON();
 
@@ -915,6 +1003,14 @@ function resaltarColoniaYManzanas(entryAgg) {
     map.fitBounds(layerColonia.getBounds(), { padding: [20, 20] });
     showMapLoading(false);
   }, 0);
+}
+
+function resaltarFilaTabla(idx) {
+  const tbody = document.querySelector('#tablaColonias tbody');
+  if (!tbody) return;
+  tbody.querySelectorAll('tr').forEach(tr => tr.classList.remove('selected-row'));
+  const tr = tbody.querySelector(`tr[data-idx="${idx}"]`);
+  if (tr) tr.classList.add('selected-row');
 }
 
 // =======================
@@ -982,7 +1078,11 @@ document.addEventListener('DOMContentLoaded', () => {
     capaManzanasResaltadas.clearLayers();
     resultadoDiv.style.display='none';
     capaColonias.resetStyle();
-    capaColonias.eachLayer(l=>l.unbindTooltip());
+    capaColonias.eachLayer(l=>{
+      l.unbindTooltip();
+      l.unbindPopup();
+    });
+    limpiarPanelManzana();
 
     if (!alc) return;
 
@@ -1015,6 +1115,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const gm        = entry.gm_2020 || "";
     const prioridad = entry.prio_colonia || "Sin dato";
     const numManz   = entry.n_manz || 0;
+    const pobCol    = entry.pob_colonia || 0;
 
     const kpiHtml =
       `<div class="kpi-card">
@@ -1028,6 +1129,10 @@ document.addEventListener('DOMContentLoaded', () => {
            <span class="label-bold">No. de manzanas dentro de la colonia:</span>
            <span class="kpi-value">${numManz.toLocaleString("es-MX")}</span>
         </p>
+        <p class="kpi-number-line">
+           <span class="label-bold">Población total de la colonia:</span>
+           <span class="kpi-value">${Number(pobCol).toLocaleString("es-MX")}</span>
+        </p>
       </div>`;
 
     resultadoDiv.innerHTML = kpiHtml;
@@ -1039,7 +1144,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
 });
 </script>
-
 
 </body>
 </html>
