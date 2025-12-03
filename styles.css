@@ -287,6 +287,10 @@ h2 {
 }
 
 .btn-fullscreen {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  z-index: 1100;
   padding: 4px 10px;
   border-radius: 999px;
   border: 1px solid #b0bec5;
@@ -569,7 +573,8 @@ h2 {
 .stats-section h4 {
   margin: 0 0 8px 0;
   font-weight: 500;
-  color: #004d40;
+  color: #004d40; /* mismo tono que otros subtítulos */
+  font-size: 16px;
 }
 
 .stats-contexto {
