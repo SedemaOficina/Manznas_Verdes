@@ -249,6 +249,8 @@ h2 {
   color: #777;
 }
 
+
+
 /* Badge prioridad */
 
 .badge-prioridad {
@@ -262,15 +264,14 @@ h2 {
   letter-spacing: 0.5px;
 }
 
-/* Colores prioridad */
+/* Colores prioridad (TODOS LOS USOS EN LA PÁGINA) */
 
-.prio-muy-baja { background-color: #006100; }
-.prio-baja     { background-color: #7aab00; }
-.prio-media    { background-color: #ffff00; color: #333; }
-.prio-alta     { background-color: #ff9900; }
-.prio-muy-alta { background-color: #ff2200; }
-.prio-desconocida { background-color: #757575; }
-
+.prio-muy-baja { background-color: #006100; }  /* Muy Baja   */
+.prio-baja     { background-color: #7aab00; }  /* Baja       */
+.prio-media    { background-color: #ffff00; color: #333; } /* Media */
+.prio-alta     { background-color: #ff9900; }  /* Alta       */
+.prio-muy-alta { background-color: #ff2200; }  /* Muy Alta   */
+.prio-desconocida { background-color: #b0b0b0; color: #333; } /* Sin dato (gris) */
 /* MAPA */
 
 .map-section h3 {
@@ -366,7 +367,7 @@ h2 {
 .leaflet-tooltip.tooltip-prioridad.prio-media    { background-color: #ffff00; color: #333; }
 .leaflet-tooltip.tooltip-prioridad.prio-alta     { background-color: #ff9900; }
 .leaflet-tooltip.tooltip-prioridad.prio-muy-alta { background-color: #ff2200; }
-.leaflet-tooltip.tooltip-prioridad.prio-desconocida { background-color: #757575; }
+.leaflet-tooltip.tooltip-prioridad.prio-desconocida { background-color: #b0b0b0; color: #333; }
 
 /* LEYENDA COMPACTA */
 
@@ -381,7 +382,7 @@ h2 {
   box-shadow: 0 1px 4px rgba(0,0,0,0.25);
   font-size: 10px;
   line-height: 1.3;
-  max-width: 200px;
+  max-width: 220px;
 }
 
 .legend-title {
@@ -607,7 +608,6 @@ h2 {
 .stats-media    { border-left: 4px solid #ffff00; }
 .stats-baja     { border-left: 4px solid #7aab00; }
 .stats-muy-baja { border-left: 4px solid #006100; }
-
 /* GRÁFICAS / ANÁLISIS */
 
 .analysis-section h3 {
@@ -664,5 +664,3 @@ footer {
   color: #777;
   padding-bottom: 16px;
 }
-
-
