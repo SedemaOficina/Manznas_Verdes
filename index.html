@@ -1088,13 +1088,13 @@ function resaltarColoniaYManzanas(entryAgg) {
     const est = estiloPrioridad(prio);
     const prClass = prioridadClass(prio);
 
-    // Perímetro negro, relleno semitransparente según prioridad
-    layerColonia.setStyle({
-      color: '#000000',
-      weight: 3,
-      fillColor: est.fill,
-      fillOpacity: 0.35
-    });
+    // Solo perímetro grueso, sin relleno
+layerColonia.setStyle({
+  color: est.color,    // color de la prioridad
+  weight: 3,
+  fillColor: est.fill, // da igual, porque:
+  fillOpacity: 0       // sin relleno
+});
 
     const pobTxt = pob ? pob.toLocaleString("es-MX") : "";
     const haTxt  = ha  ? ha.toLocaleString("es-MX", {minimumFractionDigits:2, maximumFractionDigits:2}) : "";
