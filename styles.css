@@ -282,7 +282,7 @@ h2,
 .btn-fullscreen {
   position: absolute;
   top: 8px;
-  left: 8px;  /* para no encimar el control de capas */
+  left: 13px;  /* para no encimar el control de capas */
   right: auto;
   z-index: 1100;
   padding: 4px 10px;
@@ -348,33 +348,129 @@ h2,
 
 /* Popup de colonia (fondo blanco, borde por prioridad) */
 
+/* POPUP DE COLONIA – ESTILO INSTITUCIONAL COMPLETO */
+.popup-colonia {
+  /* solo usamos esta clase para colorear el borde y animar */
+}
+
+/* Contenedor principal del popup de Leaflet */
 .popup-colonia .leaflet-popup-content-wrapper {
   background: #ffffff;
   border-radius: 10px;
   border: 2px solid #cccccc;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.25);
+  box-shadow: 0 6px 18px rgba(0,0,0,0.25);
+  padding: 0;                 /* quitamos padding interno por defecto */
+  animation: popup-colonia-in 0.18s ease-out;
 }
 
-.popup-colonia.prio-muy-baja .leaflet-popup-content-wrapper { border-color: #006100; }
-.popup-colonia.prio-baja     .leaflet-popup-content-wrapper { border-color: #7aab00; }
-.popup-colonia.prio-media    .leaflet-popup-content-wrapper { border-color: #ffff00; }
-.popup-colonia.prio-alta     .leaflet-popup-content-wrapper { border-color: #ff9900; }
-.popup-colonia.prio-muy-alta .leaflet-popup-content-wrapper { border-color: #ff2200; }
-.popup-colonia.prio-desconocida .leaflet-popup-content-wrapper { border-color: #b0b0b0; }
+/* Triangulito del popup del mismo color que el borde */
+.popup-colonia .leaflet-popup-tip {
+  background: #ffffff;
+  border-top: 2px solid #cccccc;
+}
 
-.popup-colonia-content {
+/* Ajuste del contenedor de contenido interno */
+.popup-colonia .leaflet-popup-content {
+  margin: 0;
+}
+
+/* Encabezado del popup */
+.popup-colonia-header {
+  font-weight: 700;
+  text-align: center;
+  padding: 6px 8px;
+  margin: 0;
+  border-radius: 8px 8px 0 0;
+  color: #000;
+  background: rgba(176,176,176,0.6); /* se sobrescribe por prioridad */
+}
+
+/* Cuerpo del popup */
+.popup-colonia-body {
+  padding: 6px 10px 8px 10px;
   font-size: 11px;
   line-height: 1.4;
 }
 
+/* Colores de header/borde según prioridad de la colonia */
+.popup-colonia.prio-muy-baja .leaflet-popup-content-wrapper,
+.popup-colonia.prio-muy-baja .leaflet-popup-tip {
+  border-color: #006100;
+}
+.popup-colonia.prio-muy-baja .popup-colonia-header {
+  background-color: rgba(0,97,0,0.6);
+}
+
+.popup-colonia.prio-baja .leaflet-popup-content-wrapper,
+.popup-colonia.prio-baja .leaflet-popup-tip {
+  border-color: #7aab00;
+}
+.popup-colonia.prio-baja .popup-colonia-header {
+  background-color: rgba(122,171,0,0.6);
+}
+
+.popup-colonia.prio-media .leaflet-popup-content-wrapper,
+.popup-colonia.prio-media .leaflet-popup-tip {
+  border-color: #b2b200;
+}
+.popup-colonia.prio-media .popup-colonia-header {
+  background-color: rgba(255,255,0,0.6);
+}
+
+.popup-colonia.prio-alta .leaflet-popup-content-wrapper,
+.popup-colonia.prio-alta .leaflet-popup-tip {
+  border-color: #ff9900;
+}
+.popup-colonia.prio-alta .popup-colonia-header {
+  background-color: rgba(255,153,0,0.6);
+}
+
+.popup-colonia.prio-muy-alta .leaflet-popup-content-wrapper,
+.popup-colonia.prio-muy-alta .leaflet-popup-tip {
+  border-color: #ff2200;
+}
+.popup-colonia.prio-muy-alta .popup-colonia-header {
+  background-color: rgba(255,34,0,0.6);
+}
+
+.popup-colonia.prio-desconocida .leaflet-popup-content-wrapper,
+.popup-colonia.prio-desconocida .leaflet-popup-tip {
+  border-color: #b0b0b0;
+}
+.popup-colonia.prio-desconocida .popup-colonia-header {
+  background-color: rgba(176,176,176,0.6);
+}
+
+/* Ajuste del botón de cerrar del popup */
+.popup-colonia .leaflet-popup-close-button {
+  color: #ffffff;
+  font-weight: bold;
+  top: 4px;
+  right: 6px;
+}
+
+/* Animación de entrada del popup */
+@keyframes popup-colonia-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+
 /* Encabezado del popup de colonia */
 .popup-colonia-header {
-  font-weight: 700;
-  padding: 4px 8px;
-  margin: -6px -6px 4px -6px; /* se ajusta al borde del popup */
+  font-weight: 700;           /* negritas */
+  text-align: center;         /* CENTRADO */
+  padding: 6px 8px;
+  margin: -6px -6px 4px -6px;
   border-radius: 8px 8px 0 0;
   color: #000;
-  background-color: rgba(176,176,176,0.6); /* fallback gris */
+  background-color: rgba(176,176,176,0.6); /* se sobrescribe por prioridad */
 }
 
 .popup-colonia-body {
