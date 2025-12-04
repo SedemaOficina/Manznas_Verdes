@@ -490,7 +490,8 @@ function initMap() {
   );
 
   baseEmpty = L.layerGroup();
-
+ // Usar Calles claras como mapa base por defecto
+  baseLight.addTo(map);
   baseOSM.addTo(map);
 
   capaManzanasTodas = L.geoJSON(null, {
@@ -1098,21 +1099,26 @@ function resaltarColoniaYManzanas(entryAgg) {
     const pobTxt = pob ? pob.toLocaleString("es-MX") : "";
     const haTxt  = ha  ? ha.toLocaleString("es-MX", {minimumFractionDigits:2, maximumFractionDigits:2}) : "";
 
-    const popupHtml =
-      `<div class="popup-colonia-content">
-        <b>Colonia:</b> ${normalizarTexto(col)}<br>
-        <b>Prioridad:</b> <span class="badge-prioridad ${prClass}">${prio}</span><br>` +
-        (gm ? `<b>Grado de marginación 2020:</b> ${gm}<br>` : "") +
-        `<b>Manzanas dentro de la colonia:</b> ${numManz.toLocaleString("es-MX")}<br>` +
-        (pobTxt ? `<b>Población:</b> ${pobTxt} hab.<br>` : "") +
-        (haTxt  ? `<b>Superficie:</b> ${haTxt} ha` : "") +
-      `</div>`;
+const popupHtml =
+  `<div class="popup-colonia-content">
+     <div class="popup-colonia-header">
+       Selección de colonia
+     </div>
+     <div class="popup-colonia-body">
+       <b>Colonia:</b> ${normalizarTexto(col)}<br>
+       <b>Prioridad:</b> <span class="badge-prioridad ${prClass}">${prio}</span><br>` +
+       (gm ? `<b>Grado de marginación 2020:</b> ${gm}<br>` : "") +
+       `<b>Manzanas dentro de la colonia:</b> ${numManz.toLocaleString("es-MX")}<br>` +
+       (pobTxt ? `<b>Población:</b> ${pobTxt} hab.<br>` : "") +
+       (haTxt  ? `<b>Superficie:</b> ${haTxt} ha` : "") +
+     `</div>
+   </div>`;
 
-    layerColonia
-      .bindPopup(popupHtml, {
-        className: `popup-colonia ${prClass}`
-      })
-      .openPopup();
+   layerColonia
+  .bindPopup(popupHtml, {
+    className: `popup-colonia ${prClass}`
+  })
+  .openPopup();
 
     const gCol = layerColonia.toGeoJSON();
 
