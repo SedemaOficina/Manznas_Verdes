@@ -268,7 +268,7 @@
 <!-- JS libs -->
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@turf/turf@6/turf.min.js"></script>
-script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <script>
 // =======================
@@ -1006,7 +1006,6 @@ function resaltarColoniaYManzanas(entryAgg) {
         if (mx2 < minX) return false;
         if (mx1 > maxX) return false;
         if (my2 < minY) return false;
-        if (my1 < minY) return true;
         if (my1 > maxY) return false;
         return true;
       } catch {
