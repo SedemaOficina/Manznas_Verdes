@@ -268,7 +268,7 @@
 <!-- JS libs -->
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@turf/turf@6/turf.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <script>
 // =======================
@@ -363,7 +363,7 @@ function construirAgregadosColonias() {
   coloniasAgg = [];
   coloniasAggByKey = {};
 
-  // 0) Conteo de manzanas por colonia (NOM_MUN + COLONIA)
+  // Conteo de manzanas por colonia (NOM_MUN + COLONIA)
   const manzanasPorColonia = {};
   manzanasFeatures.forEach((feat) => {
     const p = feat.properties || {};
@@ -374,7 +374,6 @@ function construirAgregadosColonias() {
     manzanasPorColonia[key] = (manzanasPorColonia[key] || 0) + 1;
   });
 
-  // 1) Base por colonia
   coloniasFeatures.forEach((feat, idx) => {
     const p = feat.properties || {};
     const alc = normalizarTexto(p.NOM_MUN || "");
@@ -387,10 +386,10 @@ function construirAgregadosColonias() {
     const pob      = p.POBTOT != null ? Math.round(p.POBTOT) : 0;
     const prCol    = (p.prioridad || "Sin dato").toString().trim();
     const gm       = p.GM_2020 || "";
-    const nManzCol = manzanasPorColonia[key] || 0; // calculado a partir de manzanas
+    const nManzCol = manzanasPorColonia[key] || 0; // calculado
 
     const entry = {
-      idx,           // índice de la feature de colonia
+      idx,
       key,
       nom_mun: alc,
       colonia: col,
@@ -406,7 +405,6 @@ function construirAgregadosColonias() {
     coloniasAggByKey[key] = entry;
   });
 
-  // 2) Totales globales (ciudad completa)
   totalColoniasBase = coloniasAgg.length;
   totalPobBase = coloniasAgg.reduce((acc, e) => acc + (e.pob_colonia || 0), 0);
   totalHaBase  = coloniasAgg.reduce((acc, e) => acc + (e.area_ha     || 0), 0);
@@ -468,12 +466,13 @@ function initMap() {
     }
   }).addTo(map);
 
+  // Colonias (no seleccionadas) con contorno sobrio
   capaColonias = L.geoJSON(null, {
     pane: 'overlayPane',
     style: {
-      color:"#00897b",
-      weight:1.2,
-      fillOpacity:0
+      color: "#5f6b73",
+      weight: 1.2,
+      fillOpacity: 0
     },
     onEachFeature: function(feat, layer) {
       const p = feat.properties || {};
@@ -484,6 +483,7 @@ function initMap() {
     }
   }).addTo(map);
 
+  // Manzanas dentro de la colonia seleccionada
   capaManzanasResaltadas = L.geoJSON(null, {
     pane: 'overlayPane',
     style: function(feature) {
@@ -493,7 +493,7 @@ function initMap() {
         color: "#555555",
         weight: 0.6,
         fillColor: s.fill,
-        fillOpacity: 0.7
+        fillOpacity: 0.65
       };
     },
     onEachFeature: function(feat, layer) {
@@ -522,11 +522,12 @@ function initMap() {
     collapsed: true
   }).addTo(map);
 
-  // Control personalizado de información de manzana
-  manzanaInfoControl = L.control({ position: 'bottomright' });
+  // Control personalizado de información de manzana (arriba derecha, debajo de capas)
+  manzanaInfoControl = L.control({ position: 'topright' });
   manzanaInfoControl.onAdd = function(map) {
     const div = L.DomUtil.create('div', 'manzana-info');
-    div.innerHTML = '<p class="manzana-info-empty">Pasa el cursor o haz clic sobre una manzana para ver detalles.</p>';
+    div.innerHTML = '<b>Selección de manzana</b><br>' +
+                    '<p class="manzana-info-empty">Pasa el cursor o haz clic sobre una manzana para ver detalles.</p>';
     return div;
   };
   manzanaInfoControl.addTo(map);
@@ -537,7 +538,8 @@ function limpiarPanelManzana() {
   const div = manzanaInfoControl.getContainer();
   if (!div) return;
   div.className = 'manzana-info';
-  div.innerHTML = '<p class="manzana-info-empty">Pasa el cursor o haz clic sobre una manzana para ver detalles.</p>';
+  div.innerHTML = '<b>Selección de manzana</b><br>' +
+                  '<p class="manzana-info-empty">Pasa el cursor o haz clic sobre una manzana para ver detalles.</p>';
 }
 
 function actualizarPanelManzana(p) {
@@ -563,6 +565,7 @@ function actualizarPanelManzana(p) {
 
   div.className = 'manzana-info ' + badgeClass;
   div.innerHTML =
+    `<b>Selección de manzana</b><br>` +
     `<b>Colonia:</b> ${col || 'Sin dato'}<br>` +
     `<b>Alcaldía:</b> ${alc || 'Sin dato'}<br>` +
     `<b>ID manzana:</b> ${id || 'Sin dato'}<br>` +
@@ -660,9 +663,18 @@ function actualizarTablaColonias() {
   let html = "";
   filas.forEach(r => {
     const prClass = prioridadClass(r.prio_colonia);
-    html += `<tr data-idx="${r.idx}">
+    const gmapsQuery = encodeURIComponent(`Colonia ${r.colonia}, Alcaldía ${r.nom_mun}, Ciudad de México`);
+    html += `<tr data-idx="${r.idx}" title="Ver colonia en el mapa">
       <td>${normalizarTexto(r.nom_mun)}</td>
-      <td>${normalizarTexto(r.colonia)}</td>
+      <td>
+        ${normalizarTexto(r.colonia)}<br>
+        <a href="https://www.google.com/maps/search/${gmapsQuery}"
+           class="gmaps-link"
+           target="_blank"
+           rel="noopener noreferrer">
+           Ver en Google Maps
+        </a>
+      </td>
       <td>${r.n_manz.toLocaleString("es-MX")}</td>
       <td><span class="prio-dot ${prClass}"></span>${r.prio_colonia}</td>
       <td>${r.gm_2020 || ""}</td>
@@ -721,6 +733,9 @@ function inicializarTablaColonias() {
 
   // click en fila → seleccionar colonia en mapa/KPI
   document.querySelector('#tablaColonias tbody').addEventListener('click', (e) => {
+    // Si el clic fue en el enlace de Google Maps, no hacer nada extra
+    if (e.target.closest('a.gmaps-link')) return;
+
     const tr = e.target.closest('tr[data-idx]');
     if (!tr) return;
     const idx = parseInt(tr.getAttribute('data-idx'), 10);
@@ -761,6 +776,12 @@ function inicializarTablaColonias() {
 
     resaltarColoniaYManzanas(entryAgg);
     resaltarFilaTabla(idx);
+
+    // Scroll hacia el mapa
+    const mapSection = document.querySelector('.map-section');
+    if (mapSection) {
+      mapSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
   });
 }
 
@@ -944,13 +965,14 @@ function resaltarColoniaYManzanas(entryAgg) {
     });
 
     const est = estiloPrioridad(prio);
+    const prClass = prioridadClass(prio);
 
-    // Solo perímetro grueso, sin relleno
+    // Perímetro negro, relleno según prioridad
     layerColonia.setStyle({
-      color: est.color,
+      color: '#000000',
       weight: 3,
       fillColor: est.fill,
-      fillOpacity: 0
+      fillOpacity: 0.35
     });
 
     const pobTxt = pob ? pob.toLocaleString("es-MX") : "";
@@ -959,16 +981,18 @@ function resaltarColoniaYManzanas(entryAgg) {
     const popupHtml =
       `<div class="popup-colonia-content">
         <b>Colonia:</b> ${normalizarTexto(col)}<br>
-        <b>Prioridad:</b> ${prio}<br>` +
+        <b>Prioridad:</b> <span class="badge-prioridad ${prClass}">${prio}</span><br>` +
         (gm ? `<b>Grado de marginación 2020:</b> ${gm}<br>` : "") +
         `<b>Manzanas dentro de la colonia:</b> ${numManz.toLocaleString("es-MX")}<br>` +
         (pobTxt ? `<b>Población:</b> ${pobTxt} hab.<br>` : "") +
         (haTxt  ? `<b>Superficie:</b> ${haTxt} ha` : "") +
       `</div>`;
 
-    layerColonia.bindPopup(popupHtml, {
-      className: `popup-colonia ${prioridadClass(prio)}`
-    }).openPopup();
+    layerColonia
+      .bindPopup(popupHtml, {
+        className: `popup-colonia ${prClass}`
+      })
+      .openPopup();
 
     const gCol = layerColonia.toGeoJSON();
 
@@ -982,6 +1006,7 @@ function resaltarColoniaYManzanas(entryAgg) {
         if (mx2 < minX) return false;
         if (mx1 > maxX) return false;
         if (my2 < minY) return false;
+        if (my1 < minY) return true;
         if (my1 > maxY) return false;
         return true;
       } catch {
