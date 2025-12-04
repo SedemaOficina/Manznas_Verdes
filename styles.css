@@ -549,7 +549,7 @@ h2,
   font-size: 10px;
 }
 
-/* Hover y selección */
+/* Hover, cursor y selección */
 
 #tablaColonias tbody tr {
   cursor: pointer;
@@ -652,7 +652,7 @@ h2,
 
 .stats-muy-alta { border-left: 4px solid #ff2200; }
 .stats-alta     { border-left: 4px solid #ff9900; }
-.stats-media    { border-left: 4px solid #ffff00; }
+stats-media    { border-left: 4px solid #ffff00; }
 .stats-baja     { border-left: 4px solid #7aab00; }
 .stats-muy-baja { border-left: 4px solid #006100; }
 
