@@ -356,13 +356,12 @@ h2,
 /* Contenedor principal del popup de Leaflet */
 .popup-colonia .leaflet-popup-content-wrapper {
   background: #ffffff;
-  border-radius: 10px;
+  border-radius: 14px;   /* ← Aumenta redondeado aquí */
   border: 2px solid #cccccc;
-  box-shadow: 0 6px 18px rgba(0,0,0,0.25);
-  padding: 0;                 /* quitamos padding interno por defecto */
-  animation: popup-colonia-in 0.18s ease-out;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.28);
+  padding: 0;
+  animation: popup-colonia-in 0.20s ease-out;
 }
-
 /* Triangulito del popup del mismo color que el borde */
 .popup-colonia .leaflet-popup-tip {
   background: #ffffff;
@@ -377,8 +376,10 @@ h2,
 /* Encabezado del popup */
 .popup-colonia-header {
   font-weight: 700;
+  font-size: 13px;
+    letter-spacing: 0.3px;
   text-align: center;
-  padding: 6px 8px;
+  padding: 10px 12px;
   margin: 0;
   border-radius: 8px 8px 0 0;
   color: #000;
@@ -387,9 +388,9 @@ h2,
 
 /* Cuerpo del popup */
 .popup-colonia-body {
-  padding: 6px 10px 8px 10px;
-  font-size: 11px;
-  line-height: 1.4;
+  padding: 12px 14px;   /* ← margen interno aumentado */
+  font-size: 12px;
+  line-height: 1.45;
 }
 
 /* Colores de header/borde según prioridad de la colonia */
@@ -442,11 +443,25 @@ h2,
 }
 
 /* Ajuste del botón de cerrar del popup */
-.popup-colonia .leaflet-popup-close-button {
+popup-colonia .leaflet-popup-close-button {
   color: #ffffff;
-  font-weight: bold;
-  top: 4px;
-  right: 6px;
+  font-weight: 900;        /* ← mucho más grueso */
+  font-size: 20px;         /* ← más grande */
+  top: 6px;                /* ajusta posición */
+  right: 8px;
+  text-shadow: 0 0 2px #000; /* mejora visibilidad */
+  opacity: 0.9;            /* más visible */
+}
+
+.popup-colonia .leaflet-popup-close-button {
+  background: rgba(0,0,0,0.35);
+  border-radius: 50%;
+  padding: 4px 8px;
+}
+
+.popup-colonia .leaflet-popup-close-button:hover {
+  opacity: 1;
+  transform: scale(1.15);  /* ligera animación */
 }
 
 /* Animación de entrada del popup */
