@@ -367,6 +367,31 @@ h2,
   line-height: 1.4;
 }
 
+/* Encabezado del popup de colonia */
+.popup-colonia-header {
+  font-weight: 700;
+  padding: 4px 8px;
+  margin: -6px -6px 4px -6px; /* se ajusta al borde del popup */
+  border-radius: 8px 8px 0 0;
+  color: #000;
+  background-color: rgba(176,176,176,0.6); /* fallback gris */
+}
+
+.popup-colonia-body {
+  padding: 0 2px 2px 2px;
+}
+
+/* Colores de header según prioridad (misma paleta, 60% opacidad) */
+.popup-colonia.prio-muy-baja .popup-colonia-header  { background-color: rgba(0,97,0,0.6); }
+.popup-colonia.prio-baja     .popup-colonia-header  { background-color: rgba(122,171,0,0.6); }
+.popup-colonia.prio-media    .popup-colonia-header  { background-color: rgba(255,255,0,0.6); }
+.popup-colonia.prio-alta     .popup-colonia-header  { background-color: rgba(255,153,0,0.6); }
+.popup-colonia.prio-muy-alta .popup-colonia-header  { background-color: rgba(255,34,0,0.6); }
+.popup-colonia.prio-desconocida .popup-colonia-header { background-color: rgba(176,176,176,0.6); } {
+  font-size: 11px;
+  line-height: 1.4;
+}
+
 /* LEYENDA COMPACTA */
 
 .map-legend {
