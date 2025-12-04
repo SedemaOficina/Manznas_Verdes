@@ -181,55 +181,69 @@
 
     <p id="tablaResumen" class="tabla-resumen"></p>
 
-    <div class="table-wrapper">
-      <table id="tablaColonias">
-        <thead>
-          <tr>
-            <th data-col="alc"   title="Haz clic para ordenar">Alcaldía ↕</th>
-            <th data-col="col"   title="Haz clic para ordenar">Colonia ↕</th>
-            <th data-col="manz"  title="Haz clic para ordenar">No. de manzanas ↕</th>
-            <th data-col="prio"  title="Haz clic para ordenar">Prioridad (colonia) ↕</th>
-            <th data-col="gm"    title="Haz clic para ordenar">Grado de marginación 2020 ↕</th>
-            <th data-col="pob"   title="Haz clic para ordenar">Población 2020 ↕</th>
-            <th data-col="ha"    title="Superficie ha ↕</th>
-          </tr>
-          <tr class="filters-row">
-            <!-- Alcaldía -->
-            <th>
-              <select id="filtroAlc">
-                <option value="">Todas</option>
-              </select>
-            </th>
-            <!-- Colonia -->
-            <th>
-              <input id="filtroCol" type="text" placeholder="Filtrar colonia…">
-            </th>
-            <!-- No. manzanas -->
-            <th></th>
-            <!-- Prioridad colonia -->
-            <th>
-              <select id="filtroPrio">
-                <option value="">Todas</option>
-              </select>
-            </th>
-            <!-- GM_2020 -->
-            <th>
-              <select id="filtroGM">
-                <option value="">Todos</option>
-              </select>
-            </th>
-            <!-- Población -->
-            <th></th>
-            <!-- Ha -->
-            <th></th>
-          </tr>
-        </thead>
-        <tbody>
-          <!-- Filas generadas dinámicamente -->
-        </tbody>
-      </table>
-    </div>
+   <div class="table-wrapper">
+  <table id="tablaColonias">
+    <thead>
+      <tr>
 
+        <!-- Alcaldía -->
+        <th data-col="alc" title="Haz clic para ordenar">
+          Alcaldía ↕
+          <br>
+          <select id="filtroAlc">
+            <option value="">Todas</option>
+          </select>
+        </th>
+
+        <!-- Colonia -->
+        <th data-col="col" title="Haz clic para ordenar">
+          Colonia ↕
+          <br>
+          <input id="filtroCol" type="text" placeholder="Filtrar colonia…">
+        </th>
+
+        <!-- No. de manzanas -->
+        <th data-col="manz" title="Haz clic para ordenar">
+          No. de manzanas ↕
+        </th>
+
+        <!-- Prioridad -->
+        <th data-col="prio" title="Haz clic para ordenar">
+          Prioridad (colonia) ↕
+          <br>
+          <select id="filtroPrio">
+            <option value="">Todas</option>
+          </select>
+        </th>
+
+        <!-- Grado de marginación -->
+        <th data-col="gm" title="Haz clic para ordenar">
+          Grado de marginación ↕
+          <br>
+          <select id="filtroGM">
+            <option value="">Todos</option>
+          </select>
+        </th>
+
+        <!-- Población -->
+        <th data-col="pob" title="Haz clic para ordenar">
+          Población 2020 ↕
+        </th>
+
+        <!-- Superficie -->
+        <th data-col="ha" title="Haz clic para ordenar">
+          Superficie ha ↕
+        </th>
+
+      </tr>
+    </thead>
+
+    <tbody>
+      <!-- Filas generadas dinámicamente -->
+    </tbody>
+
+  </table>
+</div>
     <!-- RESUMEN GENERAL -->
     <section id="statsResumen" class="stats-section"></section>
   </section>
