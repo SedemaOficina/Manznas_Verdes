@@ -553,9 +553,8 @@ h2,
 
 #tablaColonias thead {
   background-color: #f3f5f8;
-  position: sticky;
-  top: 0;
-  z-index: 2;
+  /* sin sticky, para que la fila de filtros se mantenga justo debajo
+     de los encabezados y no se vea flotando raro en la parte superior */
 }
 
 #tablaColonias th,
