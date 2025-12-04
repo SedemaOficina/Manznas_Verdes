@@ -251,11 +251,6 @@ h2,
   color: #c62828;
 }
 
-.kpi-secondary {
-  font-size: 12px;
-  color: #777;
-}
-
 /* Badge prioridad */
 
 .badge-prioridad {
@@ -271,23 +266,24 @@ h2,
 
 /* Colores prioridad (TODOS LOS USOS EN LA PÁGINA) */
 
-.prio-muy-baja { background-color: #006100; }  /* Muy Baja   */
-.prio-baja     { background-color: #7aab00; }  /* Baja       */
-.prio-media    { background-color: #ffff00; color: #333; } /* Media */
-.prio-alta     { background-color: #ff9900; }  /* Alta       */
-.prio-muy-alta { background-color: #ff2200; }  /* Muy Alta   */
-.prio-desconocida { background-color: #b0b0b0; color: #333; } /* Sin dato (gris) */
+.prio-muy-baja { background-color: #006100; }
+.prio-baja     { background-color: #7aab00; }
+.prio-media    { background-color: #ffff00; color: #333; }
+.prio-alta     { background-color: #ff9900; }
+.prio-muy-alta { background-color: #ff2200; }
+.prio-desconocida { background-color: #b0b0b0; color: #333; }
 
 /* MAPA */
 
 .map-section h3 {
-  /* hereda estilo institucional de regla global */
+  /* hereda estilo institucional */
 }
 
 .btn-fullscreen {
   position: absolute;
   top: 8px;
-  right: 8px;
+  left: 8px;  /* para no encimar el control de capas */
+  right: auto;
   z-index: 1100;
   padding: 4px 10px;
   border-radius: 999px;
@@ -349,27 +345,6 @@ h2,
   font-weight: 600;
   color: #333;
 }
-
-/* Tooltip prioridad (ya casi no se usa, pero se conserva) */
-
-.leaflet-tooltip.tooltip-prioridad {
-  border: none;
-  border-radius: 10px;
-  padding: 4px 10px;
-  font-size: 11px;
-  font-weight: 600;
-  color: #fff;
-  text-transform: uppercase;
-  text-align: center;
-  line-height: 1.4;
-}
-
-.leaflet-tooltip.tooltip-prioridad.prio-muy-baja { background-color: #006100; }
-.leaflet-tooltip.tooltip-prioridad.prio-baja     { background-color: #7aab00; }
-.leaflet-tooltip.tooltip-prioridad.prio-media    { background-color: #ffff00; color: #333; }
-.leaflet-tooltip.tooltip-prioridad.prio-alta     { background-color: #ff9900; }
-.leaflet-tooltip.tooltip-prioridad.prio-muy-alta { background-color: #ff2200; }
-.leaflet-tooltip.tooltip-prioridad.prio-desconocida { background-color: #b0b0b0; color: #333; }
 
 /* Popup de colonia (fondo blanco, borde por prioridad) */
 
@@ -446,18 +421,18 @@ h2,
 }
 
 .colonias-color {
-  border-color: #00897b;
-  background-color: rgba(0, 137, 123, 0.05);
+  border-color: #5f6b73;
+  background-color: rgba(95,107,115,0);
 }
 
 .manzanas-color {
   border-color: #999999;
-  background-color: #d0d0d0;
+  background-color: rgba(192,192,192,0.3);
 }
 
 .manzanas-sel-color {
   border-color: #555555;
-  background-color: #777777;
+  background-color: rgba(119,119,119,0.65);
 }
 
 /* Panel de información de manzana (control personalizado) */
@@ -465,10 +440,10 @@ h2,
 .manzana-info {
   background: rgba(255,255,255,0.96);
   border-radius: 8px;
-  padding: 6px 8px;
+  padding: 4px 6px;
   box-shadow: 0 1px 4px rgba(0,0,0,0.25);
-  font-size: 11px;
-  line-height: 1.4;
+  font-size: 10px;
+  line-height: 1.3;
   max-width: 230px;
   border: 2px solid #cccccc;
 }
@@ -477,12 +452,25 @@ h2,
   margin: 0;
 }
 
+/* Que quede debajo del control de capas */
+.leaflet-top.leaflet-right .manzana-info {
+  margin-top: 55px;
+  margin-right: 4px;
+}
+
+/* Borde por prioridad */
 .manzana-info.prio-muy-baja { border-color: #006100; }
 .manzana-info.prio-baja     { border-color: #7aab00; }
 .manzana-info.prio-media    { border-color: #ffff00; }
 .manzana-info.prio-alta     { border-color: #ff9900; }
 .manzana-info.prio-muy-alta { border-color: #ff2200; }
 .manzana-info.prio-desconocida { border-color: #b0b0b0; }
+
+/* Badge más pequeño dentro del panel */
+.manzana-info .badge-prioridad {
+  font-size: 9px;
+  padding: 2px 6px;
+}
 
 /* TABLA */
 
@@ -563,6 +551,10 @@ h2,
 
 /* Hover y selección */
 
+#tablaColonias tbody tr {
+  cursor: pointer;
+}
+
 #tablaColonias tbody tr:hover {
   background-color: #e8f4ff;
 }
@@ -603,6 +595,18 @@ h2,
   vertical-align: middle;
 }
 
+/* Enlace a Google Maps junto al nombre de colonia */
+
+.gmaps-link {
+  font-size: 10px;
+  color: #00695c;
+  text-decoration: underline;
+}
+
+.gmaps-link:hover {
+  color: #004d40;
+}
+
 /* RESUMEN GENERAL */
 
 .stats-section {
@@ -612,7 +616,6 @@ h2,
 }
 
 .stats-section h4 {
-  /* ya alineado en regla global */
   margin: 0 0 8px 0;
 }
 
