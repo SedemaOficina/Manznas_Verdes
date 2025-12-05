@@ -3,15 +3,15 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>SEDEMA · Consulta tu Colonia</title>
+  <title>SEDEMA · Tablero de Priorización</title>
 
   <!-- Leaflet CSS -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-  <!-- Geocoder CSS (Buscador) -->
+  <!-- Geocoder CSS -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.css" />
   <!-- Fuente Roboto -->
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
-  <!-- Estilos propios -->
+  <!-- Estilos -->
   <link href="styles.css" rel="stylesheet" />
 </head>
 <body>
@@ -23,20 +23,21 @@
     </div>
     <div class="header-texto">
       <h1>SEDEMA · Manzanas por colonia</h1>
-      <p>Consulta la prioridad de intervención de tu colonia y manzana en la Ciudad de México.</p>
+      <p>Tablero de consulta de prioridades e intervención territorial.</p>
     </div>
   </div>
 </header>
 
 <main class="container">
 
-  <!-- KPIs globales -->
+  <!-- KPIs Institucionales -->
   <section class="kpi-global-section">
     <div class="kpi-global-card">
       <div class="kpi-icon">🏙️</div>
       <div class="kpi-content">
         <div class="kpi-global-label">Total Colonias CDMX</div>
         <div id="kpiTotalColonias" class="kpi-global-value">...</div>
+        <small class="kpi-subtext">100%</small>
       </div>
     </div>
     <div class="kpi-global-card alert">
@@ -50,35 +51,33 @@
     <div class="kpi-global-card alert">
       <div class="kpi-icon">👥</div>
       <div class="kpi-content">
-        <!-- TEXTO CORREGIDO -->
-        <div class="kpi-global-label">Pob. Prioritaria (Alta + Muy Alta)</div>
+        <div class="kpi-global-label">Población Prioritaria (Alta+Muy Alta)</div>
         <div id="kpiPobAlta" class="kpi-global-value">...</div>
-        <small id="kpiPobAltaPerc" class="kpi-subtext">--% de la pob. total</small>
+        <small id="kpiPobAltaPerc" class="kpi-subtext">--% de pob. total</small>
       </div>
     </div>
     <div class="kpi-global-card">
       <div class="kpi-icon">📐</div>
       <div class="kpi-content">
-        <div class="kpi-global-label">Sup. Prioritaria (Alta + Muy Alta)</div>
+        <div class="kpi-global-label">Sup. Prioritaria (Alta+Muy Alta)</div>
         <div id="kpiHaAlta" class="kpi-global-value">...</div>
         <small class="kpi-subtext">Hectáreas</small>
       </div>
     </div>
   </section>
 
-  <!-- Buscador Principal -->
+  <!-- Buscador Específico -->
   <section class="section-block">
-    <h2>Encuentra tu colonia</h2>
+    <h2>Localiza tu colonia</h2>
     <div class="form-grid">
       <div class="form-item">
-        <label for="munSelector">1. Selecciona tu Alcaldía</label>
-        <select id="munSelector"><option value="">Selecciona una opción...</option></select>
+        <label for="munSelector">1. Alcaldía</label>
+        <select id="munSelector"><option value="">Selecciona...</option></select>
       </div>
       <div class="form-item">
-        <label for="colInput">2. Escribe tu Colonia</label>
-        <input id="colInput" list="colList" placeholder="Escribe el nombre aquí..." disabled>
+        <label for="colInput">2. Colonia</label>
+        <input id="colInput" list="colList" placeholder="Escribe para buscar..." disabled>
         <datalist id="colList"></datalist>
-        <small class="hint">Selecciona de la lista que aparece al escribir.</small>
       </div>
     </div>
   </section>
@@ -87,18 +86,21 @@
   <section class="map-section section-block">
     <div class="map-header">
       <h3>Mapa de Prioridades</h3>
-      <button id="btnFullscreen" class="btn-fullscreen">⤢ Pantalla completa</button>
+      <!-- Botón solo para entrar -->
+      <button id="btnFullscreenOpen" class="btn-fullscreen">⤢ Pantalla completa</button>
     </div>
 
     <div class="map-wrapper" id="mapWrapper">
+      <!-- Botón flotante para SALIR (oculto por defecto) -->
+      <button id="btnFullscreenClose" class="btn-close-map">✖ Cerrar Mapa</button>
+      
       <div id="map"></div>
-      <div id="mapLoading" class="map-loading">Cargando mapa...</div>
+      <div id="mapLoading" class="map-loading">Cargando datos geográficos...</div>
 
       <!-- LEYENDA -->
       <div class="map-legend">
         <div class="legend-title">Simbología</div>
         
-        <!-- Alineado en una sola línea -->
         <div class="legend-simple-item">
           <span class="legend-color colonias-color"></span>
           <span class="legend-label">Límite Colonia</span>
@@ -108,11 +110,11 @@
           <span class="legend-label">Manzanas (Selección)</span>
         </div>
 
-        <div class="legend-subtitle">Niveles de Prioridad</div>
-        <p class="legend-guide">Toca los botones para ver la distribución en toda la ciudad.</p>
+        <div class="legend-subtitle">Capas Globales</div>
+        <p class="legend-guide">Haz clic para encender una capa en toda la ciudad.</p>
         
         <div class="legend-group">
-          <!-- Muy Baja -->
+          <!-- Botones corregidos -->
           <div class="legend-row">
             <div class="legend-info">
               <span class="legend-color prio-muy-baja"></span>
@@ -123,7 +125,6 @@
               <button class="legend-btn" data-prio="muy baja" data-target="manzanas">Manzana</button>
             </div>
           </div>
-          <!-- Baja -->
           <div class="legend-row">
             <div class="legend-info">
               <span class="legend-color prio-baja"></span>
@@ -134,7 +135,6 @@
               <button class="legend-btn" data-prio="baja" data-target="manzanas">Manzana</button>
             </div>
           </div>
-          <!-- Media -->
           <div class="legend-row">
             <div class="legend-info">
               <span class="legend-color prio-media"></span>
@@ -145,7 +145,6 @@
               <button class="legend-btn" data-prio="media" data-target="manzanas">Manzana</button>
             </div>
           </div>
-          <!-- Alta -->
           <div class="legend-row">
             <div class="legend-info">
               <span class="legend-color prio-alta"></span>
@@ -156,7 +155,6 @@
               <button class="legend-btn" data-prio="alta" data-target="manzanas">Manzana</button>
             </div>
           </div>
-          <!-- Muy Alta -->
           <div class="legend-row">
             <div class="legend-info">
               <span class="legend-color prio-muy-alta"></span>
@@ -172,16 +170,17 @@
     </div>
   </section>
 
-  <!-- TABLA -->
+  <!-- TABLA Y ANÁLISIS -->
   <section class="table-section section-block">
     <div class="table-header-row">
       <h3>Explorador de Datos</h3>
-      <button id="btnLimpiarFiltros" class="btn-clear-table">
-        Quitar filtros
-      </button>
+      <button id="btnLimpiarFiltros" class="btn-clear-table">Restablecer todo</button>
     </div>
     
-    <p id="tablaResumen" class="tabla-resumen"></p>
+    <!-- Narrativa de filtros -->
+    <div id="filtroNarrativo" class="filtro-narrativo">
+      Mostrando todas las colonias de la Ciudad de México.
+    </div>
 
     <div class="table-wrapper">
       <table id="tablaColonias">
@@ -191,29 +190,29 @@
             <th data-col="col">Colonia ↕<br><input id="filtroCol" type="text" placeholder="Buscar..."></th>
             <th data-col="manz">No. Manzanas ↕</th>
             <th data-col="prio">Prioridad ↕<br><select id="filtroPrio"><option value="">Todas</option></select></th>
-            <th data-col="gm">Grado Marg. ↕<br><select id="filtroGM"><option value="">Todos</option></select></th>
+            <th data-col="gm">Marginación ↕<br><select id="filtroGM"><option value="">Todos</option></select></th>
             <th data-col="pob">Población ↕</th>
             <th data-col="ha">Superficie (ha) ↕</th>
           </tr>
         </thead>
-        <tbody><!-- JS rellena esto --></tbody>
+        <tbody><!-- Datos --></tbody>
       </table>
     </div>
-    <section id="statsResumen" class="stats-section"></section>
+    <div id="tablaConteo" class="tabla-resumen-footer"></div>
   </section>
 
   <!-- GRÁFICAS -->
   <section class="analysis-section section-block">
-    <h3>Estadísticas (Selección actual)</h3>
+    <h3>Estadísticas (Selección actual en tabla)</h3>
     <div class="charts-wrapper">
       <div class="chart-card">
-        <h4 id="chartTitleColonias">Colonias por Prioridad</h4>
+        <h4 id="chartTitleColonias">Colonias por Prioridad (%)</h4>
         <div class="chart-container-box">
           <canvas id="chartColonias"></canvas>
         </div>
       </div>
       <div class="chart-card">
-        <h4 id="chartTitlePoblacion">Población por Prioridad</h4>
+        <h4 id="chartTitlePoblacion">Población por Prioridad (%)</h4>
         <div class="chart-container-box">
           <canvas id="chartPoblacion"></canvas>
         </div>
@@ -227,27 +226,31 @@
   <p>Gobierno de la Ciudad de México · SEDEMA 2025</p>
 </footer>
 
-<!-- JS Libs -->
+<!-- Librerías -->
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@turf/turf@6/turf.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <script>
-// =======================
-// JS LOGIC
-// =======================
+// ============================================
+// VARIABLES
+// ============================================
 let coloniasFeatures = [], manzanasFeatures = [], coloniasAgg = [];
-let map, baseOSM, baseLight, baseSat, baseEmpty;
+// Diccionario optimizado: "ALCALDIA|COLONIA" -> [Array de manzanas]
+let manzanasPorColoniaMap = {}; 
+
+let map, baseLight, baseOSM, baseSat;
 let capaColonias, capaManzanasTodas, capaManzanasResaltadas;
 let capaColoniasPrioridad, capaManzanasPrioridad;
 let indiceColonias = {};
-let manzanaInfoControl;
+let manzanaInfoControl, userMarker;
 let currentSort = { col: null, dir: 'asc' };
 let chartColonias = null, chartPoblacion = null;
-let userMarker = null;
 
-// Helpers
+// ============================================
+// FUNCIONES DE APOYO
+// ============================================
 function normalizarTexto(str) {
   if (!str) return "";
   const fixes = { "TL?HUAC": "TLÁHUAC", "?LVARO OBREG?N": "ÁLVARO OBREGÓN" };
@@ -255,6 +258,20 @@ function normalizarTexto(str) {
   return fixes[raw] || raw;
 }
 function normalizarPrioridad(str) { return (str || "").toString().toLowerCase().trim(); }
+
+function estiloPrioridad(p) {
+  // Escala Semáforo (Verde -> Rojo)
+  const c = { 
+    "muy baja": "#006100", 
+    "baja":     "#7aab00", 
+    "media":    "#ffff00", 
+    "alta":     "#ff9900", 
+    "muy alta": "#ff2200" 
+  };
+  const k = normalizarPrioridad(p);
+  const color = c[k] || "#ccc";
+  return { color: color, fill: color };
+}
 
 function prioridadClass(p) {
   const pr = normalizarPrioridad(p);
@@ -266,71 +283,55 @@ function prioridadClass(p) {
   return "prio-desconocida";
 }
 
-// === COLORES DE PRIORIDAD (ORIGINALES / SEMÁFORO) ===
-function estiloPrioridad(p) {
-  const c = { 
-    "muy baja": "#006100", // Verde fuerte
-    "baja":     "#7aab00", // Verde claro
-    "media":    "#ffff00", // Amarillo
-    "alta":     "#ff9900", // Naranja
-    "muy alta": "#ff2200"  // Rojo
-  };
-  const k = normalizarPrioridad(p);
-  const color = c[k] || "#ccc";
-  return { color: color, fill: color };
+function showLoading(show) { 
+  const el = document.getElementById('mapLoading'); 
+  if(el) el.style.display = show ? 'flex' : 'none'; 
 }
 
-function showMapLoading(show) { 
-  const el = document.getElementById('mapLoading'); if(el) el.style.display = show ? 'flex':'none'; 
-}
-
-// =======================
+// ============================================
 // MAPA
-// =======================
+// ============================================
 function initMap() {
-  map = L.map('map').setView([19.35, -99.13], 11);
+  map = L.map('map', { zoomControl: false }).setView([19.35, -99.13], 11);
+  L.control.zoom({ position: 'topright' }).addTo(map);
 
-  // Bases
   baseOSM = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19, attribution: 'OSM' });
   baseLight = L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', { maxZoom: 19, attribution: 'Carto' });
   baseLight.addTo(map);
 
   const myRenderer = L.canvas({ padding: 0.5 });
 
-  // 1. Manzanas Fondo (GRIS PERO INTERACTIVA)
+  // 1. Manzanas Fondo (Interactiva Hover)
   capaManzanasTodas = L.geoJSON(null, {
     renderer: myRenderer,
-    // Aseguramos que sea interactiva para que funcione el mouseover
-    interactive: true, 
-    style: { color: "#999", weight: 0.1, fillColor: "#ccc", fillOpacity: 0.2 },
+    interactive: true, // CLAVE PARA EL HOVER
+    style: { color: "#aaaaaa", weight: 0.2, fillColor: "#cccccc", fillOpacity: 0.15 },
     onEachFeature: (f, l) => {
       l.on('mouseover', () => actualizarPanelManzana(f.properties));
-      // l.on('mouseout', () => limpiarPanelManzana()); // Opcional: limpiar al salir
       l.on('click', () => actualizarPanelManzana(f.properties));
     }
   }).addTo(map);
 
-  // 2. Colonias (Límites)
+  // 2. Colonias Límite
   capaColonias = L.geoJSON(null, {
     style: { color: "#55585a", weight: 1.5, fillOpacity: 0 },
     onEachFeature: (f, l) => {
-      const p = f.properties;
-      const key = `${normalizarTexto(p.NOM_MUN)}|${normalizarTexto(p.COLONIA)}`;
-      indiceColonias[key] = l;
+      const k = `${normalizarTexto(f.properties.NOM_MUN)}|${normalizarTexto(f.properties.COLONIA)}`;
+      indiceColonias[k] = l;
       l.on('click', () => {
-         const entry = coloniasAgg.find(c => c.key === key);
+         const entry = coloniasAgg.find(c => c.key === k);
          if(entry) resaltarColoniaYManzanas(entry);
       });
     }
   }).addTo(map);
 
-  // 3. Manzanas Resaltadas (Selección)
+  // 3. Manzanas Selección (Optimizado)
   capaManzanasResaltadas = L.geoJSON(null, {
     renderer: myRenderer,
     interactive: true,
     style: f => {
       const s = estiloPrioridad(f.properties.PRIORIDAD);
-      return { color: "#444", weight: 0.5, fillColor: s.fill, fillOpacity: 0.8 };
+      return { color: "#333", weight: 0.5, fillColor: s.fill, fillOpacity: 0.8 };
     },
     onEachFeature: (f, l) => {
       l.on('mouseover', () => actualizarPanelManzana(f.properties));
@@ -338,14 +339,13 @@ function initMap() {
     }
   }).addTo(map);
 
-  // 4. Capas Globales (Botones)
+  // 4. Capas Globales
   capaColoniasPrioridad = L.geoJSON(null, {
     style: f => ({ color: estiloPrioridad(f.properties.prioridad).color, weight: 2, fillOpacity: 0.4 }),
-    onEachFeature: (f, l) => {
+    onEachFeature: (f,l) => {
       l.on('click', () => {
-         const p = f.properties;
-         const key = `${normalizarTexto(p.NOM_MUN)}|${normalizarTexto(p.COLONIA)}`;
-         const entry = coloniasAgg.find(c => c.key === key);
+         const k = `${normalizarTexto(f.properties.NOM_MUN)}|${normalizarTexto(f.properties.COLONIA)}`;
+         const entry = coloniasAgg.find(c => c.key === k);
          if(entry) resaltarColoniaYManzanas(entry);
       });
     }
@@ -355,72 +355,57 @@ function initMap() {
     renderer: myRenderer,
     interactive: true,
     style: f => ({ color: "#444", weight: 0.2, fillColor: estiloPrioridad(f.properties.PRIORIDAD).fill, fillOpacity: 0.7 }),
-    onEachFeature: (f, l) => {
+    onEachFeature: (f,l) => {
        l.on('mouseover', () => actualizarPanelManzana(f.properties));
        l.on('click', () => actualizarPanelManzana(f.properties));
     }
   }).addTo(map);
 
-  // Controles
   L.control.layers(
-    { "Mapa Claro": baseLight, "Mapa Calles": baseOSM },
-    { "Colonias": capaColonias, "Manzanas": capaManzanasTodas },
-    { position: 'topright' }
+    {"Mapa Claro": baseLight, "Calles": baseOSM},
+    {"Colonias": capaColonias, "Manzanas": capaManzanasTodas},
+    {position:'topright'}
   ).addTo(map);
 
-  // BUSCADOR (Geocoder Nominatim)
+  // 5. GEOCODER
   const geocoder = L.Control.Geocoder.nominatim({
-      geocodingQueryParams: {
-          countrycodes: 'mx',
-          // Limitar búsqueda (bounding box aproximado CDMX)
-          viewbox: '-99.36,19.59,-98.94,19.04',
-          bounded: 1
-      }
+    geocodingQueryParams: { countrycodes: 'mx', viewbox: '-99.36,19.59,-98.94,19.04', bounded: 1 }
   });
-
   L.Control.geocoder({
     defaultMarkGeocode: false,
-    placeholder: "Buscar calle, colonia...",
+    placeholder: "Buscar calle...",
     geocoder: geocoder
-  })
-  .on('markgeocode', function(e) {
+  }).on('markgeocode', function(e) {
     const center = e.geocode.center;
     map.setView(center, 16);
-    
-    // Marcador temporal
-    const marker = L.marker(center).addTo(map)
-      .bindPopup(e.geocode.name).openPopup();
-
-    // Intentar seleccionar la colonia automáticamente
+    L.popup().setLatLng(center).setContent(e.geocode.name).openOn(map);
     seleccionarColoniaEnPunto(center.lat, center.lng);
-  })
-  .addTo(map);
+  }).addTo(map);
 
-  // Botón "Mi Ubicación"
-  const locateControl = L.Control.extend({
+  // 6. Botón Ubicación
+  const lc = L.Control.extend({
     options: { position: 'topleft' },
-    onAdd: function(map) {
-      const btn = L.DomUtil.create('button', 'btn-locate');
-      btn.innerHTML = '📍';
-      btn.title = "Ir a mi ubicación";
-      btn.onclick = () => map.locate({setView: true, maxZoom: 16});
-      return btn;
+    onAdd: () => {
+      const b = L.DomUtil.create('button', 'btn-locate');
+      b.innerHTML = '📍';
+      b.title = "Mi Ubicación";
+      b.onclick = () => map.locate({setView:true, maxZoom:16});
+      return b;
     }
   });
-  map.addControl(new locateControl());
+  map.addControl(new lc());
 
   map.on('locationfound', e => {
     if(userMarker) map.removeLayer(userMarker);
     userMarker = L.marker(e.latlng).addTo(map).bindPopup("Estás aquí").openPopup();
     seleccionarColoniaEnPunto(e.latlng.lat, e.latlng.lng);
   });
-  map.on('locationerror', () => alert("No se pudo obtener tu ubicación. Verifica los permisos de tu navegador."));
 
-  // Panel Manzana (Esquina Superior)
+  // 7. Panel Manzana Hover
   manzanaInfoControl = L.control({ position: 'topright' });
   manzanaInfoControl.onAdd = () => {
     const div = L.DomUtil.create('div', 'manzana-info');
-    div.innerHTML = '<b>Info. Manzana</b><br><i>Pasa el cursor sobre el mapa...</i>';
+    div.innerHTML = '<b>Info. Manzana</b><br><i>Pasa el cursor...</i>';
     return div;
   };
   manzanaInfoControl.addTo(map);
@@ -430,78 +415,25 @@ function actualizarPanelManzana(p) {
   const div = manzanaInfoControl.getContainer();
   const cls = prioridadClass(p.PRIORIDAD);
   div.className = 'manzana-info ' + cls;
-  // Validamos si hay datos
-  if (!p.CVEGEO) {
-     div.innerHTML = '<b>Info. Manzana</b><br><i>Pasa el cursor...</i>';
-     return;
+  
+  if(!p.CVEGEO) {
+    div.innerHTML = '<b>Info. Manzana</b><br><i>Pasa el cursor...</i>';
+    return;
   }
-  div.innerHTML = `<b>Manzana:</b> ${p.CVEGEO}<br>
+  
+  // Badge en el panel también
+  div.innerHTML = `
+    <b>ID:</b> ${p.CVEGEO}<br>
     <b>Colonia:</b> ${normalizarTexto(p.COLONIA)}<br>
     <b>Prioridad:</b> <span class="badge-prioridad ${cls}">${p.PRIORIDAD}</span><br>
     <b>Pob:</b> ${Number(p.POB||0).toLocaleString()}<br>
-    <b>Viv:</b> ${Number(p.VIV||0).toLocaleString()}<br>
-    <small>${p.Inf_Azul || ''}</small>`;
+    <small>${p.Inf_Azul || ''}</small>
+  `;
 }
 
-function seleccionarColoniaEnPunto(lat, lng) {
-  if (coloniasFeatures.length === 0) return;
-  const pt = turf.point([lng, lat]);
-  const featureFound = coloniasFeatures.find(f => turf.booleanPointInPolygon(pt, f));
-  
-  if (featureFound) {
-    const p = featureFound.properties;
-    const key = `${normalizarTexto(p.NOM_MUN)}|${normalizarTexto(p.COLONIA)}`;
-    const entry = coloniasAgg.find(c => c.key === key);
-    if (entry) {
-      resaltarColoniaYManzanas(entry);
-    }
-  }
-}
-
-function resaltarColoniaYManzanas(entry) {
-  if (!entry) return;
-  const layer = indiceColonias[entry.key];
-  if (!layer) return;
-
-  showMapLoading(true);
-  
-  capaColonias.resetStyle();
-  capaColonias.eachLayer(l => { l.unbindPopup(); l.closePopup(); });
-
-  const s = estiloPrioridad(entry.prio_colonia);
-  layer.setStyle({ color: s.color, weight: 4, fillOpacity: 0 });
-
-  const prClass = prioridadClass(entry.prio_colonia);
-  const html = `
-    <div class="popup-colonia-wrapper">
-      <div class="popup-colonia-header ${prClass}">
-        ${normalizarTexto(entry.colonia)}
-      </div>
-      <div class="popup-colonia-body">
-        <b>Alcaldía:</b> ${normalizarTexto(entry.nom_mun)}<br>
-        <b>Prioridad:</b> <span class="badge-prioridad ${prClass}">${entry.prio_colonia}</span><br>
-        <b>G. Marginación:</b> ${entry.gm_2020 || 'N/D'}<br>
-        <b>Manzanas:</b> ${entry.n_manz}<br>
-        <b>Población:</b> ${entry.pob_colonia.toLocaleString()}<br>
-        <b>Sup:</b> ${entry.area_ha.toFixed(2)} ha
-      </div>
-    </div>`;
-
-  layer.bindPopup(html, { className: 'popup-colonia', minWidth: 220 }).openPopup();
-  map.fitBounds(layer.getBounds(), { padding: [50, 50] });
-
-  setTimeout(() => {
-    const geo = layer.toGeoJSON();
-    const matches = manzanasFeatures.filter(f => {
-       try { return turf.booleanIntersects(f, geo); } catch(e){ return false; }
-    });
-    capaManzanasResaltadas.clearLayers().addData(matches);
-    showMapLoading(false);
-  }, 50);
-  
-  document.getElementById('munSelector').value = entry.nom_mun;
-}
-
+// ============================================
+// LÓGICA DE DATOS (OPTIMIZACIÓN)
+// ============================================
 function initData() {
   Promise.all([
     fetch('colonias_manzanas_verdes.geojson').then(r=>r.json()),
@@ -509,16 +441,29 @@ function initData() {
   ]).then(([colD, manzD]) => {
     coloniasFeatures = colD.features;
     manzanasFeatures = manzD.features;
-    
+
     capaColonias.addData(coloniasFeatures);
     capaManzanasTodas.addData(manzanasFeatures);
 
+    // ⚡⚡ INDEXADO RÁPIDO ⚡⚡
+    // Agrupamos manzanas por clave de colonia AL INICIO para no hacerlo en cada clic
+    manzanasPorColoniaMap = {};
     const counts = {};
+
     manzanasFeatures.forEach(f => {
       const k = `${normalizarTexto(f.properties.NOM_MUN)}|${normalizarTexto(f.properties.COLONIA)}`;
+      
+      // Contar
       counts[k] = (counts[k] || 0) + 1;
+      
+      // Guardar referencia para acceso rápido
+      if (!manzanasPorColoniaMap[k]) {
+        manzanasPorColoniaMap[k] = [];
+      }
+      manzanasPorColoniaMap[k].push(f);
     });
 
+    // Construir tabla agregada
     coloniasAgg = coloniasFeatures.map((f, i) => {
       const p = f.properties;
       const k = `${normalizarTexto(p.NOM_MUN)}|${normalizarTexto(p.COLONIA)}`;
@@ -534,7 +479,18 @@ function initData() {
       };
     });
 
-    // CÁLCULO DE KPIS
+    // Calcular KPIs
+    calcularKpisGenerales();
+    
+    // Llenar Selects
+    llenarSelects();
+
+    // Renderizar Tabla Inicial
+    actualizarTabla();
+  });
+}
+
+function calcularKpisGenerales() {
     const totalCol = coloniasAgg.length;
     const totalPob = coloniasAgg.reduce((a,b)=>a+b.pob_colonia,0);
     const totalHa = coloniasAgg.reduce((a,b)=>a+b.area_ha,0);
@@ -552,8 +508,9 @@ function initData() {
     document.getElementById('kpiPobAltaPerc').innerText = totalPob ? ((pobAlta/totalPob)*100).toFixed(1) + "% de pob. total" : "0%";
 
     document.getElementById('kpiHaAlta').innerText = haAlta.toLocaleString(undefined,{maximumFractionDigits:1});
-    document.getElementById('kpiHaAltaPerc').innerText = totalHa ? ((haAlta/totalHa)*100).toFixed(1) + "% de sup. total" : "0%";
+}
 
+function llenarSelects() {
     const alcs = [...new Set(coloniasAgg.map(c=>c.nom_mun))].sort();
     alcs.forEach(a => {
       document.getElementById('munSelector').add(new Option(a,a));
@@ -563,9 +520,70 @@ function initData() {
     prios.forEach(p => document.getElementById('filtroPrio').add(new Option(p,p)));
     const gms = [...new Set(coloniasAgg.map(c=>c.gm_2020))].sort();
     gms.forEach(g => document.getElementById('filtroGM').add(new Option(g,g)));
+}
 
-    actualizarTabla();
-  });
+// ============================================
+// LÓGICA DE INTERACCIÓN
+// ============================================
+
+function seleccionarColoniaEnPunto(lat, lng) {
+  if (coloniasFeatures.length === 0) return;
+  const pt = turf.point([lng, lat]);
+  // Buscar polígono que contiene el punto
+  const featureFound = coloniasFeatures.find(f => turf.booleanPointInPolygon(pt, f));
+  
+  if (featureFound) {
+    const p = featureFound.properties;
+    const key = `${normalizarTexto(p.NOM_MUN)}|${normalizarTexto(p.COLONIA)}`;
+    const entry = coloniasAgg.find(c => c.key === key);
+    if (entry) resaltarColoniaYManzanas(entry);
+  }
+}
+
+function resaltarColoniaYManzanas(entry) {
+  if (!entry) return;
+  const layer = indiceColonias[entry.key];
+  if (!layer) return;
+
+  showLoading(true);
+  
+  // Limpiar
+  capaColonias.resetStyle();
+  capaColonias.eachLayer(l => l.closePopup());
+
+  // Resaltar
+  const s = estiloPrioridad(entry.prio_colonia);
+  layer.setStyle({ color: s.color, weight: 4, fillOpacity: 0 });
+
+  // Popup con Badge
+  const prClass = prioridadClass(entry.prio_colonia);
+  const popupHtml = `
+    <div class="popup-colonia-wrapper">
+      <div class="popup-colonia-header ${prClass}">
+        ${entry.colonia}
+      </div>
+      <div class="popup-colonia-body">
+        <b>Alcaldía:</b> ${entry.nom_mun}<br>
+        <b>Prioridad:</b> <span class="badge-prioridad ${prClass}">${entry.prio_colonia}</span><br>
+        <b>Marginación:</b> ${entry.gm_2020}<br>
+        <b>Pob:</b> ${entry.pob_colonia.toLocaleString()}<br>
+        <b>Manzanas:</b> ${entry.n_manz}
+      </div>
+    </div>`;
+
+  layer.bindPopup(popupHtml, { className: 'popup-colonia', minWidth: 240 }).openPopup();
+  map.fitBounds(layer.getBounds(), { padding: [50,50] });
+
+  // ⚡ MOSTRAR MANZANAS (USANDO DICCIONARIO - RAPIDÍSIMO) ⚡
+  const manzanasDeLaColonia = manzanasPorColoniaMap[entry.key] || [];
+  
+  capaManzanasResaltadas.clearLayers();
+  if (manzanasDeLaColonia.length > 0) {
+    capaManzanasResaltadas.addData(manzanasDeLaColonia);
+  }
+  
+  showLoading(false);
+  document.getElementById('munSelector').value = entry.nom_mun;
 }
 
 function actualizarTabla() {
@@ -574,6 +592,19 @@ function actualizarTabla() {
   const fPrio = document.getElementById('filtroPrio').value;
   const fGM = document.getElementById('filtroGM').value;
 
+  // Actualizar Narrativa
+  const narr = [];
+  if(fAlc) narr.push(`Alcaldía <strong>${fAlc}</strong>`);
+  if(fPrio) narr.push(`Prioridad <strong>${fPrio}</strong>`);
+  if(fGM) narr.push(`Marginación <strong>${fGM}</strong>`);
+  if(fCol) narr.push(`búsqueda "${fCol}"`);
+  
+  const textoNarrativo = narr.length > 0 
+    ? "Viendo: " + narr.join(" + ")
+    : "Mostrando todas las colonias de la Ciudad de México.";
+  document.getElementById('filtroNarrativo').innerHTML = textoNarrativo;
+
+  // Filtro
   let d = coloniasAgg.filter(r => 
     (!fAlc || r.nom_mun === fAlc) &&
     (!fCol || r.colonia.toLowerCase().includes(fCol)) &&
@@ -581,6 +612,7 @@ function actualizarTabla() {
     (!fGM || r.gm_2020 === fGM)
   );
 
+  // Orden
   if (currentSort.col) {
     const {col, dir} = currentSort;
     const m = dir === 'asc' ? 1 : -1;
@@ -590,6 +622,7 @@ function actualizarTabla() {
     });
   }
 
+  // Render HTML
   const tbody = document.querySelector('#tablaColonias tbody');
   let html = "";
   d.forEach(r => {
@@ -604,49 +637,91 @@ function actualizarTabla() {
     </tr>`;
   });
   tbody.innerHTML = html;
-  document.getElementById('tablaResumen').innerText = `Mostrando ${d.length} colonias filtradas.`;
+  
+  document.getElementById('tablaConteo').innerText = `${d.length} colonias encontradas.`;
   actualizarGraficas(d);
 }
 
 function actualizarGraficas(d) {
-  // Colores ORIGINALES (Verde, Amarillo, Rojo)
-  const colors = ["#ff2200", "#ff9900", "#ffff00", "#7aab00", "#006100"];
-  
+  // Datos para gráficas
   const c = { "muy alta":0, "alta":0, "media":0, "baja":0, "muy baja":0 };
   const p = { "muy alta":0, "alta":0, "media":0, "baja":0, "muy baja":0 };
   
+  let totalLocalPob = 0;
+  let totalLocalCol = 0;
+
   d.forEach(i => {
     const k = normalizarPrioridad(i.prio_colonia);
-    if(c[k] !== undefined) { c[k]++; p[k] += i.pob_colonia; }
+    if(c[k] !== undefined) { 
+      c[k]++; 
+      p[k] += i.pob_colonia;
+      totalLocalCol++;
+      totalLocalPob += i.pob_colonia;
+    }
   });
 
   const labels = Object.keys(c).map(s=>s.toUpperCase());
+  const colors = ["#ff2200", "#ff9900", "#ffff00", "#7aab00", "#006100"];
 
+  // Configuración Común
+  const optionsCommon = {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: { display: false },
+      tooltip: {
+        callbacks: {
+          label: function(context) {
+            let val = context.raw;
+            let total = context.chart.canvas.id === 'chartColonias' ? totalLocalCol : totalLocalPob;
+            let perc = total ? ((val/total)*100).toFixed(1) + '%' : '0%';
+            return `${context.label}: ${val.toLocaleString()} (${perc})`;
+          }
+        }
+      }
+    }
+  };
+
+  // Chart Colonias
   if(chartColonias) chartColonias.destroy();
   chartColonias = new Chart(document.getElementById('chartColonias'), {
-    type: 'bar', data: { labels, datasets:[{ data:Object.values(c), backgroundColor:colors }] },
-    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display:false } } }
+    type: 'bar',
+    data: { labels, datasets:[{ data:Object.values(c), backgroundColor:colors }] },
+    options: optionsCommon
   });
 
+  // Chart Poblacion
   if(chartPoblacion) chartPoblacion.destroy();
   chartPoblacion = new Chart(document.getElementById('chartPoblacion'), {
-    type: 'doughnut', data: { labels, datasets:[{ data:Object.values(p), backgroundColor:colors }] },
-    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position:'right' } } }
+    type: 'doughnut',
+    data: { labels, datasets:[{ data:Object.values(p), backgroundColor:colors }] },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: {
+        legend: { position: 'right' },
+        tooltip: optionsCommon.plugins.tooltip
+      }
+    }
   });
 }
 
+// ============================================
+// EVENTOS
+// ============================================
 document.addEventListener('DOMContentLoaded', () => {
   initMap();
   initData();
 
+  // Filtros Tabla
   ['filtroAlc','filtroCol','filtroPrio','filtroGM'].forEach(id => 
     document.getElementById(id).addEventListener(id==='filtroCol'?'input':'change', actualizarTabla));
-  
+
   document.getElementById('btnLimpiarFiltros').addEventListener('click', () => {
     ['filtroAlc','filtroCol','filtroPrio','filtroGM'].forEach(id => document.getElementById(id).value = "");
     actualizarTabla();
   });
 
+  // Click en Tabla
   document.querySelector('#tablaColonias tbody').addEventListener('click', e => {
     const tr = e.target.closest('tr');
     if(tr && tr.dataset.idx) {
@@ -656,6 +731,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
+  // Buscador Arriba
   document.getElementById('munSelector').addEventListener('change', e => {
     const alc = e.target.value;
     const l = document.getElementById('colList');
@@ -673,19 +749,24 @@ document.addEventListener('DOMContentLoaded', () => {
     if(item) resaltarColoniaYManzanas(item);
   });
 
-  // LOGICA PANTALLA COMPLETA MEJORADA
-  const btnFull = document.getElementById('btnFullscreen');
-  btnFull.addEventListener('click', () => {
-    const wrapper = document.getElementById('mapWrapper');
-    const isFull = wrapper.classList.toggle('map-fullscreen');
-    
-    // Cambiar texto botón
-    btnFull.textContent = isFull ? "✖ Salir de pantalla completa" : "⤢ Pantalla completa";
-    
-    // Mover botón dentro del wrapper si no lo está visualmente o ajustar z-index
-    setTimeout(() => map.invalidateSize(), 300);
+  // Fullscreen Lógica
+  const btnOpen = document.getElementById('btnFullscreenOpen');
+  const btnClose = document.getElementById('btnFullscreenClose');
+  const wrapper = document.getElementById('mapWrapper');
+
+  btnOpen.addEventListener('click', () => {
+    wrapper.classList.add('map-fullscreen');
+    btnClose.style.display = 'block';
+    map.invalidateSize();
   });
 
+  btnClose.addEventListener('click', () => {
+    wrapper.classList.remove('map-fullscreen');
+    btnClose.style.display = 'none';
+    map.invalidateSize();
+  });
+
+  // Leyenda Botones Globales
   document.querySelectorAll('.legend-btn').forEach(btn => {
     btn.addEventListener('click', () => {
       const isActive = btn.classList.contains('active');
@@ -699,7 +780,7 @@ document.addEventListener('DOMContentLoaded', () => {
       if (!isActive) {
         btn.classList.add('active');
         const p = btn.dataset.prio;
-        showMapLoading(true);
+        showLoading(true);
 
         setTimeout(() => {
           if (target === 'colonias') {
@@ -709,7 +790,7 @@ document.addEventListener('DOMContentLoaded', () => {
              const filtered = manzanasFeatures.filter(f => normalizarPrioridad(f.properties.PRIORIDAD) === p);
              capaManzanasPrioridad.addData(filtered);
           }
-          showMapLoading(false);
+          showLoading(false);
         }, 10);
       }
     });
