@@ -1,11 +1,12 @@
 :root {
+  /* INSTITUCIONAL */
   --guinda: #9d2148;
   --dorado: #b28e5c;
   --gris-texto: #55585a;
   --marfil: #fffae9;
   --blanco: #ffffff;
   
-  /* Colores Semáforo */
+  /* COLORES SEMÁFORO (Datos) */
   --prio-muy-baja: #006100;
   --prio-baja: #7aab00;
   --prio-media: #ffff00;
@@ -30,28 +31,9 @@ header { background: var(--blanco); border-bottom: 4px solid var(--dorado); }
 h2 { color: var(--guinda); font-size: 20px; margin-top: 0; border-bottom: 1px solid #eee; padding-bottom: 8px; }
 h3 { color: var(--dorado); font-size: 18px; margin-top: 0; }
 
-.kpi-header-title {
-  grid-column: 1 / -1; /* Ocupa todo el ancho */
-  font-family: 'Roboto', sans-serif;
-  font-size: 18px;
-  font-weight: 700;
-  color: var(--guinda); /* Color institucional */
-  margin-bottom: 10px;
-  border-bottom: 2px solid var(--dorado);
-  padding-bottom: 5px;
-}
-
-/* Asegurar que las sugerencias del buscador se vean (Z-Index alto) */
-.leaflet-control-geocoder-alternatives {
-  z-index: 99999 !important; 
-  background: white;
-  border: 1px solid #ccc;
-  max-width: 300px;
-}
-
-/* KPI Section */
+/* KPIs */
 .kpi-global-section { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; margin-bottom: 24px; }
-.kpi-header-title { grid-column: 1 / -1; font-size: 14px; font-weight: 700; color: var(--gris-texto); margin-bottom: 5px; text-transform: uppercase; }
+.kpi-header-title { grid-column: 1 / -1; font-size: 18px; font-weight: 700; color: var(--guinda); margin-bottom: 10px; border-bottom: 2px solid var(--dorado); padding-bottom: 5px; }
 .kpi-global-card { background: var(--blanco); padding: 20px; border-radius: var(--radio-borde); box-shadow: var(--sombra); display: flex; align-items: center; gap: 16px; border-left: 6px solid var(--dorado); }
 .kpi-global-card.alert { border-left-color: var(--guinda); background: #fffbfb; }
 .kpi-icon { font-size: 28px; }
@@ -106,13 +88,15 @@ h3 { color: var(--dorado); font-size: 18px; margin-top: 0; }
 .badge-prioridad.prio-baja     { background: var(--prio-baja); color: #fff; }
 .badge-prioridad.prio-muy-baja { background: var(--prio-muy-baja); color: #fff; }
 
-/* INFO MANZANA */
+/* INFO MANZANA (Posicionada abajo derecha) */
 .manzana-info { background: rgba(255, 255, 255, 0.98); padding: 12px; border-radius: var(--radio-borde); border: 1px solid #ddd; min-width: 200px; font-size: 11px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); margin-bottom: 25px; margin-right: 12px; z-index: 1000; }
 .manzana-info.prio-muy-alta { border-top: 4px solid var(--prio-muy-alta); }
 
-/* GEOCODER FIX */
+/* GEOCODER & BOTONES */
 .leaflet-control-geocoder { z-index: 9999; }
+.leaflet-control-geocoder-alternatives { z-index: 99999 !important; background: white; border: 1px solid #ccc; max-width: 300px; }
 .leaflet-control-geocoder-form input { font-size: 14px; padding: 5px; }
+.btn-locate { background: var(--blanco); width: 36px; height: 36px; border: 2px solid rgba(0,0,0,0.1); border-radius: 8px; cursor: pointer; font-size: 18px; display: flex; align-items: center; justify-content: center; color: var(--guinda); }
 
 /* TABLA & GRÁFICAS */
 .filtro-narrativo { font-size: 13px; color: var(--dorado); margin-bottom: 10px; font-style: italic; }
@@ -124,6 +108,19 @@ td { padding: 10px; border-bottom: 1px solid #eee; }
 tr:hover { background-color: var(--marfil); cursor: pointer; }
 th select, th input { margin-top: 6px; padding: 4px; border-radius: 4px; border: none; width: 100%; color: #333; }
 .prio-dot { display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin-right: 6px; }
+.tabla-resumen-footer { margin-top: 8px; font-size: 11px; color: #777; text-align: right; }
+
+/* POPUP */
+.popup-colonia .leaflet-popup-content-wrapper { padding: 0; overflow: hidden; border-radius: 8px; }
+.popup-colonia .leaflet-popup-content { margin: 0; width: 250px !important; }
+.popup-colonia-header { padding: 12px; color: #fff; text-align: center; font-weight: 700; font-size: 14px; }
+.popup-colonia-header.prio-media { color: #000; }
+.popup-colonia-header.prio-muy-alta { background: var(--prio-muy-alta); }
+.popup-colonia-header.prio-alta     { background: var(--prio-alta); }
+.popup-colonia-header.prio-media    { background: var(--prio-media); }
+.popup-colonia-header.prio-baja     { background: var(--prio-baja); }
+.popup-colonia-header.prio-muy-baja { background: var(--prio-muy-baja); }
+.popup-colonia-body { padding: 16px; font-size: 12px; line-height: 1.5; color: #333; }
 
 .charts-wrapper { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
 .chart-card { background: var(--blanco); border: 1px solid #eee; padding: 20px; border-radius: var(--radio-borde); }
