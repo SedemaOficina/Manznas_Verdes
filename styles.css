@@ -1,111 +1,113 @@
-/* Estilos Base y Variables */
 :root {
   --verde-sedema: #007a4d;
   --verde-oscuro: #00513a;
   --dorado: #c49a3b;
-  --gris-fondo: #f5f5f5;
+  --gris-fondo: #f0f2f5;
+  --alert-bg: #fff5f5;
 }
 * { box-sizing: border-box; }
 body { font-family: 'Roboto', sans-serif; margin: 0; background: var(--gris-fondo); color: #333; }
 
-/* Header */
-header { background: #fff; border-bottom: 3px solid #e0e0e0; }
-.header-inner { max-width: 1100px; margin: 0 auto; padding: 12px 16px; display: flex; flex-direction: column; gap: 8px; }
+header { background: #fff; border-bottom: 4px solid var(--verde-sedema); }
+.header-inner { max-width: 1200px; margin: 0 auto; padding: 10px 20px; display: flex; flex-direction: column; gap: 5px; }
 .logo-sedema-manzanas { height: 75px; object-fit: contain; }
-.header-texto h1 { margin: 0; font-size: 22px; color: var(--verde-oscuro); }
+.header-texto h1 { margin: 0; font-size: 20px; color: var(--verde-oscuro); text-transform: uppercase; letter-spacing: 0.5px; }
 .header-texto p { margin: 0; font-size: 13px; color: #555; }
-.linea-oro { width: 100px; height: 4px; background: var(--dorado); margin-left: 16px; border-radius: 2px; }
 
-/* Contenedor Principal */
-.container { max-width: 1100px; margin: 20px auto; background: #fff; padding: 20px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.08); }
-.section-block { margin-top: 25px; padding-top: 15px; border-top: 1px solid #eee; }
-h2 { color: var(--verde-oscuro); font-size: 18px; margin-bottom: 10px; }
-h3 { color: var(--verde-oscuro); font-size: 16px; margin-bottom: 10px; }
+.container { max-width: 1200px; margin: 20px auto; padding: 0 15px; }
+.section-block { background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); margin-bottom: 20px; }
+h2, h3 { color: var(--verde-oscuro); margin-top: 0; margin-bottom: 15px; }
 
-/* Formulario */
-.form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 15px; }
-.form-item label { display: block; font-weight: 500; margin-bottom: 5px; }
-.form-item select, .form-item input { width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 6px; }
-.hint { font-size: 11px; color: #777; }
-
-/* KPIs Globales */
-.kpi-global-section { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
-.kpi-global-card { background: #f9f9f9; padding: 12px; border: 1px solid #eee; border-radius: 8px; text-align: center; }
+/* KPIs Globales (Mejorados) */
+.kpi-global-section { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 15px; margin-bottom: 20px; }
+.kpi-global-card { 
+  background: #fff; padding: 15px; border-radius: 8px; 
+  box-shadow: 0 4px 6px rgba(0,0,0,0.05); display: flex; align-items: center; gap: 15px; 
+  border-left: 5px solid var(--verde-sedema);
+}
+.kpi-global-card.alert { border-left-color: #ff9900; background: #fffdf8; }
+.kpi-icon { font-size: 24px; opacity: 0.8; }
 .kpi-global-label { font-size: 11px; text-transform: uppercase; color: #666; font-weight: bold; }
-.kpi-global-value { font-size: 18px; font-weight: 700; color: #333; margin-top: 4px; }
+.kpi-global-value { font-size: 20px; font-weight: 700; color: #333; }
 
-/* Resultado KPI */
-.resultado { margin-top: 15px; display: flex; justify-content: center; }
-.kpi-card { background: #fff; border: 1px solid #ddd; padding: 15px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); width: 100%; max-width: 400px; }
-.kpi-card h4 { margin: 0 0 5px 0; color: var(--verde-oscuro); }
+/* Formularios */
+.form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+.form-item label { display: block; font-weight: 500; margin-bottom: 5px; }
+.form-item select, .form-item input { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 5px; font-size: 14px; }
 
 /* MAPA */
+.map-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
 .map-wrapper { position: relative; }
-#map { width: 100%; height: 500px; border-radius: 8px; border: 1px solid #ccc; }
-.map-fullscreen { position: fixed !important; top: 0; left: 0; right: 0; bottom: 0; z-index: 9999; background: #fff; padding: 10px; height: 100vh; }
-.map-fullscreen #map { height: 95vh; }
-.btn-fullscreen { position: absolute; top: 10px; left: 10px; z-index: 1000; background: #fff; padding: 5px 10px; border-radius: 20px; border: 1px solid #ccc; font-size: 11px; cursor: pointer; }
-.map-loading { position: absolute; inset: 0; background: rgba(255,255,255,0.8); z-index: 2000; display: none; align-items: center; justify-content: center; color: #333; font-weight: bold; }
+#map { width: 100%; height: 550px; border-radius: 8px; border: 1px solid #ddd; z-index: 1; }
 
-/* Leyenda */
-.map-legend { position: absolute; bottom: 20px; left: 10px; z-index: 1000; background: rgba(255,255,255,0.95); padding: 8px; border-radius: 6px; box-shadow: 0 2px 5px rgba(0,0,0,0.2); font-size: 11px; max-width: 260px; }
-.legend-title { font-weight: bold; margin-bottom: 5px; }
-.legend-subtitle { font-weight: bold; color: #666; margin: 5px 0 2px 0; font-size: 10px; text-transform: uppercase; border-top: 1px solid #ddd; padding-top: 4px; }
-.legend-item { display: flex; align-items: center; margin-bottom: 3px; }
-.legend-color { width: 12px; height: 12px; margin-right: 5px; border: 1px solid #999; }
-.legend-btn { margin-left: auto; font-size: 9px; padding: 1px 5px; cursor: pointer; border: 1px solid #ccc; background: #f0f0f0; border-radius: 3px; }
+.btn-fullscreen { background: #fff; border: 1px solid #ccc; padding: 5px 10px; border-radius: 4px; cursor: pointer; font-size: 12px; }
+.map-fullscreen { position: fixed !important; inset: 0; z-index: 9999; background: #fff; padding: 10px; height: 100vh; }
+.map-fullscreen #map { height: 95vh; }
+.map-loading { position: absolute; inset: 0; background: rgba(255,255,255,0.9); z-index: 2000; display: none; align-items: center; justify-content: center; font-weight: bold; }
+
+/* LEYENDA (Corregido espacio y texto) */
+.map-legend { 
+  position: absolute; bottom: 25px; left: 15px; z-index: 999; 
+  background: rgba(255,255,255,0.95); padding: 10px; border-radius: 6px; 
+  box-shadow: 0 2px 10px rgba(0,0,0,0.2); width: 280px; font-size: 11px;
+}
+.legend-title { font-weight: bold; margin-bottom: 8px; font-size: 12px; }
+.legend-subtitle { font-weight: bold; color: #555; margin: 8px 0 4px; border-top: 1px solid #eee; padding-top: 5px; text-transform: uppercase; font-size: 10px; }
+
+.legend-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; }
+.legend-info { display: flex; align-items: center; }
+.legend-color { width: 14px; height: 14px; margin-right: 6px; border: 1px solid #aaa; border-radius: 2px; }
+.legend-actions { display: flex; gap: 4px; }
+
+.legend-btn { 
+  padding: 2px 6px; font-size: 10px; background: #f4f4f4; border: 1px solid #ccc; 
+  border-radius: 3px; cursor: pointer; transition: all 0.2s; 
+}
+.legend-btn:hover { background: #e0e0e0; }
 .legend-btn.active { background: var(--verde-sedema); color: #fff; border-color: var(--verde-oscuro); }
 
-/* Colores Mapa */
 .colonias-color { background: transparent; border: 2px solid #5f6b73; }
 .manzanas-sel-color { background: #555; opacity: 0.6; }
+.prio-muy-alta { background: #ff2200; } 
+.prio-alta { background: #ff9900; } 
+.prio-media { background: #ffff00; } 
+.prio-baja { background: #7aab00; } 
+.prio-muy-baja { background: #006100; }
 
-/* POPUP COLONIA (Estilo restaurado) */
-.popup-colonia .leaflet-popup-content-wrapper { padding: 0; overflow: hidden; border-radius: 8px; }
-.popup-colonia .leaflet-popup-content { margin: 0; width: 220px !important; }
-.popup-colonia-header { padding: 8px; color: #fff; font-weight: bold; text-align: center; font-size: 13px; }
-.popup-colonia-body { padding: 10px; font-size: 12px; line-height: 1.4; color: #333; }
-
-/* PANEL MANZANA (Dinámico) */
+/* Panel Manzana */
 .manzana-info { 
-  background: rgba(255,255,255,0.95); padding: 8px; border-radius: 6px; 
-  border: 2px solid #ccc; max-width: 200px; font-size: 11px; 
-  box-shadow: 0 2px 6px rgba(0,0,0,0.2); margin-top: 10px; margin-right: 10px;
+  background: rgba(255,255,255,0.95); padding: 10px; border-radius: 6px; 
+  border: 2px solid #ccc; min-width: 180px; font-size: 11px; 
+  box-shadow: 0 2px 10px rgba(0,0,0,0.2); margin-top: 60px; margin-right: 10px;
 }
-.manzana-info.prio-muy-alta { border-color: #ff2200; }
-.manzana-info.prio-alta { border-color: #ff9900; }
-.manzana-info.prio-media { border-color: #ffff00; }
-.manzana-info.prio-baja { border-color: #7aab00; }
-.manzana-info.prio-muy-baja { border-color: #006100; }
+.manzana-info.prio-muy-alta { border-color: #ff2200; border-width: 3px; }
 
-/* TABLA (Inputs corregidos) */
-.table-wrapper { max-height: 400px; overflow-y: auto; border: 1px solid #eee; margin-top: 10px; }
-table { width: 100%; border-collapse: collapse; font-size: 12px; min-width: 800px; }
-th, td { padding: 6px 8px; border: 1px solid #ddd; text-align: left; }
-th { background: #f4f4f4; position: sticky; top: 0; z-index: 10; font-weight: 600; }
-tr:hover { background: #f0f8ff; cursor: pointer; }
+/* TABLA */
+.table-header-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+.btn-clear-table { background: #ffebee; color: #c62828; border: 1px solid #ef9a9a; padding: 5px 12px; border-radius: 4px; cursor: pointer; font-size: 12px; font-weight: bold; }
+.btn-clear-table:hover { background: #ffcdd2; }
 
-/* Corrección de inputs en TH */
-th select, th input {
-  display: block; width: 100%; margin-top: 4px; padding: 2px 4px;
-  font-size: 11px; border: 1px solid #ccc; border-radius: 3px; box-sizing: border-box;
-}
+.table-wrapper { max-height: 400px; overflow-y: auto; border: 1px solid #eee; }
+table { width: 100%; border-collapse: collapse; font-size: 12px; min-width: 700px; }
+th, td { padding: 8px 10px; border: 1px solid #eee; text-align: left; }
+th { background: #f8f9fa; position: sticky; top: 0; z-index: 10; font-weight: 600; color: #444; }
+th select, th input { width: 100%; margin-top: 5px; padding: 4px; border: 1px solid #ccc; border-radius: 3px; box-sizing: border-box; }
+tr:hover { background: #f0f7ff; cursor: pointer; }
 
-/* Clases de utilidad y colores */
-.prio-dot { display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin-right: 5px; vertical-align: middle; }
-.badge-prioridad { padding: 2px 6px; border-radius: 4px; color: #fff; font-size: 10px; font-weight: bold; text-transform: uppercase; }
+/* Popup Colonia */
+.popup-colonia .leaflet-popup-content-wrapper { padding: 0; border-radius: 8px; overflow: hidden; }
+.popup-colonia .leaflet-popup-content { margin: 0; width: 240px !important; }
+.popup-colonia-header { padding: 10px; color: #fff; text-align: center; font-weight: bold; font-size: 13px; }
+.popup-colonia-body { padding: 12px; font-size: 12px; line-height: 1.5; color: #333; }
+.badge-prioridad { padding: 2px 6px; background: rgba(0,0,0,0.2); border-radius: 4px; color: #fff; margin-left: 5px; }
 
-/* Colores específicos */
-.prio-muy-alta { background: #ff2200; } .popup-colonia-header.prio-muy-alta { background: #ff2200; }
-.prio-alta { background: #ff9900; }     .popup-colonia-header.prio-alta { background: #ff9900; }
-.prio-media { background: #ffff00; color: #333; } .popup-colonia-header.prio-media { background: #e6e600; color: #333; }
-.prio-baja { background: #7aab00; }     .popup-colonia-header.prio-baja { background: #7aab00; }
-.prio-muy-baja { background: #006100; } .popup-colonia-header.prio-muy-baja { background: #006100; }
-
+/* GRÁFICAS (Tamaño Uniforme) */
 .charts-wrapper { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
-.chart-card { border: 1px solid #eee; padding: 10px; border-radius: 8px; }
+.chart-card { border: 1px solid #eee; padding: 15px; border-radius: 8px; background: #fff; }
+.chart-container-box { position: relative; height: 250px; width: 100%; }
 
 @media (max-width: 768px) {
-  .form-grid, .charts-wrapper, .kpi-global-section { grid-template-columns: 1fr; }
+  .form-grid, .charts-wrapper { grid-template-columns: 1fr; }
   .kpi-global-section { grid-template-columns: 1fr 1fr; }
+  .map-legend { width: 200px; bottom: 20px; left: 10px; }
 }
