@@ -1,16 +1,16 @@
 /* =========================================
-   ESTILO INSTITUCIONAL GOB CDMX + PRIORIDADES
+   ESTILO INSTITUCIONAL GOB CDMX
    ========================================= */
 
 :root {
-  /* COLORES INSTITUCIONALES (Interfaz) */
-  --guinda: #9d2148;       /* Encabezados, acentos */
-  --dorado: #b28e5c;       /* Bordes, detalles */
-  --gris-texto: #55585a;   /* Texto general */
-  --marfil: #fffae9;       /* Fondo */
+  /* INSTITUCIONAL */
+  --guinda: #9d2148;
+  --dorado: #b28e5c;
+  --gris-texto: #55585a;
+  --marfil: #fffae9;
   --blanco: #ffffff;
 
-  /* COLORES DE PRIORIDAD (Originales/Semáforo) */
+  /* PRIORIDADES (Semáforo) */
   --prio-muy-baja: #006100;
   --prio-baja: #7aab00;
   --prio-media: #ffff00;
@@ -22,328 +22,111 @@
 }
 
 * { box-sizing: border-box; }
+body { font-family: 'Roboto', sans-serif; margin: 0; background-color: var(--marfil); color: var(--gris-texto); }
 
-body {
-  font-family: 'Roboto', sans-serif;
-  margin: 0;
-  background-color: var(--marfil);
-  color: var(--gris-texto);
-}
-
-/* ================= HEADER ================= */
-header {
-  background: var(--blanco);
-  border-bottom: 4px solid var(--dorado);
-}
-
-.header-inner {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 16px 20px;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
+/* HEADER */
+header { background: var(--blanco); border-bottom: 4px solid var(--dorado); }
+.header-inner { max-width: 1200px; margin: 0 auto; padding: 15px 20px; display: flex; flex-direction: column; gap: 8px; }
 .logo-sedema-manzanas { height: 75px; object-fit: contain; }
+.header-texto h1 { margin: 0; font-weight: 700; font-size: 22px; color: var(--guinda); text-transform: uppercase; }
+.header-texto p { margin: 4px 0 0; font-size: 14px; }
 
-.header-texto h1 {
-  margin: 0;
-  font-weight: 700;
-  font-size: 24px;
-  color: var(--guinda);
-  text-transform: uppercase;
-}
+/* LAYOUT */
+.container { max-width: 1200px; margin: 24px auto; padding: 0 16px; }
+.section-block { background: var(--blanco); padding: 24px; border-radius: var(--radio-borde); box-shadow: var(--sombra); margin-bottom: 24px; border-top: 4px solid var(--gris-texto); }
+h2 { color: var(--guinda); font-size: 20px; margin-top: 0; border-bottom: 1px solid #eee; padding-bottom: 8px; }
+h3 { color: var(--dorado); font-size: 18px; margin-top: 0; }
 
-.header-texto p {
-  margin: 4px 0 0;
-  font-size: 14px;
-}
-
-/* ================= LAYOUT ================= */
-.container {
-  max-width: 1200px;
-  margin: 24px auto;
-  padding: 0 16px;
-}
-
-.section-block {
-  background: var(--blanco);
-  padding: 24px;
-  border-radius: var(--radio-borde);
-  box-shadow: var(--sombra);
-  margin-bottom: 24px;
-  border-top: 4px solid var(--gris-texto);
-}
-
-h2 {
-  color: var(--guinda);
-  font-size: 20px;
-  margin-top: 0;
-  border-bottom: 1px solid #eee;
-  padding-bottom: 8px;
-}
-
-h3 {
-  color: var(--dorado);
-  font-size: 18px;
-  margin-top: 0;
-}
-
-/* ================= KPIs ================= */
-.kpi-global-section {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-  gap: 16px;
-  margin-bottom: 24px;
-}
-
-.kpi-global-card {
-  background: var(--blanco);
-  padding: 20px;
-  border-radius: var(--radio-borde);
-  box-shadow: var(--sombra);
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  border-left: 6px solid var(--dorado);
-}
-
-.kpi-global-card.alert {
-  border-left-color: var(--guinda);
-  background: #fffafa;
-}
-
+/* KPIs */
+.kpi-global-section { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; margin-bottom: 24px; }
+.kpi-global-card { background: var(--blanco); padding: 20px; border-radius: var(--radio-borde); box-shadow: var(--sombra); display: flex; align-items: center; gap: 16px; border-left: 6px solid var(--dorado); }
+.kpi-global-card.alert { border-left-color: var(--guinda); background: #fffbfb; }
 .kpi-icon { font-size: 28px; }
-.kpi-content { display: flex; flex-direction: column; }
+.kpi-global-label { font-size: 11px; text-transform: uppercase; color: var(--gris-texto); font-weight: 700; }
+.kpi-global-value { font-size: 22px; font-weight: 700; color: var(--guinda); margin: 4px 0; }
+.kpi-subtext { font-size: 11px; color: var(--dorado); font-weight: 500; }
 
-.kpi-global-label {
-  font-size: 11px;
-  text-transform: uppercase;
-  color: var(--gris-texto);
-  font-weight: 700;
-}
+/* FORMULARIO */
+.form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+.form-item label { display: block; font-weight: 500; color: var(--guinda); margin-bottom: 6px; }
+.form-item select, .form-item input { width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 8px; }
 
-.kpi-global-value {
-  font-size: 22px;
-  font-weight: 700;
-  color: var(--guinda);
-  margin: 4px 0;
-}
+/* MAPA */
+.map-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+.map-wrapper { position: relative; border-radius: var(--radio-borde); border: 1px solid #ddd; }
+#map { width: 100%; height: 600px; z-index: 1; }
 
-.kpi-subtext {
-  font-size: 11px;
-  color: var(--dorado);
-  font-weight: 500;
-}
+.btn-fullscreen { background: var(--blanco); border: 1px solid var(--dorado); color: var(--dorado); padding: 6px 14px; border-radius: 20px; cursor: pointer; font-size: 12px; font-weight: 500; }
+.btn-close-map { display: none; position: absolute; top: 20px; right: 20px; z-index: 10000; background: var(--guinda); color: white; border: none; padding: 10px 20px; border-radius: 30px; cursor: pointer; font-weight: bold; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
 
-/* ================= FORMS ================= */
-.form-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 24px;
-}
-.form-item label {
-  display: block;
-  font-weight: 500;
-  color: var(--guinda);
-  margin-bottom: 6px;
-}
-.form-item select, .form-item input {
-  width: 100%;
-  padding: 12px;
-  border: 1px solid #ccc;
-  border-radius: 8px;
-  font-size: 14px;
-}
-
-/* ================= MAPA ================= */
-.map-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 12px;
-}
-
-.map-wrapper {
-  position: relative;
-  border-radius: var(--radio-borde);
-  border: 1px solid #ddd;
-}
-
-#map {
-  width: 100%;
-  height: 600px;
-  z-index: 1;
-}
-
-/* Pantalla Completa */
-.map-fullscreen {
-  position: fixed !important;
-  inset: 0;
-  z-index: 99999; /* Z-Index muy alto */
-  background: #fff;
-  padding: 0;
-  height: 100vh;
-}
+.map-fullscreen { position: fixed !important; inset: 0; z-index: 99999; background: #fff; padding: 0; height: 100vh; }
 .map-fullscreen #map { height: 100vh; border-radius: 0; }
-/* Botón flotante al estar en fullscreen */
-.map-fullscreen .btn-fullscreen {
-  position: absolute;
-  top: 20px;
-  right: 20px;
-  z-index: 100000;
-  background: var(--guinda);
-  color: white;
-  border: none;
-  padding: 10px 20px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-}
+.map-loading { position: absolute; inset: 0; background: rgba(255,255,255,0.9); z-index: 2000; display: none; align-items: center; justify-content: center; color: var(--guinda); font-weight: 700; }
 
-.btn-fullscreen {
-  background: var(--blanco);
-  border: 1px solid var(--dorado);
-  color: var(--dorado);
-  padding: 6px 14px;
-  border-radius: 20px;
-  cursor: pointer;
-  font-size: 12px;
-  font-weight: 500;
-}
-
-.map-loading {
-  position: absolute; inset: 0; background: rgba(255,255,255,0.9);
-  z-index: 2000; display: none; align-items: center; justify-content: center;
-  color: var(--guinda); font-weight: 700;
-}
-
-/* ================= LEYENDA ================= */
-.map-legend {
-  position: absolute;
-  bottom: 24px;
-  left: 20px;
-  z-index: 999;
-  background: rgba(255, 255, 255, 0.98);
-  padding: 16px;
-  border-radius: var(--radio-borde);
-  box-shadow: 0 4px 14px rgba(0,0,0,0.15);
-  width: 280px;
-  font-size: 12px;
-}
-
-.legend-title {
-  color: var(--guinda);
-  font-weight: 700;
-  margin-bottom: 10px;
-  text-transform: uppercase;
-}
-
-.legend-simple-item {
-  display: flex;
-  align-items: center;
-  margin-bottom: 5px;
-}
-
-.legend-color {
-  width: 18px;
-  height: 18px;
-  margin-right: 8px;
-  border: 1px solid #999;
-  border-radius: 3px;
-}
-
+/* LEYENDA */
+.map-legend { position: absolute; bottom: 24px; left: 20px; z-index: 999; background: rgba(255, 255, 255, 0.98); padding: 16px; border-radius: var(--radio-borde); box-shadow: 0 4px 14px rgba(0,0,0,0.15); width: 280px; font-size: 12px; }
+.legend-title { color: var(--guinda); font-weight: 700; margin-bottom: 10px; text-transform: uppercase; }
+.legend-simple-item { display: flex; align-items: center; margin-bottom: 5px; }
+.legend-color { width: 16px; height: 16px; margin-right: 8px; border: 1px solid #999; border-radius: 3px; }
 .colonias-color { background: transparent; border: 2px solid var(--gris-texto); }
-.manzanas-sel-color { background: #555; opacity: 0.5; }
-
-.legend-subtitle {
-  color: var(--dorado);
-  font-weight: 700;
-  margin: 12px 0 6px 0;
-  font-size: 11px;
-  text-transform: uppercase;
-  border-top: 1px solid #eee;
-  padding-top: 8px;
-}
-
-.legend-guide { font-size: 10px; color: #666; font-style: italic; margin-bottom: 8px; }
-
-.legend-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px; }
+.manzanas-sel-color { background: #333; opacity: 0.6; }
+.legend-subtitle { color: var(--dorado); font-weight: 700; margin: 12px 0 6px 0; font-size: 11px; text-transform: uppercase; border-top: 1px solid #eee; padding-top: 8px; }
+.legend-guide { font-size: 10px; color: #666; font-style: italic; margin-bottom: 10px; }
+.legend-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
 .legend-info { display: flex; align-items: center; }
 .legend-actions { display: flex; gap: 4px; }
-
-.legend-btn {
-  padding: 3px 8px;
-  font-size: 10px;
-  background: #f0f0f0;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  cursor: pointer;
-}
-.legend-btn:hover { background: #e0e0e0; }
+.legend-btn { padding: 3px 8px; font-size: 10px; background: #f0f0f0; border: 1px solid #ccc; border-radius: 4px; cursor: pointer; }
 .legend-btn.active { background: var(--guinda); color: white; border-color: var(--guinda); }
 
-/* Colores Semáforo */
-.prio-muy-baja { background: var(--prio-muy-baja); }
-.prio-baja     { background: var(--prio-baja); }
-.prio-media    { background: var(--prio-media); }
-.prio-alta     { background: var(--prio-alta); }
-.prio-muy-alta { background: var(--prio-muy-alta); }
+/* BADGES DE PRIORIDAD (CONTRASTE MEJORADO) */
+.prio-muy-alta { background: var(--prio-muy-alta); color: #fff; }
+.prio-alta     { background: var(--prio-alta);     color: #fff; }
+.prio-media    { background: var(--prio-media);    color: #000; } /* Texto negro en amarillo */
+.prio-baja     { background: var(--prio-baja);     color: #fff; }
+.prio-muy-baja { background: var(--prio-muy-baja); color: #fff; }
 
-/* ================= INFO MANZANA ================= */
-.manzana-info {
-  background: rgba(255, 255, 255, 0.98);
-  padding: 12px;
-  border-radius: var(--radio-borde);
-  border: 1px solid #ddd;
-  min-width: 200px;
-  font-size: 11px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-  margin-top: 80px;
-  margin-right: 12px;
-  z-index: 1000; /* Asegurar visibilidad */
-}
-/* Bordes superiores de color */
-.manzana-info.prio-muy-alta { border-top: 4px solid var(--prio-muy-alta); }
-.manzana-info.prio-alta     { border-top: 4px solid var(--prio-alta); }
-.manzana-info.prio-media    { border-top: 4px solid var(--prio-media); }
-.manzana-info.prio-baja     { border-top: 4px solid var(--prio-baja); }
-.manzana-info.prio-muy-baja { border-top: 4px solid var(--prio-muy-baja); }
+.badge-prioridad { padding: 3px 8px; border-radius: 10px; font-weight: 700; text-transform: uppercase; font-size: 10px; margin-left: 5px; text-shadow: none; box-shadow: 0 1px 2px rgba(0,0,0,0.1); }
 
-/* ================= POPUP ================= */
+/* POPUP */
 .popup-colonia .leaflet-popup-content-wrapper { padding: 0; overflow: hidden; border-radius: 8px; }
 .popup-colonia .leaflet-popup-content { margin: 0; width: 250px !important; }
 .popup-colonia-header { padding: 12px; color: #fff; text-align: center; font-weight: 700; font-size: 14px; }
-.popup-colonia-header.prio-muy-alta { background: var(--prio-muy-alta); }
-.popup-colonia-header.prio-alta     { background: var(--prio-alta); }
-.popup-colonia-header.prio-media    { background: var(--prio-media); color: #333; }
-.popup-colonia-header.prio-baja     { background: var(--prio-baja); }
-.popup-colonia-header.prio-muy-baja { background: var(--prio-muy-baja); }
-
+.popup-colonia-header.prio-media { color: #000; } /* Header negro si es media */
 .popup-colonia-body { padding: 16px; font-size: 12px; line-height: 1.5; color: #333; }
 
-/* ================= GEOCODER ================= */
-.leaflet-control-geocoder { z-index: 9000; }
-.btn-locate { background: #fff; width: 34px; height: 34px; border-radius: 4px; border: 2px solid rgba(0,0,0,0.2); cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 20px; }
+/* PANEL INFO MANZANA */
+.manzana-info { background: rgba(255, 255, 255, 0.98); padding: 12px; border-radius: var(--radio-borde); border: 1px solid #ddd; min-width: 200px; font-size: 11px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); margin-top: 80px; margin-right: 12px; z-index: 1000; }
+.manzana-info.prio-muy-alta { border-top: 4px solid var(--prio-muy-alta); }
 
-/* ================= TABLA & GRÁFICAS ================= */
-.table-wrapper { max-height: 400px; overflow-y: auto; border: 1px solid #ccc; border-radius: 8px; margin-top: 10px; }
+/* TABLA & NARRATIVA */
+.table-header-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+.filtro-narrativo { font-size: 13px; color: var(--dorado); margin-bottom: 10px; font-style: italic; }
+.btn-clear-table { background: var(--marfil); color: var(--guinda); border: 1px solid var(--guinda); padding: 6px 12px; border-radius: 20px; cursor: pointer; font-size: 12px; font-weight: 500; }
+.table-wrapper { max-height: 450px; overflow-y: auto; border: 1px solid #eee; border-radius: 8px; }
 table { width: 100%; border-collapse: collapse; font-size: 12px; }
-th { background: var(--gris-texto); color: white; padding: 10px; position: sticky; top: 0; }
+th { background: var(--gris-texto); color: var(--blanco); position: sticky; top: 0; padding: 10px; text-align: left; }
 td { padding: 10px; border-bottom: 1px solid #eee; }
-tr:hover { background: var(--marfil); cursor: pointer; }
+tr:hover { background-color: var(--marfil); cursor: pointer; }
+th select, th input { margin-top: 6px; padding: 4px; border-radius: 4px; border: none; width: 100%; color: #333; }
+.prio-dot { display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin-right: 6px; }
+.tabla-resumen-footer { margin-top: 8px; font-size: 11px; color: #777; text-align: right; }
 
-th select, th input { margin-top: 5px; width: 100%; color: #333; padding: 4px; border: none; border-radius: 3px; }
+/* GEOCODER & BOTONES */
+.leaflet-control-geocoder { z-index: 9999; }
+.leaflet-control-geocoder-form input { font-size: 14px; padding: 5px; }
+.btn-locate { background: var(--blanco); width: 36px; height: 36px; border: 2px solid rgba(0,0,0,0.1); border-radius: 8px; cursor: pointer; font-size: 18px; display: flex; align-items: center; justify-content: center; color: var(--guinda); }
 
+/* GRÁFICAS */
 .charts-wrapper { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
-.chart-card { background: #fff; padding: 20px; border-radius: 12px; border: 1px solid #eee; }
+.chart-card { background: var(--blanco); border: 1px solid #eee; padding: 20px; border-radius: var(--radio-borde); }
 .chart-container-box { position: relative; height: 280px; width: 100%; }
 
-/* ================= FOOTER ================= */
-footer { text-align: center; padding: 20px; background: var(--marfil); font-size: 12px; border-top: 1px solid #ddd; }
+/* FOOTER */
+footer { text-align: center; padding: 24px; font-size: 12px; color: var(--gris-texto); background: var(--marfil); border-top: 1px solid #e0e0e0; }
 
-/* RESPONSIVE */
 @media (max-width: 768px) {
   .form-grid, .charts-wrapper { grid-template-columns: 1fr; }
   .kpi-global-section { grid-template-columns: 1fr 1fr; }
   .map-legend { width: 100%; position: static; margin-top: 10px; }
+  #map { height: 400px; }
 }
