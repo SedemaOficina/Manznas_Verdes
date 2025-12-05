@@ -1,44 +1,38 @@
-/* =========================================
-   ESTILO INSTITUCIONAL GOB CDMX
-   ========================================= */
-
 :root {
-  /* INSTITUCIONAL */
   --guinda: #9d2148;
   --dorado: #b28e5c;
   --gris-texto: #55585a;
   --marfil: #fffae9;
   --blanco: #ffffff;
-
-  /* PRIORIDADES (Semáforo) */
+  
+  /* Colores Semáforo */
   --prio-muy-baja: #006100;
   --prio-baja: #7aab00;
   --prio-media: #ffff00;
   --prio-alta: #ff9900;
   --prio-muy-alta: #ff2200;
 
-  --radio-borde: 10px;
+  --radio-borde: 12px;
   --sombra: 0 4px 12px rgba(0, 0, 0, 0.08);
 }
 
 * { box-sizing: border-box; }
 body { font-family: 'Roboto', sans-serif; margin: 0; background-color: var(--marfil); color: var(--gris-texto); }
 
-/* HEADER */
 header { background: var(--blanco); border-bottom: 4px solid var(--dorado); }
 .header-inner { max-width: 1200px; margin: 0 auto; padding: 15px 20px; display: flex; flex-direction: column; gap: 8px; }
 .logo-sedema-manzanas { height: 75px; object-fit: contain; }
 .header-texto h1 { margin: 0; font-weight: 700; font-size: 22px; color: var(--guinda); text-transform: uppercase; }
 .header-texto p { margin: 4px 0 0; font-size: 14px; }
 
-/* LAYOUT */
 .container { max-width: 1200px; margin: 24px auto; padding: 0 16px; }
 .section-block { background: var(--blanco); padding: 24px; border-radius: var(--radio-borde); box-shadow: var(--sombra); margin-bottom: 24px; border-top: 4px solid var(--gris-texto); }
 h2 { color: var(--guinda); font-size: 20px; margin-top: 0; border-bottom: 1px solid #eee; padding-bottom: 8px; }
 h3 { color: var(--dorado); font-size: 18px; margin-top: 0; }
 
-/* KPIs */
+/* KPI Section */
 .kpi-global-section { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; margin-bottom: 24px; }
+.kpi-header-title { grid-column: 1 / -1; font-size: 14px; font-weight: 700; color: var(--gris-texto); margin-bottom: 5px; text-transform: uppercase; }
 .kpi-global-card { background: var(--blanco); padding: 20px; border-radius: var(--radio-borde); box-shadow: var(--sombra); display: flex; align-items: center; gap: 16px; border-left: 6px solid var(--dorado); }
 .kpi-global-card.alert { border-left-color: var(--guinda); background: #fffbfb; }
 .kpi-icon { font-size: 28px; }
@@ -46,7 +40,6 @@ h3 { color: var(--dorado); font-size: 18px; margin-top: 0; }
 .kpi-global-value { font-size: 22px; font-weight: 700; color: var(--guinda); margin: 4px 0; }
 .kpi-subtext { font-size: 11px; color: var(--dorado); font-weight: 500; }
 
-/* FORMULARIO */
 .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
 .form-item label { display: block; font-weight: 500; color: var(--guinda); margin-bottom: 6px; }
 .form-item select, .form-item input { width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 8px; }
@@ -54,13 +47,14 @@ h3 { color: var(--dorado); font-size: 18px; margin-top: 0; }
 /* MAPA */
 .map-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
 .map-wrapper { position: relative; border-radius: var(--radio-borde); border: 1px solid #ddd; }
-#map { width: 100%; height: 600px; z-index: 1; }
+#map { width: 100%; height: 600px; z-index: 1; background: #e0e0e0; }
 
 .btn-fullscreen { background: var(--blanco); border: 1px solid var(--dorado); color: var(--dorado); padding: 6px 14px; border-radius: 20px; cursor: pointer; font-size: 12px; font-weight: 500; }
 .btn-close-map { display: none; position: absolute; top: 20px; right: 20px; z-index: 10000; background: var(--guinda); color: white; border: none; padding: 10px 20px; border-radius: 30px; cursor: pointer; font-weight: bold; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
 
 .map-fullscreen { position: fixed !important; inset: 0; z-index: 99999; background: #fff; padding: 0; height: 100vh; }
 .map-fullscreen #map { height: 100vh; border-radius: 0; }
+
 .map-loading { position: absolute; inset: 0; background: rgba(255,255,255,0.9); z-index: 2000; display: none; align-items: center; justify-content: center; color: var(--guinda); font-weight: 700; }
 
 /* LEYENDA */
@@ -68,8 +62,8 @@ h3 { color: var(--dorado); font-size: 18px; margin-top: 0; }
 .legend-title { color: var(--guinda); font-weight: 700; margin-bottom: 10px; text-transform: uppercase; }
 .legend-simple-item { display: flex; align-items: center; margin-bottom: 5px; }
 .legend-color { width: 16px; height: 16px; margin-right: 8px; border: 1px solid #999; border-radius: 3px; }
-.colonias-color { background: transparent; border: 2px solid var(--gris-texto); }
-.manzanas-sel-color { background: #333; opacity: 0.6; }
+.colonias-color { background: transparent; border: 2px solid #555; }
+.manzanas-sel-color { background: #333; opacity: 0.8; }
 .legend-subtitle { color: var(--dorado); font-weight: 700; margin: 12px 0 6px 0; font-size: 11px; text-transform: uppercase; border-top: 1px solid #eee; padding-top: 8px; }
 .legend-guide { font-size: 10px; color: #666; font-style: italic; margin-bottom: 10px; }
 .legend-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
@@ -78,28 +72,30 @@ h3 { color: var(--dorado); font-size: 18px; margin-top: 0; }
 .legend-btn { padding: 3px 8px; font-size: 10px; background: #f0f0f0; border: 1px solid #ccc; border-radius: 4px; cursor: pointer; }
 .legend-btn.active { background: var(--guinda); color: white; border-color: var(--guinda); }
 
-/* BADGES DE PRIORIDAD (CONTRASTE MEJORADO) */
-.prio-muy-alta { background: var(--prio-muy-alta); color: #fff; }
-.prio-alta     { background: var(--prio-alta);     color: #fff; }
-.prio-media    { background: var(--prio-media);    color: #000; } /* Texto negro en amarillo */
-.prio-baja     { background: var(--prio-baja);     color: #fff; }
-.prio-muy-baja { background: var(--prio-muy-baja); color: #fff; }
+/* Colores Semáforo */
+.prio-muy-baja { background: var(--prio-muy-baja); }
+.prio-baja     { background: var(--prio-baja); }
+.prio-media    { background: var(--prio-media); }
+.prio-alta     { background: var(--prio-alta); }
+.prio-muy-alta { background: var(--prio-muy-alta); }
 
-.badge-prioridad { padding: 3px 8px; border-radius: 10px; font-weight: 700; text-transform: uppercase; font-size: 10px; margin-left: 5px; text-shadow: none; box-shadow: 0 1px 2px rgba(0,0,0,0.1); }
+/* Badges */
+.badge-prioridad { padding: 3px 8px; border-radius: 10px; font-weight: 700; text-transform: uppercase; font-size: 10px; margin-left: 5px; }
+.badge-prioridad.prio-muy-alta { background: var(--prio-muy-alta); color: #fff; }
+.badge-prioridad.prio-alta     { background: var(--prio-alta); color: #fff; }
+.badge-prioridad.prio-media    { background: var(--prio-media); color: #000; }
+.badge-prioridad.prio-baja     { background: var(--prio-baja); color: #fff; }
+.badge-prioridad.prio-muy-baja { background: var(--prio-muy-baja); color: #fff; }
 
-/* POPUP */
-.popup-colonia .leaflet-popup-content-wrapper { padding: 0; overflow: hidden; border-radius: 8px; }
-.popup-colonia .leaflet-popup-content { margin: 0; width: 250px !important; }
-.popup-colonia-header { padding: 12px; color: #fff; text-align: center; font-weight: 700; font-size: 14px; }
-.popup-colonia-header.prio-media { color: #000; } /* Header negro si es media */
-.popup-colonia-body { padding: 16px; font-size: 12px; line-height: 1.5; color: #333; }
-
-/* PANEL INFO MANZANA */
-.manzana-info { background: rgba(255, 255, 255, 0.98); padding: 12px; border-radius: var(--radio-borde); border: 1px solid #ddd; min-width: 200px; font-size: 11px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); margin-top: 80px; margin-right: 12px; z-index: 1000; }
+/* INFO MANZANA */
+.manzana-info { background: rgba(255, 255, 255, 0.98); padding: 12px; border-radius: var(--radio-borde); border: 1px solid #ddd; min-width: 200px; font-size: 11px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); margin-bottom: 25px; margin-right: 12px; z-index: 1000; }
 .manzana-info.prio-muy-alta { border-top: 4px solid var(--prio-muy-alta); }
 
-/* TABLA & NARRATIVA */
-.table-header-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+/* GEOCODER FIX */
+.leaflet-control-geocoder { z-index: 9999; }
+.leaflet-control-geocoder-form input { font-size: 14px; padding: 5px; }
+
+/* TABLA & GRÁFICAS */
 .filtro-narrativo { font-size: 13px; color: var(--dorado); margin-bottom: 10px; font-style: italic; }
 .btn-clear-table { background: var(--marfil); color: var(--guinda); border: 1px solid var(--guinda); padding: 6px 12px; border-radius: 20px; cursor: pointer; font-size: 12px; font-weight: 500; }
 .table-wrapper { max-height: 450px; overflow-y: auto; border: 1px solid #eee; border-radius: 8px; }
@@ -109,19 +105,11 @@ td { padding: 10px; border-bottom: 1px solid #eee; }
 tr:hover { background-color: var(--marfil); cursor: pointer; }
 th select, th input { margin-top: 6px; padding: 4px; border-radius: 4px; border: none; width: 100%; color: #333; }
 .prio-dot { display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin-right: 6px; }
-.tabla-resumen-footer { margin-top: 8px; font-size: 11px; color: #777; text-align: right; }
 
-/* GEOCODER & BOTONES */
-.leaflet-control-geocoder { z-index: 9999; }
-.leaflet-control-geocoder-form input { font-size: 14px; padding: 5px; }
-.btn-locate { background: var(--blanco); width: 36px; height: 36px; border: 2px solid rgba(0,0,0,0.1); border-radius: 8px; cursor: pointer; font-size: 18px; display: flex; align-items: center; justify-content: center; color: var(--guinda); }
-
-/* GRÁFICAS */
 .charts-wrapper { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
 .chart-card { background: var(--blanco); border: 1px solid #eee; padding: 20px; border-radius: var(--radio-borde); }
 .chart-container-box { position: relative; height: 280px; width: 100%; }
 
-/* FOOTER */
 footer { text-align: center; padding: 24px; font-size: 12px; color: var(--gris-texto); background: var(--marfil); border-top: 1px solid #e0e0e0; }
 
 @media (max-width: 768px) {
