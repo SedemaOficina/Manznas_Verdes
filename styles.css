@@ -1,25 +1,24 @@
 /* =========================================
-   MANUAL DE IDENTIDAD GOB CDMX 2024-2030
+   ESTILO INSTITUCIONAL GOB CDMX + PRIORIDADES
    ========================================= */
 
 :root {
-  /* COLORES INSTITUCIONALES */
-  --guinda: #9d2148;       /* Pantone 7420 C */
-  --dorado: #b28e5c;       /* Pantone 465 C */
-  --gris-texto: #55585a;   /* Pantone 425 C */
-  --marfil: #fffae9;       /* Pantone P7-1 C (Fondo secundario) */
+  /* COLORES INSTITUCIONALES (Interfaz) */
+  --guinda: #9d2148;       /* Encabezados, acentos */
+  --dorado: #b28e5c;       /* Bordes, detalles */
+  --gris-texto: #55585a;   /* Texto general */
+  --marfil: #fffae9;       /* Fondo */
   --blanco: #ffffff;
 
-  /* PALETA AUXILIAR (Usada para Prioridades) */
-  --prio-muy-baja: #027a35; /* Pantone 356 C (Verde) */
-  --prio-baja: #73cae6;     /* Pantone 0821 C (Azul) */
-  --prio-media: #fdc60a;    /* Pantone 7548 C (Amarillo) */
-  --prio-alta: #f08217;     /* Pantone 151 C (Naranja) */
-  --prio-muy-alta: #e5074c; /* Pantone 1925 C (Rojo) */
+  /* COLORES DE PRIORIDAD (Originales/Semáforo) */
+  --prio-muy-baja: #006100;
+  --prio-baja: #7aab00;
+  --prio-media: #ffff00;
+  --prio-alta: #ff9900;
+  --prio-muy-alta: #ff2200;
 
-  /* RETÍCULA Y ESPACIADO */
-  --radio-borde: 12px;      /* Suavidad en esquinas */
-  --sombra-suave: 0 4px 12px rgba(0, 0, 0, 0.08);
+  --radio-borde: 10px;
+  --sombra: 0 4px 12px rgba(0, 0, 0, 0.08);
 }
 
 * { box-sizing: border-box; }
@@ -27,71 +26,41 @@
 body {
   font-family: 'Roboto', sans-serif;
   margin: 0;
-  background-color: var(--marfil); /* Fondo Marfil Institucional */
+  background-color: var(--marfil);
   color: var(--gris-texto);
-  font-weight: 400; /* Regular */
 }
 
-/* =========================================
-   HEADER
-   ========================================= */
+/* ================= HEADER ================= */
 header {
   background: var(--blanco);
-  border-bottom: 4px solid var(--dorado); /* Línea dorada institucional */
-  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+  border-bottom: 4px solid var(--dorado);
 }
 
 .header-inner {
   max-width: 1200px;
   margin: 0 auto;
-  padding: 16px 24px;
+  padding: 16px 20px;
   display: flex;
   flex-direction: column;
   gap: 8px;
 }
 
-.header-logos {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-}
-
-.logo-sedema-manzanas {
-  height: 80px;
-  object-fit: contain;
-}
+.logo-sedema-manzanas { height: 75px; object-fit: contain; }
 
 .header-texto h1 {
   margin: 0;
-  font-family: 'Roboto', sans-serif;
-  font-weight: 700; /* Bold */
+  font-weight: 700;
   font-size: 24px;
-  color: var(--guinda); /* Título en Guinda */
+  color: var(--guinda);
   text-transform: uppercase;
-  letter-spacing: 0.5px;
 }
 
 .header-texto p {
-  margin: 4px 0 0 0;
+  margin: 4px 0 0;
   font-size: 14px;
-  color: var(--gris-texto);
-  font-weight: 400;
 }
 
-.linea-oro {
-  /* La línea ya está en el border-bottom del header, 
-     pero si quieres la animación decorativa interna: */
-  height: 4px;
-  width: 100px;
-  background: var(--dorado);
-  margin-left: 24px;
-  border-radius: 2px;
-  display: none; /* Opcional, ya que el borde del header es dorado */
-}
-
-/* =========================================
-   ESTRUCTURA Y TARJETAS
-   ========================================= */
+/* ================= LAYOUT ================= */
 .container {
   max-width: 1200px;
   margin: 24px auto;
@@ -102,37 +71,26 @@ header {
   background: var(--blanco);
   padding: 24px;
   border-radius: var(--radio-borde);
-  box-shadow: var(--sombra-suave);
+  box-shadow: var(--sombra);
   margin-bottom: 24px;
-  border-top: 4px solid var(--gris-texto); /* Detalle sobrio */
+  border-top: 4px solid var(--gris-texto);
 }
 
 h2 {
   color: var(--guinda);
-  font-weight: 700; /* Bold */
   font-size: 20px;
   margin-top: 0;
-  margin-bottom: 16px;
   border-bottom: 1px solid #eee;
   padding-bottom: 8px;
 }
 
 h3 {
-  color: var(--dorado); /* Subtítulos en Dorado */
-  font-weight: 500; /* Medium */
+  color: var(--dorado);
   font-size: 18px;
   margin-top: 0;
-  margin-bottom: 12px;
 }
 
-.intro-section p, .intro-pasos li {
-  font-size: 14px;
-  line-height: 1.5;
-}
-
-/* =========================================
-   KPIs GLOBALES (Monitor)
-   ========================================= */
+/* ================= KPIs ================= */
 .kpi-global-section {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
@@ -144,44 +102,32 @@ h3 {
   background: var(--blanco);
   padding: 20px;
   border-radius: var(--radio-borde);
-  box-shadow: var(--sombra-suave);
+  box-shadow: var(--sombra);
   display: flex;
   align-items: center;
   gap: 16px;
-  border-left: 6px solid var(--dorado); /* Acento Dorado */
-  transition: transform 0.2s;
-}
-
-.kpi-global-card:hover {
-  transform: translateY(-2px);
+  border-left: 6px solid var(--dorado);
 }
 
 .kpi-global-card.alert {
-  border-left-color: var(--guinda); /* Acento Guinda para alertas */
+  border-left-color: var(--guinda);
+  background: #fffafa;
 }
 
-.kpi-icon {
-  font-size: 28px;
-  color: var(--gris-texto);
-}
-
-.kpi-content {
-  display: flex;
-  flex-direction: column;
-}
+.kpi-icon { font-size: 28px; }
+.kpi-content { display: flex; flex-direction: column; }
 
 .kpi-global-label {
   font-size: 11px;
   text-transform: uppercase;
   color: var(--gris-texto);
-  font-weight: 700; /* Bold */
-  letter-spacing: 0.5px;
+  font-weight: 700;
 }
 
 .kpi-global-value {
-  font-size: 24px;
-  font-weight: 700; /* Bold */
-  color: var(--guinda); /* Números en Guinda */
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--guinda);
   margin: 4px 0;
 }
 
@@ -191,51 +137,27 @@ h3 {
   font-weight: 500;
 }
 
-/* =========================================
-   FORMULARIOS
-   ========================================= */
+/* ================= FORMS ================= */
 .form-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 24px;
 }
-
 .form-item label {
   display: block;
   font-weight: 500;
   color: var(--guinda);
   margin-bottom: 6px;
 }
-
-.form-item select,
-.form-item input {
+.form-item select, .form-item input {
   width: 100%;
   padding: 12px;
   border: 1px solid #ccc;
-  border-radius: 8px; /* Bordes redondeados según manual */
-  font-family: 'Roboto', sans-serif;
+  border-radius: 8px;
   font-size: 14px;
-  background-color: #fff;
-  color: var(--gris-texto);
 }
 
-.form-item select:focus,
-.form-item input:focus {
-  outline: none;
-  border-color: var(--dorado);
-  box-shadow: 0 0 0 2px rgba(178, 142, 92, 0.2);
-}
-
-.hint {
-  font-size: 11px;
-  color: #777;
-  margin-top: 4px;
-  display: block;
-}
-
-/* =========================================
-   MAPA
-   ========================================= */
+/* ================= MAPA ================= */
 .map-header {
   display: flex;
   justify-content: space-between;
@@ -246,7 +168,6 @@ h3 {
 .map-wrapper {
   position: relative;
   border-radius: var(--radio-borde);
-  overflow: hidden;
   border: 1px solid #ddd;
 }
 
@@ -254,22 +175,31 @@ h3 {
   width: 100%;
   height: 600px;
   z-index: 1;
-  background: #e6e6e6;
 }
 
-.map-loading {
-  position: absolute;
+/* Pantalla Completa */
+.map-fullscreen {
+  position: fixed !important;
   inset: 0;
-  background: rgba(255, 250, 233, 0.9); /* Marfil semitransparente */
-  z-index: 2000;
-  display: none;
-  align-items: center;
-  justify-content: center;
-  font-weight: 700;
-  color: var(--guinda);
+  z-index: 99999; /* Z-Index muy alto */
+  background: #fff;
+  padding: 0;
+  height: 100vh;
+}
+.map-fullscreen #map { height: 100vh; border-radius: 0; }
+/* Botón flotante al estar en fullscreen */
+.map-fullscreen .btn-fullscreen {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  z-index: 100000;
+  background: var(--guinda);
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
 }
 
-/* Botones de Mapa */
 .btn-fullscreen {
   background: var(--blanco);
   border: 1px solid var(--dorado);
@@ -280,38 +210,24 @@ h3 {
   font-size: 12px;
   font-weight: 500;
 }
-.btn-fullscreen:hover {
-  background: var(--dorado);
-  color: var(--blanco);
+
+.map-loading {
+  position: absolute; inset: 0; background: rgba(255,255,255,0.9);
+  z-index: 2000; display: none; align-items: center; justify-content: center;
+  color: var(--guinda); font-weight: 700;
 }
 
-.btn-locate {
-  background: var(--blanco);
-  width: 36px;
-  height: 36px;
-  border: 2px solid rgba(0,0,0,0.1);
-  border-radius: 8px;
-  cursor: pointer;
-  font-size: 18px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: var(--guinda);
-}
-
-/* =========================================
-   LEYENDA (Estilo Tarjeta)
-   ========================================= */
+/* ================= LEYENDA ================= */
 .map-legend {
   position: absolute;
   bottom: 24px;
   left: 20px;
   z-index: 999;
-  background: rgba(255, 255, 255, 0.97);
+  background: rgba(255, 255, 255, 0.98);
   padding: 16px;
   border-radius: var(--radio-borde);
   box-shadow: 0 4px 14px rgba(0,0,0,0.15);
-  width: 290px;
+  width: 280px;
   font-size: 12px;
 }
 
@@ -319,9 +235,25 @@ h3 {
   color: var(--guinda);
   font-weight: 700;
   margin-bottom: 10px;
-  font-size: 13px;
   text-transform: uppercase;
 }
+
+.legend-simple-item {
+  display: flex;
+  align-items: center;
+  margin-bottom: 5px;
+}
+
+.legend-color {
+  width: 18px;
+  height: 18px;
+  margin-right: 8px;
+  border: 1px solid #999;
+  border-radius: 3px;
+}
+
+.colonias-color { background: transparent; border: 2px solid var(--gris-texto); }
+.manzanas-sel-color { background: #555; opacity: 0.5; }
 
 .legend-subtitle {
   color: var(--dorado);
@@ -333,73 +265,31 @@ h3 {
   padding-top: 8px;
 }
 
-.legend-guide {
-  font-size: 10px;
-  color: #666;
-  font-style: italic;
-  margin-bottom: 10px;
-}
+.legend-guide { font-size: 10px; color: #666; font-style: italic; margin-bottom: 8px; }
 
-.legend-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 6px;
-}
-
-.legend-info {
-  display: flex;
-  align-items: center;
-}
-
-.legend-color {
-  width: 16px;
-  height: 16px;
-  margin-right: 8px;
-  border-radius: 4px; /* Iconos con vértices redondeados (Manual) */
-  border: 1px solid rgba(0,0,0,0.1);
-}
-
-.legend-actions {
-  display: flex;
-  gap: 6px;
-}
+.legend-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px; }
+.legend-info { display: flex; align-items: center; }
+.legend-actions { display: flex; gap: 4px; }
 
 .legend-btn {
   padding: 3px 8px;
   font-size: 10px;
-  background: #f5f5f5;
-  border: 1px solid #ddd;
+  background: #f0f0f0;
+  border: 1px solid #ccc;
   border-radius: 4px;
   cursor: pointer;
-  color: var(--gris-texto);
-  font-weight: 500;
 }
+.legend-btn:hover { background: #e0e0e0; }
+.legend-btn.active { background: var(--guinda); color: white; border-color: var(--guinda); }
 
-.legend-btn:hover {
-  background: #e9e9e9;
-  color: var(--guinda);
-}
-
-.legend-btn.active {
-  background: var(--guinda);
-  color: var(--blanco);
-  border-color: var(--guinda);
-}
-
-/* COLORES DE PRIORIDAD (Paleta Manual) */
-.prio-muy-alta { background: var(--prio-muy-alta); }
-.prio-alta     { background: var(--prio-alta); }
-.prio-media    { background: var(--prio-media); }
-.prio-baja     { background: var(--prio-baja); }
+/* Colores Semáforo */
 .prio-muy-baja { background: var(--prio-muy-baja); }
+.prio-baja     { background: var(--prio-baja); }
+.prio-media    { background: var(--prio-media); }
+.prio-alta     { background: var(--prio-alta); }
+.prio-muy-alta { background: var(--prio-muy-alta); }
 
-.colonias-color { background: transparent; border: 2px solid var(--gris-texto); }
-.manzanas-sel-color { background: var(--gris-texto); opacity: 0.5; }
-
-/* =========================================
-   PANEL MANZANA (Flotante)
-   ========================================= */
+/* ================= INFO MANZANA ================= */
 .manzana-info {
   background: rgba(255, 255, 255, 0.98);
   padding: 12px;
@@ -410,185 +300,50 @@ h3 {
   box-shadow: 0 4px 12px rgba(0,0,0,0.1);
   margin-top: 80px;
   margin-right: 12px;
-  color: var(--gris-texto);
+  z-index: 1000; /* Asegurar visibilidad */
 }
-
+/* Bordes superiores de color */
 .manzana-info.prio-muy-alta { border-top: 4px solid var(--prio-muy-alta); }
 .manzana-info.prio-alta     { border-top: 4px solid var(--prio-alta); }
 .manzana-info.prio-media    { border-top: 4px solid var(--prio-media); }
 .manzana-info.prio-baja     { border-top: 4px solid var(--prio-baja); }
 .manzana-info.prio-muy-baja { border-top: 4px solid var(--prio-muy-baja); }
 
-/* =========================================
-   POPUP COLONIA
-   ========================================= */
-.popup-colonia .leaflet-popup-content-wrapper {
-  padding: 0;
-  border-radius: var(--radio-borde);
-  overflow: hidden;
-  box-shadow: 0 4px 14px rgba(0,0,0,0.2);
-}
-
-.popup-colonia .leaflet-popup-content {
-  margin: 0;
-  width: 250px !important;
-}
-
-.popup-colonia-header {
-  padding: 12px;
-  color: var(--blanco);
-  text-align: center;
-  font-weight: 700;
-  font-size: 14px;
-}
-
-/* Fondo Header Popup según prioridad */
+/* ================= POPUP ================= */
+.popup-colonia .leaflet-popup-content-wrapper { padding: 0; overflow: hidden; border-radius: 8px; }
+.popup-colonia .leaflet-popup-content { margin: 0; width: 250px !important; }
+.popup-colonia-header { padding: 12px; color: #fff; text-align: center; font-weight: 700; font-size: 14px; }
 .popup-colonia-header.prio-muy-alta { background: var(--prio-muy-alta); }
 .popup-colonia-header.prio-alta     { background: var(--prio-alta); }
 .popup-colonia-header.prio-media    { background: var(--prio-media); color: #333; }
-.popup-colonia-header.prio-baja     { background: var(--prio-baja); color: #fff; } /* Azul necesita texto blanco */
+.popup-colonia-header.prio-baja     { background: var(--prio-baja); }
 .popup-colonia-header.prio-muy-baja { background: var(--prio-muy-baja); }
 
-.popup-colonia-body {
-  padding: 16px;
-  font-size: 12px;
-  line-height: 1.6;
-  color: var(--gris-texto);
-}
+.popup-colonia-body { padding: 16px; font-size: 12px; line-height: 1.5; color: #333; }
 
-.badge-prioridad {
-  padding: 3px 8px;
-  border-radius: 10px;
-  color: #fff;
-  font-weight: 700;
-  text-transform: uppercase;
-  font-size: 10px;
-  margin-left: 5px;
-  text-shadow: 0 1px 2px rgba(0,0,0,0.2);
-}
+/* ================= GEOCODER ================= */
+.leaflet-control-geocoder { z-index: 9000; }
+.btn-locate { background: #fff; width: 34px; height: 34px; border-radius: 4px; border: 2px solid rgba(0,0,0,0.2); cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 20px; }
 
-/* =========================================
-   TABLA
-   ========================================= */
-.table-header-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 16px;
-}
+/* ================= TABLA & GRÁFICAS ================= */
+.table-wrapper { max-height: 400px; overflow-y: auto; border: 1px solid #ccc; border-radius: 8px; margin-top: 10px; }
+table { width: 100%; border-collapse: collapse; font-size: 12px; }
+th { background: var(--gris-texto); color: white; padding: 10px; position: sticky; top: 0; }
+td { padding: 10px; border-bottom: 1px solid #eee; }
+tr:hover { background: var(--marfil); cursor: pointer; }
 
-.btn-clear-table {
-  background: var(--marfil);
-  color: var(--guinda);
-  border: 1px solid var(--guinda);
-  padding: 6px 12px;
-  border-radius: 20px;
-  cursor: pointer;
-  font-size: 12px;
-  font-weight: 500;
-  transition: all 0.2s;
-}
+th select, th input { margin-top: 5px; width: 100%; color: #333; padding: 4px; border: none; border-radius: 3px; }
 
-.btn-clear-table:hover {
-  background: var(--guinda);
-  color: var(--blanco);
-}
+.charts-wrapper { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+.chart-card { background: #fff; padding: 20px; border-radius: 12px; border: 1px solid #eee; }
+.chart-container-box { position: relative; height: 280px; width: 100%; }
 
-.table-wrapper {
-  max-height: 450px;
-  overflow-y: auto;
-  border: 1px solid #eee;
-  border-radius: 8px;
-}
-
-table {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 12px;
-}
-
-th {
-  background: var(--gris-texto);
-  color: var(--blanco);
-  position: sticky;
-  top: 0;
-  z-index: 10;
-  font-weight: 500;
-  padding: 10px;
-  text-align: left;
-}
-
-td {
-  padding: 10px;
-  border-bottom: 1px solid #eee;
-  color: var(--gris-texto);
-}
-
-tr:hover {
-  background-color: var(--marfil);
-  cursor: pointer;
-}
-
-/* Inputs en headers de tabla */
-th select, th input {
-  margin-top: 6px;
-  padding: 4px;
-  border-radius: 4px;
-  border: none;
-  font-size: 11px;
-  width: 100%;
-  box-sizing: border-box;
-  color: #333;
-}
-
-.prio-dot {
-  display: inline-block;
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-  margin-right: 6px;
-}
-
-/* =========================================
-   GRÁFICAS
-   ========================================= */
-.charts-wrapper {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 24px;
-}
-
-.chart-card {
-  background: var(--blanco);
-  border: 1px solid #eee;
-  padding: 20px;
-  border-radius: var(--radio-borde);
-  box-shadow: 0 2px 6px rgba(0,0,0,0.03);
-}
-
-.chart-container-box {
-  position: relative;
-  height: 280px;
-  width: 100%;
-}
-
-/* =========================================
-   FOOTER
-   ========================================= */
-footer {
-  text-align: center;
-  padding: 24px;
-  font-size: 12px;
-  color: var(--gris-texto);
-  background: var(--marfil);
-  border-top: 1px solid #e0e0e0;
-}
+/* ================= FOOTER ================= */
+footer { text-align: center; padding: 20px; background: var(--marfil); font-size: 12px; border-top: 1px solid #ddd; }
 
 /* RESPONSIVE */
 @media (max-width: 768px) {
   .form-grid, .charts-wrapper { grid-template-columns: 1fr; }
   .kpi-global-section { grid-template-columns: 1fr 1fr; }
-  .map-legend { width: 100%; position: static; box-shadow: none; border: 1px solid #eee; margin-top: 10px; }
-  .map-wrapper { height: auto; }
-  #map { height: 400px; }
+  .map-legend { width: 100%; position: static; margin-top: 10px; }
 }
