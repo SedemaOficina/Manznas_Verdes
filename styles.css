@@ -30,6 +30,25 @@ header { background: var(--blanco); border-bottom: 4px solid var(--dorado); }
 h2 { color: var(--guinda); font-size: 20px; margin-top: 0; border-bottom: 1px solid #eee; padding-bottom: 8px; }
 h3 { color: var(--dorado); font-size: 18px; margin-top: 0; }
 
+.kpi-header-title {
+  grid-column: 1 / -1; /* Ocupa todo el ancho */
+  font-family: 'Roboto', sans-serif;
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--guinda); /* Color institucional */
+  margin-bottom: 10px;
+  border-bottom: 2px solid var(--dorado);
+  padding-bottom: 5px;
+}
+
+/* Asegurar que las sugerencias del buscador se vean (Z-Index alto) */
+.leaflet-control-geocoder-alternatives {
+  z-index: 99999 !important; 
+  background: white;
+  border: 1px solid #ccc;
+  max-width: 300px;
+}
+
 /* KPI Section */
 .kpi-global-section { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; margin-bottom: 24px; }
 .kpi-header-title { grid-column: 1 / -1; font-size: 14px; font-weight: 700; color: var(--gris-texto); margin-bottom: 5px; text-transform: uppercase; }
