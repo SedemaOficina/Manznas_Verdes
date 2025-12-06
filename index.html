@@ -30,7 +30,7 @@
 
 <main class="container">
 
-  <!-- KPIs Institucionales (DATOS ESTÁTICOS) -->
+  <!-- KPIs Institucionales (Datos Estáticos) -->
   <section class="kpi-global-section">
     <h3 class="kpi-header-title">Vistazo General: Ciudad de México</h3>
     
@@ -95,7 +95,7 @@
     </div>
 
     <div class="map-wrapper" id="mapWrapper">
-      <!-- Botón flotante para SALIR (oculto por defecto) -->
+      <!-- Botón flotante para SALIR -->
       <button id="btnFullscreenClose" class="btn-close-map">✖ Salir de pantalla completa</button>
       
       <div id="map"></div>
@@ -177,14 +177,13 @@
     </div>
   </section>
 
-  <!-- TABLA Y ANÁLISIS -->
+  <!-- TABLA -->
   <section class="table-section section-block">
     <div class="table-header-row">
       <h3>Explorador de Datos</h3>
-      <button id="btnLimpiarFiltros" class="btn-clear-table">Restablecer todo</button>
+      <button id="btnLimpiarFiltros" class="btn-clear-table">Quitar filtros</button>
     </div>
     
-    <!-- Narrativa de filtros -->
     <div id="filtroNarrativo" class="filtro-narrativo">
       Mostrando todas las colonias de la Ciudad de México.
     </div>
@@ -202,7 +201,7 @@
             <th data-col="ha">Superficie (ha) ↕</th>
           </tr>
         </thead>
-        <tbody><!-- Datos generados por JS --></tbody>
+        <tbody><!-- Datos JS --></tbody>
       </table>
     </div>
     <div id="tablaConteo" class="tabla-resumen-footer"></div>
@@ -210,20 +209,22 @@
 
   <!-- GRÁFICAS -->
   <section class="analysis-section section-block">
-    <h3>Estadísticas (Selección actual en tabla)</h3>
+    <h3>Análisis de Justicia Territorial (Selección actual)</h3>
     <div id="filtroNarrativoGraficas" class="filtro-narrativo"></div>
 
     <div class="charts-wrapper">
       <div class="chart-card">
-        <h4 id="chartTitleColonias">Colonias por Prioridad (%)</h4>
+        <!-- Gráfica 1: Justicia Social -->
+        <h4 title="¿Las colonias con Muy Alta prioridad tienen Muy Alta marginación?">Justicia Social: Prioridad vs Marginación</h4>
         <div class="chart-container-box">
-          <canvas id="chartColonias"></canvas>
+          <canvas id="chartJusticia"></canvas>
         </div>
       </div>
       <div class="chart-card">
-        <h4 id="chartTitlePoblacion">Población por Prioridad (%)</h4>
+        <!-- Gráfica 2: Ranking -->
+        <h4>Top 5 Alcaldías (Urgencia Muy Alta)</h4>
         <div class="chart-container-box">
-          <canvas id="chartPoblacion"></canvas>
+          <canvas id="chartRanking"></canvas>
         </div>
       </div>
     </div>
@@ -254,10 +255,10 @@ let capaColoniasPrioridad, capaManzanasPrioridad;
 let indiceColonias = {};
 let manzanaInfoControl, userMarker;
 let currentSort = { col: null, dir: 'asc' };
-let chartColonias = null, chartPoblacion = null;
+let chartJusticia = null, chartRanking = null;
 
 // ============================================
-// FUNCIONES DE APOYO
+// HELPERS
 // ============================================
 function normalizarTexto(str) {
   if (!str) return "";
@@ -267,8 +268,8 @@ function normalizarTexto(str) {
 }
 function normalizarPrioridad(str) { return (str || "").toString().toLowerCase().trim(); }
 
-// ESCALA SEMÁFORO (VERDE -> ROJO)
 function estiloPrioridad(p) {
+  // ESCALA SEMÁFORO
   const c = { 
     "muy baja": "#006100", 
     "baja":     "#7aab00", 
@@ -303,10 +304,10 @@ function initMap() {
   map = L.map('map', { zoomControl: false }).setView([19.35, -99.13], 11);
   L.control.zoom({ position: 'topright' }).addTo(map);
 
-  // 1. PANELES (Para arreglar el Popup que no funciona)
-  // Las manzanas deben estar en un z-index MAYOR que las colonias
+  // --- SOLUCIÓN DE CAPAS (Z-INDEX) ---
+  // Colonias abajo (350), Manzanas arriba (450) para que el mouse detecte manzanas
   map.createPane('coloniasPane');
-  map.getPane('coloniasPane').style.zIndex = 400; 
+  map.getPane('coloniasPane').style.zIndex = 350; 
 
   map.createPane('manzanasPane');
   map.getPane('manzanasPane').style.zIndex = 450; 
@@ -318,7 +319,6 @@ function initMap() {
   baseOSM = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19, attribution: 'OSM' });
   baseLight = L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', { maxZoom: 19, attribution: 'Carto' });
   baseSat = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', { maxZoom: 19, attribution: 'Esri' });
-  
   baseLight.addTo(map);
 
   const myRenderer = L.canvas({ padding: 0.5 });
@@ -364,7 +364,7 @@ function initMap() {
     }
   }).addTo(map);
 
-  // Capas Globales (Simbología)
+  // Capas Globales
   capaColoniasPrioridad = L.geoJSON(null, {
     pane: 'coloniasPane', 
     style: f => ({ color: estiloPrioridad(f.properties.prioridad).color, weight: 2, fillOpacity: 0.4 }),
@@ -394,7 +394,7 @@ function initMap() {
     {position:'topright'}
   ).addTo(map);
 
-  // 3. GEOCODER
+  // GEOCODER
   const geocoder = L.Control.Geocoder.nominatim({
     geocodingQueryParams: { countrycodes: 'mx', viewbox: '-99.36,19.59,-98.94,19.04', bounded: 1 }
   });
@@ -410,7 +410,7 @@ function initMap() {
     seleccionarColoniaEnPunto(center.lat, center.lng);
   }).addTo(map);
 
-  // 4. BOTÓN MI UBICACIÓN
+  // BOTÓN UBICACIÓN
   const lc = L.Control.extend({
     options: { position: 'topleft' },
     onAdd: () => {
@@ -429,7 +429,7 @@ function initMap() {
     seleccionarColoniaEnPunto(e.latlng.lat, e.latlng.lng);
   });
 
-  // 5. PANEL MANZANA (Abajo Derecha)
+  // PANEL MANZANA
   manzanaInfoControl = L.control({ position: 'bottomright' });
   manzanaInfoControl.onAdd = () => {
     const div = L.DomUtil.create('div', 'manzana-info');
@@ -458,7 +458,7 @@ function actualizarPanelManzana(p) {
 }
 
 // ============================================
-// DATOS & LOGICA
+// DATOS
 // ============================================
 function initData() {
   Promise.all([
@@ -471,7 +471,6 @@ function initData() {
     capaColonias.addData(coloniasFeatures);
     capaManzanasTodas.addData(manzanasFeatures);
 
-    // Indexado Rápido
     manzanasPorColoniaMap = {};
     const counts = {};
 
@@ -490,7 +489,7 @@ function initData() {
         nom_mun: normalizarTexto(p.NOM_MUN),
         colonia: normalizarTexto(p.COLONIA),
         prio_colonia: (p.prioridad || "Sin dato").trim(),
-        gm_2020: p.GM_2020 || "",
+        gm_2020: p.GM_2020 || "Sin dato",
         pob_colonia: p.POBTOT ? Math.round(p.POBTOT) : 0,
         area_ha: (p.area_km2 || 0) * 100,
         n_manz: counts[k] || 0
@@ -509,17 +508,22 @@ function llenarSelects() {
       document.getElementById('filtroAlc').add(new Option(a,a));
     });
 
-    // Lógica de ordenamiento personalizada (Baja -> Alta)
+    // Orden lógico prioridad
     const ordenPrio = { "muy baja": 1, "baja": 2, "media": 3, "alta": 4, "muy alta": 5 };
     const prios = [...new Set(coloniasAgg.map(c=>c.prio_colonia))].sort((a,b) => {
        const valA = ordenPrio[normalizarPrioridad(a)] || 99;
        const valB = ordenPrio[normalizarPrioridad(b)] || 99;
        return valA - valB;
     });
-
     prios.forEach(p => document.getElementById('filtroPrio').add(new Option(p,p)));
     
-    const gms = [...new Set(coloniasAgg.map(c=>c.gm_2020))].sort();
+    // Orden lógico marginación
+    const ordenGM = { "muy bajo": 1, "bajo": 2, "medio": 3, "alto": 4, "muy alto": 5 };
+    const gms = [...new Set(coloniasAgg.map(c=>c.gm_2020))].sort((a,b) => {
+        const vA = ordenGM[a.toLowerCase()] || 99;
+        const vB = ordenGM[b.toLowerCase()] || 99;
+        return vA - vB;
+    });
     gms.forEach(g => document.getElementById('filtroGM').add(new Option(g,g)));
 }
 
@@ -548,7 +552,7 @@ function resaltarColoniaYManzanas(entry) {
   capaColonias.resetStyle();
   capaColonias.eachLayer(l => l.closePopup());
 
-  // SELECCIÓN: Perímetro Grueso (4px) y color institucional para que resalte
+  // SELECCIÓN CON BORDE DORADO
   layer.setStyle({ color: "#b28e5c", weight: 4, fillOpacity: 0 });
   layer.bringToFront(); 
 
@@ -617,7 +621,10 @@ function actualizarTabla() {
 
   const tbody = document.querySelector('#tablaColonias tbody');
   let html = "";
-  d.forEach(r => {
+  // Limitar renderizado para evitar crash si son muchas
+  const displayData = d.length > 500 ? d.slice(0, 500) : d;
+  
+  displayData.forEach(r => {
     html += `<tr data-idx="${r.idx}">
       <td>${r.nom_mun}</td>
       <td>${r.colonia}</td>
@@ -634,76 +641,88 @@ function actualizarTabla() {
   actualizarGraficas(d);
 }
 
-function actualizarGraficas(d) {
-  const c = {};
-  const p = {};
-  let totalLocalPob = 0;
-  let totalLocalCol = 0;
-
-  d.forEach(i => {
-    const k = normalizarPrioridad(i.prio_colonia);
-    if (!c[k]) c[k] = 0;
-    if (!p[k]) p[k] = 0;
-    c[k]++;
-    p[k] += i.pob_colonia;
-    totalLocalCol++;
-    totalLocalPob += i.pob_colonia;
-  });
-
-  const order = ["muy alta", "alta", "media", "baja", "muy baja"];
-  const finalLabels = [];
-  const finalDataC = [];
-  const finalDataP = [];
-  const finalColors = [];
-
-  const colorMap = {
-    "muy alta": "#ff2200", "alta": "#ff9900", "media": "#ffff00", "baja": "#7aab00", "muy baja": "#006100"
+// === NUEVAS GRÁFICAS DE ANÁLISIS ===
+function actualizarGraficas(data) {
+  // 1. Gráfica Justicia Social (Barras Apiladas: Marginación vs Prioridad)
+  const marginacionOrden = ["muy bajo", "bajo", "medio", "alto", "muy alto"];
+  const prioridades = ["muy baja", "baja", "media", "alta", "muy alta"];
+  const prioColors = {
+    "muy baja": "#006100", "baja": "#7aab00", "media": "#ffff00", "alta": "#ff9900", "muy alta": "#ff2200"
   };
 
-  order.forEach(k => {
-    if (c[k] > 0) {
-      finalLabels.push(k.toUpperCase());
-      finalDataC.push(c[k]);
-      finalDataP.push(p[k]);
-      finalColors.push(colorMap[k]);
+  // Inicializar datasets
+  const datasetsJusticia = prioridades.map(prio => ({
+    label: prio.toUpperCase(),
+    data: new Array(marginacionOrden.length).fill(0),
+    backgroundColor: prioColors[prio]
+  }));
+
+  // Llenar datos
+  data.forEach(item => {
+    const marg = (item.gm_2020 || "").toLowerCase();
+    const prio = normalizarPrioridad(item.prio_colonia);
+    
+    const margIndex = marginacionOrden.indexOf(marg);
+    const prioIndex = prioridades.indexOf(prio);
+
+    if (margIndex !== -1 && prioIndex !== -1) {
+      datasetsJusticia[prioIndex].data[margIndex]++;
     }
   });
 
-  const optionsCommon = {
-    responsive: true,
-    maintainAspectRatio: false,
-    plugins: {
-      legend: { display: false },
-      tooltip: {
-        callbacks: {
-          label: function(context) {
-            let val = context.raw;
-            let total = context.chart.canvas.id === 'chartColonias' ? totalLocalCol : totalLocalPob;
-            let perc = total ? ((val/total)*100).toFixed(1) + '%' : '0%';
-            return `${context.label}: ${val.toLocaleString()} (${perc})`;
-          }
-        }
-      }
-    }
-  };
-
-  if(chartColonias) chartColonias.destroy();
-  chartColonias = new Chart(document.getElementById('chartColonias'), {
+  // Render Chart 1
+  if(chartJusticia) chartJusticia.destroy();
+  chartJusticia = new Chart(document.getElementById('chartJusticia'), {
     type: 'bar',
-    data: { labels: finalLabels, datasets:[{ data: finalDataC, backgroundColor: finalColors }] },
-    options: optionsCommon
+    data: {
+      labels: marginacionOrden.map(m => m.toUpperCase()),
+      datasets: datasetsJusticia
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      scales: {
+        x: { stacked: true },
+        y: { stacked: true, title: { display: true, text: 'No. Colonias' } }
+      },
+      plugins: { legend: { position: 'bottom' } }
+    }
   });
 
-  if(chartPoblacion) chartPoblacion.destroy();
-  chartPoblacion = new Chart(document.getElementById('chartPoblacion'), {
-    type: 'doughnut',
-    data: { labels: finalLabels, datasets:[{ data: finalDataP, backgroundColor: finalColors }] },
+  // 2. Gráfica Ranking (Top 5 Alcaldías con Prioridad Muy Alta)
+  // Filtrar solo las que tienen prioridad muy alta
+  const muyAltaData = data.filter(i => normalizarPrioridad(i.prio_colonia) === "muy alta");
+  
+  // Agrupar por alcaldía y sumar hectáreas
+  const alcaldiasMap = {};
+  muyAltaData.forEach(i => {
+    if(!alcaldiasMap[i.nom_mun]) alcaldiasMap[i.nom_mun] = 0;
+    alcaldiasMap[i.nom_mun] += i.area_ha;
+  });
+
+  // Convertir a array y ordenar
+  const sortedAlcaldias = Object.keys(alcaldiasMap)
+    .map(key => ({ name: key, val: alcaldiasMap[key] }))
+    .sort((a,b) => b.val - a.val)
+    .slice(0, 5); // Top 5
+
+  // Render Chart 2
+  if(chartRanking) chartRanking.destroy();
+  chartRanking = new Chart(document.getElementById('chartRanking'), {
+    type: 'bar',
+    data: {
+      labels: sortedAlcaldias.map(d => d.name),
+      datasets: [{
+        label: 'Superficie (ha) en Muy Alta',
+        data: sortedAlcaldias.map(d => d.val),
+        backgroundColor: '#e5074c' // Guinda/Rojo intenso
+      }]
+    },
     options: {
-      responsive: true, maintainAspectRatio: false,
-      plugins: {
-        legend: { position: 'right' },
-        tooltip: optionsCommon.plugins.tooltip
-      }
+      indexAxis: 'y', // Horizontal
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: { legend: { display: false } }
     }
   });
 }
@@ -749,7 +768,6 @@ document.addEventListener('DOMContentLoaded', () => {
     if(item) resaltarColoniaYManzanas(item);
   });
 
-  // LOGICA FULLSCREEN (Salir/Entrar)
   const btnOpen = document.getElementById('btnFullscreenOpen');
   const btnClose = document.getElementById('btnFullscreenClose');
   const wrapper = document.getElementById('mapWrapper');
@@ -765,14 +783,12 @@ document.addEventListener('DOMContentLoaded', () => {
     map.invalidateSize();
   });
 
-  // LEYENDA (MUTUAL EXCLUSION)
   document.querySelectorAll('.legend-btn').forEach(btn => {
     btn.addEventListener('click', () => {
       const isActive = btn.classList.contains('active');
       const target = btn.dataset.target;
       const prio = btn.dataset.prio;
       
-      // Apagar el "hermano" si activo Colonia/Manzana del mismo nivel
       if (!isActive) {
         const otherTarget = target === 'colonias' ? 'manzanas' : 'colonias';
         const siblingBtn = document.querySelector(`.legend-btn[data-prio="${prio}"][data-target="${otherTarget}"]`);
@@ -781,7 +797,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
       }
 
-      // Toggle normal
       if (isActive) {
         btn.classList.remove('active');
       } else {
