@@ -201,6 +201,7 @@ let manzanasPorColoniaMap = {};
 let map, baseLight, baseOSM, baseSat;
 let capaColonias, capaManzanasTodas, capaManzanasResaltadas;
 let capaColoniasPrioridad, capaManzanasPrioridad;
+  let capaCentro;
 let indiceColonias = {};
 let manzanaInfoControl, userMarker;
 let currentSort = { col: null, dir: 'asc' };
@@ -253,6 +254,27 @@ function initMap() {
   map.createPane('coloniasPane'); map.getPane('coloniasPane').style.zIndex = 350; 
   map.createPane('manzanasPane'); map.getPane('manzanasPane').style.zIndex = 450; 
   map.createPane('resaltadoPane'); map.getPane('resaltadoPane').style.zIndex = 500; 
+  map.createPane('centroPane');
+map.getPane('centroPane').style.zIndex = 520; // arriba de colonias/manzanas
+
+  capaCentro = L.geoJSON(null, {
+  pane: 'centroPane',
+  pointToLayer: (feature, latlng) => {
+    return L.circleMarker(latlng, {
+      radius: 6,
+      weight: 2,
+      color: "#111827",
+      fillColor: "#00a3ff",
+      fillOpacity: 0.9
+    });
+  },
+  style: { color: "#00a3ff", weight: 3, fillOpacity: 0.1 }, // por si viene como polígonos/líneas
+  onEachFeature: (f, l) => {
+    const name = f?.properties?.NOMBRE || f?.properties?.name || "Centro";
+    l.bindPopup(`<b>${name}</b>`);
+  }
+});
+
 
   baseOSM = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19, attribution: 'OSM' });
   baseLight = L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', { maxZoom: 19, attribution: 'Carto' });
@@ -323,11 +345,11 @@ function initMap() {
     }
   }).addTo(map);
 
-  L.control.layers(
-    {"Mapa Claro": baseLight, "Satélite": baseSat, "Calles": baseOSM},
-    {"Colonias": capaColonias, "Manzanas": capaManzanasTodas},
-    {position:'topright'}
-  ).addTo(map);
+ L.control.layers(
+  {"Mapa Claro": baseLight, "Satélite": baseSat, "Calles": baseOSM},
+  {"Colonias": capaColonias, "Manzanas": capaManzanasTodas, "Centro": capaCentro},
+  {position:'topright'}
+).addTo(map);;
 
   // GEOCODER
   const geocoder = L.Control.Geocoder.nominatim({
@@ -386,16 +408,19 @@ function actualizarPanelManzana(p) {
 // DATOS
 // ============================================
 function initData() {
-  Promise.all([
-    fetch('colonias_manzanas_verdes.geojson').then(r=>r.json()),
-    fetch('manzanas_manzanas_verdes.geojson').then(r=>r.json())
-  ]).then(([colD, manzD]) => {
+ Promise.all([
+  fetch('colonias_manzanas_verdes.geojson').then(r=>r.json()),
+  fetch('manzanas_manzanas_verdes.geojson').then(r=>r.json()),
+  fetch('Centro.geojson').then(r=>r.json()) // <-- pon aquí tu nombre real
+]).then(([colD, manzD, centroD]) => {
     coloniasFeatures = colD.features;
     manzanasFeatures = manzD.features;
 
     capaColonias.addData(coloniasFeatures);
     capaManzanasTodas.addData(manzanasFeatures);
-
+capaCentro.addData(centroD);
+capaCentro.addTo(map); // opcional: si quieres que prenda por default
+   
     manzanasPorColoniaMap = {};
     const counts = {};
 
