@@ -181,6 +181,38 @@
   </section>
 
 </main>
+<!-- ============================================ -->
+<!-- BLOQUE FINAL: KPIs CENTRO HISTÓRICO -->
+<!-- ============================================ -->
+<section class="section-block section-centro" id="centroSection">
+  <h2>Centro Histórico · Indicadores del polígono</h2>
+  <p class="intro-text">
+    Resumen automático con base en intersección espacial (Centro.geojson vs colonias/manzanas).
+  </p>
+
+  <div id="centroKPIs" class="kpi-global-section"></div>
+
+  <div class="table-section-inner">
+    <div class="table-header-row">
+      <h3>Distribución por prioridad</h3>
+    </div>
+    <div class="table-wrapper">
+      <table id="tablaCentroPrioridad">
+        <thead>
+          <tr>
+            <th>Prioridad</th>
+            <th>Colonias</th>
+            <th>Manzanas</th>
+            <th>Población (sum)</th>
+            <th>Superficie (ha)</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+    <div id="centroNota" class="tabla-resumen-footer"></div>
+  </div>
+</section>
 
 <footer>
   <p>Gobierno de la Ciudad de México · SEDEMA 2025</p>
@@ -206,6 +238,7 @@ let indiceColonias = {};
 let manzanaInfoControl, userMarker;
 let currentSort = { col: null, dir: 'asc' };
 let chartJusticia = null, chartRanking = null;
+  let centroFeature = null;   // <- geometría (polígono) unificada del Centro Histórico
 
 // Escala Numérica para cálculos de promedio/ranking
 const SCORES_PRIORIDAD = { "muy baja": 1, "baja": 2, "media": 3, "alta": 4, "muy alta": 5 };
@@ -349,7 +382,7 @@ map.getPane('centroPane').style.zIndex = 520; // arriba de colonias/manzanas
   {"Mapa Claro": baseLight, "Satélite": baseSat, "Calles": baseOSM},
   {"Colonias": capaColonias, "Manzanas": capaManzanasTodas, "Centro": capaCentro},
   {position:'topright'}
-).addTo(map);;
+).addTo(map);
 
   // GEOCODER
   const geocoder = L.Control.Geocoder.nominatim({
@@ -420,6 +453,31 @@ function initData() {
     capaManzanasTodas.addData(manzanasFeatures);
 capaCentro.addData(centroD);
 capaCentro.addTo(map); // opcional: si quieres que prenda por default
+
+   // ====== NORMALIZAR CENTRO: FeatureCollection -> un solo polígono (union) ======
+centroFeature = (function buildCentroFeature(gj){
+  if (!gj) return null;
+
+  // Si viene FeatureCollection, usa union para tener un solo polígono (si hay varios)
+  if (gj.type === 'FeatureCollection') {
+    const feats = (gj.features || []).filter(f => f && f.geometry);
+    if (feats.length === 0) return null;
+    let merged = feats[0];
+    for (let i = 1; i < feats.length; i++) {
+      try { merged = turf.union(merged, feats[i]); } catch(e) { /* si falla union, ignorar esa pieza */ }
+    }
+    return merged;
+  }
+
+  // Si viene Feature suelto
+  if (gj.type === 'Feature' && gj.geometry) return gj;
+
+  // Si viene geometry suelta
+  if (gj.type && gj.coordinates) return { type: 'Feature', properties: {}, geometry: gj };
+
+  return null;
+})(centroD);
+
    
     manzanasPorColoniaMap = {};
     const counts = {};
@@ -453,8 +511,10 @@ capaCentro.addTo(map); // opcional: si quieres que prenda por default
     llenarSelects();
     renderStaticCharts(coloniasAgg); // Graficas Macro Estáticas
     actualizarTabla();
+   calcularYRenderCentroHistorico(); // <- AQUÍ: ya con todo cargado
   });
 }
+
 
 function llenarSelects() {
     const alcs = [...new Set(coloniasAgg.map(c=>c.nom_mun))].sort();
@@ -700,6 +760,124 @@ function renderStaticCharts(data) {
   });
 }
 
+
+function calcularYRenderCentroHistorico() {
+  if (!centroFeature || !centroFeature.geometry) {
+    document.getElementById('centroNota').innerText = 'No se pudo leer Centro.geojson (no hay geometría).';
+    return;
+  }
+  if (!coloniasFeatures?.length || !manzanasFeatures?.length) return;
+
+  // Helper: intersección segura
+  const intersects = (a, b) => {
+    try { return turf.booleanIntersects(a, b); } catch(e) { return false; }
+  };
+
+  const centro = centroFeature;
+
+  // ====== Filtrar por intersección ======
+  const coloniasCentro = coloniasFeatures.filter(f => f?.geometry && intersects(f, centro));
+  const manzanasCentro = manzanasFeatures.filter(f => f?.geometry && intersects(f, centro));
+
+  // ====== Agregados generales ======
+  const nColonias = coloniasCentro.length;
+  const nManzanas = manzanasCentro.length;
+
+  const pobColonias = coloniasCentro.reduce((acc, f) => acc + (Number(f?.properties?.POBTOT) || 0), 0);
+  const pobManzanas = manzanasCentro.reduce((acc, f) => acc + (Number(f?.properties?.POB) || 0), 0);
+
+  const haColonias = coloniasCentro.reduce((acc, f) => {
+    const km2 = Number(f?.properties?.area_km2) || 0;
+    return acc + (km2 * 100);
+  }, 0);
+
+  // Si tus manzanas no tienen área, este queda en 0 (no invento dato)
+  const haManzanas = manzanasCentro.reduce((acc, f) => {
+    const km2 = Number(f?.properties?.area_km2) || 0;
+    return acc + (km2 * 100);
+  }, 0);
+
+  // ====== Distribución por prioridad ======
+  const prios = ["muy baja","baja","media","alta","muy alta"];
+  const dist = {};
+  prios.forEach(p => dist[p] = { colonias: 0, manzanas: 0, pob: 0, ha: 0 });
+
+  coloniasCentro.forEach(f => {
+    const p = normalizarPrioridad(f?.properties?.prioridad);
+    if (!dist[p]) return;
+    dist[p].colonias++;
+    dist[p].pob += (Number(f?.properties?.POBTOT) || 0);
+    dist[p].ha  += ((Number(f?.properties?.area_km2) || 0) * 100);
+  });
+
+  manzanasCentro.forEach(f => {
+    const p = normalizarPrioridad(f?.properties?.PRIORIDAD);
+    if (!dist[p]) return;
+    dist[p].manzanas++;
+    dist[p].pob += (Number(f?.properties?.POB) || 0);
+    dist[p].ha  += ((Number(f?.properties?.area_km2) || 0) * 100);
+  });
+
+  // ====== Render KPIs ======
+  const kpis = document.getElementById('centroKPIs');
+  kpis.innerHTML = `
+    <div class="kpi-global-card">
+      <div class="kpi-icon">🏘️</div>
+      <div class="kpi-content">
+        <div class="kpi-global-label">Colonias en Centro</div>
+        <div class="kpi-global-value">${nColonias.toLocaleString()}</div>
+        <small class="kpi-subtext">Intersección espacial</small>
+      </div>
+    </div>
+    <div class="kpi-global-card">
+      <div class="kpi-icon">🧱</div>
+      <div class="kpi-content">
+        <div class="kpi-global-label">Manzanas en Centro</div>
+        <div class="kpi-global-value">${nManzanas.toLocaleString()}</div>
+        <small class="kpi-subtext">Intersección espacial</small>
+      </div>
+    </div>
+    <div class="kpi-global-card alert">
+      <div class="kpi-icon">👥</div>
+      <div class="kpi-content">
+        <div class="kpi-global-label">Población (Colonias)</div>
+        <div class="kpi-global-value">${pobColonias.toLocaleString()}</div>
+        <small class="kpi-subtext">Suma POBTOT</small>
+      </div>
+    </div>
+    <div class="kpi-global-card">
+      <div class="kpi-icon">📐</div>
+      <div class="kpi-content">
+        <div class="kpi-global-label">Superficie (Colonias)</div>
+        <div class="kpi-global-value">${haColonias.toFixed(1)}</div>
+        <small class="kpi-subtext">ha (desde area_km2)</small>
+      </div>
+    </div>
+  `;
+
+  // ====== Render tabla por prioridad ======
+  const tbody = document.querySelector('#tablaCentroPrioridad tbody');
+  let rows = '';
+  prios.forEach(p => {
+    const d = dist[p];
+    rows += `
+      <tr>
+        <td><span class="prio-dot ${prioridadClass(p)}"></span>${p.toUpperCase()}</td>
+        <td>${d.colonias.toLocaleString()}</td>
+        <td>${d.manzanas.toLocaleString()}</td>
+        <td>${Math.round(d.pob).toLocaleString()}</td>
+        <td>${d.ha.toFixed(2)}</td>
+      </tr>
+    `;
+  });
+  tbody.innerHTML = rows;
+
+  // Nota metodológica (para blindaje institucional)
+  document.getElementById('centroNota').innerText =
+    `Notas: conteos por “intersección” (booleanIntersects). Población de colonias = POBTOT. Población de manzanas = POB. Superficie = area_km2*100 (si existe).`;
+}
+
+  
 // EVENTOS
 document.addEventListener('DOMContentLoaded', () => {
   initMap();
